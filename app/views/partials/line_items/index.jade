@@ -1,0 +1,13 @@
+.line_items_index
+  .new.row
+    a.btn.btn-primary.col-xs-12.add_transaction(ng-href='/line_items/new') Add Transaction
+
+  .line_items.list-group
+    a.list-group-item.row(ng-href='/line_items/1')
+      .date.col-xs-3 10/20
+      .payee.col-xs-6 McDonnalds
+      .amount.col-xs-3 100$
+
+  .footer.well.row
+    a.btn.btn-default(ng-href='/processing_rules') @
+    a.btn.btn-default(ng-href='/reports') !!

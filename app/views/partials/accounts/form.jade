@@ -1,0 +1,11 @@
+.line_item_form
+  form.form_inline(role='form')
+    .form-group
+      input.form-control(type='text', placeholder='Amount')
+    .form-group
+      input.form-control(type='text', placeholder='Date')
+    .form-group
+      input.form-control(type='text', placeholder='Payee')
+    .form-group
+      input.form-control(type='text', placeholder='Category')
+    button.btn.btn-default(ng-click="onSubmit()") Submit

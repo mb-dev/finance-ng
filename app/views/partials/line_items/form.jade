@@ -1,0 +1,14 @@
+.line_item_form
+  .panel.panel-default
+    .panel-heading
+      h4.panel-title Login
+  form.panel-body.form_inline(role='form')
+    .form-group
+      input.form-control(type='text', placeholder='Amount')
+    .form-group
+      input.form-control(type='text', placeholder='Date')
+    .form-group
+      input.form-control(type='text', placeholder='Payee')
+    .form-group
+      input.form-control(type='text', placeholder='Category')
+    button.btn.btn-default(ng-click="onSubmit()") Submit
