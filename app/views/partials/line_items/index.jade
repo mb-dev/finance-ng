@@ -2,11 +2,21 @@
   .new.row
     a.btn.btn-primary.col-xs-12.add_transaction(ng-href='/line_items/new') Add Transaction
 
-  .line_items.list-group
-    a.list-group-item.row(ng-href='/line_items/1')
-      .date.col-xs-3 10/20
-      .payee.col-xs-6 McDonnalds
-      .amount.col-xs-3 100$
+  .month-nav.row.well.wells-sm
+    a.col-xs-3.prev_month(ng-click='prevMonth()') &lt;&lt; Previous
+    span.col-xs-6.current_month {{currentDate | amDateFormat:'MMMM, YYYY'}}
+    a.col-xs-3.next_month(ng-click='nextMonth()') Next &gt;&gt;
+
+  .line_items.list-group    
+    .list-group-item.row.header
+      .date.col-xs-3 Date
+      .payee.col-xs-3 Payee Name
+      .amount.col-xs-3 Amount
+    a.list-group-item.row(ng-href='/line_items/{{item.id}}', ng-repeat='item in lineItems')
+      .date.col-xs-3 {{item.event_date | amDateFormat:'DD' }}
+      .payee.col-xs-6 {{item.payee_name}}
+      .amount.col-xs-3 {{item.amount}}
+    
 
   .footer.well.row
     a.btn.btn-default(ng-href='/processing_rules') @

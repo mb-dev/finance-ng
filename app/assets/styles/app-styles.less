@@ -10,13 +10,42 @@ body {
   }
 }
 
+.table td {
+  font-size: 13px;
+  line-height: 15px;
+  padding-bottom: 5px;
+  padding-top: 5px;
+}
+
+.income, .positive {
+  color: green;
+}
+
+.expenses, .negative {
+  color: #990033;
+}
+
 .welcome_page {
   .content {
     margin: 10px 0;
   }
 }
 
+.list-group-item.header {
+  > * {
+    font-weight: bold;
+  }
+}
+
 .line_items_index {
+  .month-nav {
+    .current_month {
+      text-align: center;
+    }
+    .next_month {
+      text-align: right;
+    }
+  }
   .line_items {
     .date {
       float: left;
@@ -49,5 +78,53 @@ body {
     text-align: left;
     color: #953b39;
     font-size: 24px;
+  }
+}
+
+.budgets_index {
+  .report_table {
+    margin-top: 20px;
+
+    .categories {
+      list-style: none;
+      li {
+        color: #999;
+      }
+      padding:0;
+      margin: 0;
+      margin-top: 5px;
+    }
+
+    .limit {
+    }
+
+    .future {
+      color: #339933;
+    }
+  }
+
+  .year_selector {
+    list-style: none;
+    display: table;
+    background-color: #eee;
+    padding: 0;
+    li {
+      border-left: 1px solid #666;
+      display:table-cell;
+      text-align: center;
+      height: 20px;
+      vertical-align: middle;
+      cursor: pointer;
+      &:hover {
+        background-color: #ccc;
+      }
+      &.active {
+        background-color: #ccc;
+        cursor: auto;
+      }
+    }
+    li:last-child {
+      border-right: 1px solid #666;
+    }
   }
 }

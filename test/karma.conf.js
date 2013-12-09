@@ -18,6 +18,7 @@ module.exports = function(karma) {
       'vendor/js/jquery.js',
       'vendor/js/bootstrap.js',
       'vendor/js/moment.js',
+      'vendor/js/bignumber.js',
       'vendor/js/lazy.js',
       'vendor/js/angular/_angular.js',
       'vendor/js/angular/angular-mocks.js',

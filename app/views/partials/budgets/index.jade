@@ -1,0 +1,39 @@
+.budgets_index
+
+  div.row
+    ul.year_selector.col-xs-12
+      li(ng-repeat='year in yearRanges')
+        a(ng-click='selectYear(year)') {{year}}
+    
+  table.table.table-striped.table-bordered.table-condensed.report_table
+    thead
+      tr
+        th.name Budget Name
+        th.date(ng-repeat='month in months')
+          span {{month}}
+        th.total Total
+        th.actions
+    tbody
+      tr.item-row
+        td Income
+        td(ng-repeat='column in report.incomeRow', class='{{column.type}}')
+          span {{column.amount}}
+        td
+          currency-with-sign(amount='report.incomeMeta.totalIncome')
+        td
+      tr.item-row(ng-repeat='expenseRow in report.expenseRows')
+        td 
+          span {{expenseRow.meta.name}} - 
+          span.limit {{expenseRow.meta.limit}}
+          br/
+          span.now Now: {{expenseRow.meta.now}}
+        td(ng-repeat='expenseColumn in expenseRow.columns', class='{{expenseColumn.type}}')
+          {{expenseColumn.amount}}
+        td
+          span Total: {{expenseRow.meta.total}}
+          br/ 
+          span Expenses: {{expenseRow.meta.expenses}}
+          br/
+          span Percent: {{expenseRow.meta.percent}}
+
+  div Total Budgeted: {{report.totalBudgeted | currency}}
