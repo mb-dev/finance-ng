@@ -1,10 +1,18 @@
-.line_item_show
-  .row
-    a.btn.btn-primary.col-xs-6.add_transaction(ng-href='/line_items/edit') Edit
-    a.btn.btn-primary.col-xs-6.add_transaction(ng-href='/line_items/1') Delete
-  .row
-    .col-xs-6
-      span Groceries
-      span McDonnals
-    .col-xs-6
-      $120
+.accounts_show
+  .panel.panel-default
+    .panel-heading
+      h4.panel-title Account Details
+    .panel-body
+      table.table.table-hover.no-header
+        tr
+          td.col-xs-4 Name
+          td.col-xs-6 {{item.name}}
+        tr
+          td.col-xs-4 Import Format
+          td.col-xs-6 {{item.import_format}}
+
+  .row.form_area
+    .col-xs-3.col-xs-offset-3
+      a.btn.btn-primary.form-control.edit(ng-href='/accounts/{{item.id}}/edit') Edit
+    .col-xs-3
+      a.btn.btn-primary.form-control.delete(ng-href='/accounts/{{item.id}}/delete') Delete

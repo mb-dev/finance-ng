@@ -3,19 +3,25 @@
     a.btn.btn-primary.col-xs-12.add_transaction(ng-href='/line_items/new') Add Transaction
 
   .month-nav.row.well.wells-sm
-    a.col-xs-3.prev_month(ng-click='prevMonth()') &lt;&lt; Previous
+    a.col-xs-3.prev_month(ng-click='prevMonth()', href='#') &lt;&lt; Previous
     span.col-xs-6.current_month {{currentDate | amDateFormat:'MMMM, YYYY'}}
-    a.col-xs-3.next_month(ng-click='nextMonth()') Next &gt;&gt;
+    a.col-xs-3.next_month(ng-click='nextMonth()', href='#') Next &gt;&gt;
 
-  .line_items.list-group    
+  .main_list.list-group    
     .list-group-item.row.header
+      .icons.col-xs-1 &nbsp;
       .date.col-xs-3 Date
-      .payee.col-xs-3 Payee Name
+      .payee.col-xs-5 Payee Name
       .amount.col-xs-3 Amount
     a.list-group-item.row(ng-href='/line_items/{{item.id}}', ng-repeat='item in lineItems')
+      .icons.col-xs-1 
+        i.fa.fa-tags.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.tags[0]}}', ng-show='{{item.tags && item.tags.length > 0}}')/
+        i.fa.fa-comment.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.comment}}', ng-show='{{item.comment.length > 0}}')/
+        i.fa.fa-plane.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.grouped_label}}', ng-show='{{item.grouped_label.length > 0}}')/
+        |&nbsp;
       .date.col-xs-3 {{item.event_date | amDateFormat:'DD' }}
-      .payee.col-xs-6 {{item.payee_name}}
-      .amount.col-xs-3 {{item.amount}}
+      .payee.col-xs-5 {{item.payee_name}}
+      .amount.col-xs-3 {{item.$signedAmount()}}
     
 
   .footer.well.row

@@ -1,9 +1,7 @@
-.line_items_index
+.accounts_index
   .new.row
-    a.btn.btn-primary.col-xs-12.add_transaction(ng-href='/line_items/new') Add Transaction
+    a.btn.btn-primary.col-xs-12.add_transaction(ng-href='/accounts/new') Add Account
 
-  .line_items.list-group
-    a.list-group-item.row(ng-href='/line_items/1')
-      .date.col-xs-3 10/20
-      .payee.col-xs-6 McDonnalds
-      .amount.col-xs-3 100$
+  .main_list.list-group
+    a.list-group-item(ng-href='/accounts/{{item.id}}', ng-repeat='item in accounts')
+      {{item.name}}

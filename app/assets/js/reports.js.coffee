@@ -44,17 +44,18 @@ class BudgetReportView
     if @year == moment().year()
       currentMonth = moment().month()
       Lazy(@budgetItems).each (budgetItem) =>
-        ([(currentMonth)..11]).each (futureMonth) =>
+        Lazy([(currentMonth)..11]).each (futureMonth) =>
           @expenseBox.addToValue(budgetItem.name, futureMonth, 'future_expense', budgetItem.estimated_min_monthly_amount)
         
       # add planned items
-      Lazy(@plannedItems).each (plannedItem) =>
-        Lazy([plannedItem.$eventDateStart.month()..plannedItem.$eventDateEnd()]).each (month) ->
-          if month > currentMonth
-            if planned_item.$isIncome()
-              @incomeBox.addToValue('income', month, 'future_income', plannedItem.amount)
-            else
-              @expenseBox.addToValue(categoryToBudget[plannedItem.category_name].name, month, 'planned_expense', plannedItem.amount)
+      # Lazy(@plannedItems).each (plannedItem) =>
+      #   currentMonth = moment().month()
+      #   Lazy([plannedItem.$eventDateStart.month()..plannedItem.$eventDateEnd()]).each (month) ->
+      #     if month > currentMonth
+      #       if planned_item.$isIncome()
+      #         @incomeBox.addToValue('income', month, 'future_income', plannedItem.amount)
+      #       else
+      #         @expenseBox.addToValue(categoryToBudget[plannedItem.category_name].name, month, 'planned_expense', plannedItem.amount)
 
   isInFuture: (month) =>
     month > moment().month() && @year == moment().year()
@@ -84,6 +85,7 @@ class BudgetReportView
     Lazy(@budgetItems).each (budgetItem) =>
       expenseRow = {columns: []}
       expenseRow.meta = {
+        budgetItemId: budgetItem.id
         name: budgetItem.name 
         limit: budgetItem.limit
         now: 0

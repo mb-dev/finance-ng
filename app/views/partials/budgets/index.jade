@@ -3,7 +3,7 @@
   div.row
     ul.year_selector.col-xs-12
       li(ng-repeat='year in yearRanges')
-        a(ng-click='selectYear(year)') {{year}}
+        a(ng-click='selectYear(year)', href='#') {{year}}
     
   table.table.table-striped.table-bordered.table-condensed.report_table
     thead
@@ -35,5 +35,7 @@
           span Expenses: {{expenseRow.meta.expenses}}
           br/
           span Percent: {{expenseRow.meta.percent}}
+        td
+          a.btn.btn-primary.btn-small.edit_btn(href="/budgets/{{currentDate | amDateFormat: 'YYYY'}}/{{expenseRow.meta.budgetItemId}}/edit") Edit
 
   div Total Budgeted: {{report.totalBudgeted | currency}}

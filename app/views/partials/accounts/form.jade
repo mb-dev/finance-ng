@@ -1,11 +1,15 @@
-.line_item_form
-  form.form_inline(role='form')
-    .form-group
-      input.form-control(type='text', placeholder='Amount')
-    .form-group
-      input.form-control(type='text', placeholder='Date')
-    .form-group
-      input.form-control(type='text', placeholder='Payee')
-    .form-group
-      input.form-control(type='text', placeholder='Category')
-    button.btn.btn-default(ng-click="onSubmit()") Submit
+.accounts_form
+  .error {{error}}
+  .panel.panel-default
+    .panel-heading
+      h4.panel-title {{title}}
+    form.panel-body.form-horizontal(role='form')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Name
+        .col-xs-8.col-sm-10
+          input.form-control(type='text', placeholder='Name', ng-model='item.name')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Import Format
+        .col-xs-8.col-sm-10
+          select.form-control(ng-model='item.import_format', ng-options="id as label for (id,label) in importFormats")
+      button.btn.btn-default(ng-click="onSubmit()") Submit

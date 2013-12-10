@@ -10,8 +10,23 @@ class Collection
   setItemExtendFunc: (extendFunc) ->
     @itemExtendFunc = extendFunc
 
+  reExtendItems: ->
+    return if !@itemExtendFunc
+    Lazy(@collection).each (item) =>
+      @itemExtendFunc(item)
+
   findById: (id) ->
-    Lazy(@collection).find (item) -> item.id == id
+    result = Lazy(@collection).find (item) -> item.id == id
+    result = angular.copy(result) if result
+    result
+
+  getAll: (sortBy) ->
+    if !sortBy && @sortColumn
+      sortBy = @defaultSortFunction
+
+    result = angular.copy(@collection)
+    result = Lazy(result).sortBy sortBy if sortBy
+    result
 
   defaultSortFunction: (item) ->
     (item) -> (item) item[@sortColumn]
@@ -36,11 +51,17 @@ class Collection
     if !details.id
       id = moment().valueOf()
       details.id = id
+    else if @findById(details.id)
+      throw "idAlreadyExists"
 
     @itemExtendFunc(details) if @itemExtendFunc
     @collection.push(details)
 
     details.id
+
+  editById: (details) ->
+    item = Lazy(@collection).find (item) -> item.id == id
+    angular.copy(details, item)
 
   length: ->
     @collection.length
@@ -58,7 +79,10 @@ class LineItemCollection extends Collection
     Lazy(@collection).filter((item) -> 
       date = moment(item.event_date)
       date.month() == month && date.year() == year
-    ).sortBy(sortBy).toArray()
+    ).sortBy(sortBy)
+
+  getCategories: () ->
+    Lazy(@collection).map((item) -> item.category_name).uniq().sortBy(Lazy.identity).toArray()
 
 class BudgetItemCollection extends Collection
   getYearRange: ->
@@ -67,7 +91,7 @@ class BudgetItemCollection extends Collection
 class Database
   constructor: ->
     @db = {
-      accounts: new Collection
+      accounts: new Collection('name')
       lineItems: new LineItemCollection('event_date')
       budget_items: new BudgetItemCollection('budget_year')
       plannedItems: new Collection()
@@ -110,43 +134,70 @@ class Database
   plannedItems: ->
     @db.plannedItems
 
-  importDatabase: ($q) ->
+  importDatabase: ($q, $sessionStorage) ->
     dateToJsStorage = (dateString) -> 
       moment(dateString).valueOf()
 
     cleanItem = (item) ->
-      delete item['_id']
-      delete item['processing_rule_ids']
-      delete item['encrypted_password']
-
       item.id = item['_id']
       item.created_at = moment(item.created_at).valueOf() if item.created_at
       item.updated_at = moment(item.updated_at).valueOf() if item.updated_at
 
-    importFile = (fileName, collection, itemConvert) ->
+      delete item['_id']
+      delete item['processing_rule_ids']
+      delete item['encrypted_password']
+
+    importFile = (fileName, collectionModel, itemConvert) ->
       deferred = $q.defer();
       $.getJSON fileName, (data) ->
         Lazy(data).each (item) ->
           cleanItem(item)
           itemConvert(item) if itemConvert
-          collection.insert(item)
+          collectionModel.insert(item)
+        
         deferred.resolve(true)
       deferred.promise
 
     importDeferred = $q.defer()
-    file1 = importFile '/dumps/Account.json', @accounts()
-    file2 = importFile '/dumps/LineItem.json', @lineItems(), (item) ->
-      item.event_date = dateToJsStorage(item.event_date)
-      item.original_event_date = dateToJsStorage(item.original_event_date) if item.original_event_date
-    file3 = importFile '/dumps/BudgetItem.json', @budgetItems()
-    file4 = importFile '/dumps/PlannedItem.json', @plannedItems(), (item) ->
-      item.event_date_start = dateToJsStorage(item.event_date)
-      item.event_date_end = dateToJsStorage(item.event_date)
 
-    $q.all([file1, file2, file3, file4]).then (values) => 
+    @loadStateFromLocalStorage($sessionStorage)
+    if @db.lineItems.collection && @db.lineItems.collection.length > 1
       importDeferred.resolve(this)
+    else
+      file1 = importFile '/dumps/Account.json', @accounts()
+      file2 = importFile '/dumps/LineItem.json', @lineItems(), (item) ->
+        item.event_date = dateToJsStorage(item.event_date)
+        if item.original_event_date
+          item.original_event_date = dateToJsStorage(item.original_event_date) 
+        else
+          item.original_event_date = item.event_date
+      file3 = importFile '/dumps/BudgetItem.json', @budgetItems()
+      file4 = importFile '/dumps/PlannedItem.json', @plannedItems(), (item) ->
+        item.event_date_start = dateToJsStorage(item.event_date)
+        item.event_date_end = dateToJsStorage(item.event_date)
+
+      $q.all([file1, file2, file3, file4]).then (values) => 
+        @saveStateToLocalStorage($sessionStorage)
+        importDeferred.resolve(this)
     
     importDeferred.promise
+  
+  saveStateToLocalStorage: ($sessionStorage) ->
+    saveCollectionToLocalStorage = (collectionModel, name) ->
+      return if !collectionModel.collection
+      $sessionStorage[name] = collectionModel.collection
+    
+    saveCollectionToLocalStorage(collectionModel, name) for name, collectionModel of @db
+    null
+
+  loadStateFromLocalStorage: ($sessionStorage) ->
+    importCollectionFromLocalStorage =  (collectionModel, name) ->
+      collectionModel.collection = angular.copy($sessionStorage[name]) || []
+      collectionModel.reExtendItems() if collectionModel.reExtendItems
+    
+    importCollectionFromLocalStorage(collectionModel, name) for name, collectionModel of @db    
+    null
+
   
 class Box
   constructor: ->

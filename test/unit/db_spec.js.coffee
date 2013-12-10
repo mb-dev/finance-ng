@@ -24,7 +24,7 @@ describe 'line items', ->
       expect(root.db.lineItems().length()).toEqual(1)
 
     it 'should return items by month', ->
-      expect(root.db.lineItems().getItemsByMonthYear(10, 2012).length).toEqual(1)
+      expect(root.db.lineItems().getItemsByMonthYear(10, 2012).toArray().length).toEqual(1)
 
     it 'custom functions should work properly', ->
       lineItem = root.db.lineItems().findById(root.item1Id)
