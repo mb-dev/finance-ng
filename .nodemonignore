@@ -2,6 +2,7 @@
 /public/*
 /vendor/*
 /data/*.data
+/server/*.jade
 config.coffee
 .git
 node_modules

@@ -208,7 +208,7 @@ class Database
       else
         missingDataSets.push(dataSet)
 
-    loadDataSets = (dataSets) ->
+    loadDataSets = (dataSets) =>
       @$http.get('/data/datasets?' + $.param({dataSets: dataSets}))
         .success (data, status, headers) =>
           Lazy(data.data).each (dataSet) =>
@@ -238,7 +238,7 @@ class Database
 
     deferred.promise
 
-  saveTables: (tableList) ->
+  saveTables: (tableList) =>
     toParam = (dataSet) =>
       name: dataSet
       content: angular.toJson(@db[dataSet].collection)

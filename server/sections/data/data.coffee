@@ -22,7 +22,7 @@ exports.getDataSets = (req, res) ->
   dataSets = req.query.dataSets || []
   
   readFile = (dataSet, callback) -> 
-    fs.readFile fileLocation(req.user.id, dataSet), (err, data) ->
+    fs.readFile fileLocation(req.user.id, dataSet), 'utf8', (err, data) ->
       if(err && err.errno == 34)
         console.log 'return empty content for file', dataSet
         callback(null, {name: dataSet, content: null})
@@ -37,7 +37,8 @@ exports.getDataSets = (req, res) ->
       console.log('read failed', err)
       res.json 400, {reason: "read_failed"}
     else
-      res.json 200, {data: dataSets, user: {email: req.user.email}}
+      response = {data: dataSets, user: {email: req.user.email}}
+      res.json 200, response
 
 exports.postDataSets = (req, res) ->
   if !req.isAuthenticated()
