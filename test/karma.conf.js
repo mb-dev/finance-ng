@@ -23,7 +23,11 @@ module.exports = function(karma) {
       'vendor/js/angular/_angular.js',
       'vendor/js/angular/angular-mocks.js',
       'vendor/js/angular/angular-resource.js',
+      'vendor/js/angular/angular-cookies.js',
+      'vendor/js/angular/angular-moment.js',
       'vendor/js/angular/angular-route.js',
+      'vendor/js/angular/angular-sanitize.js',
+      'vendor/js/angular/ngStorage.js',
       'public/js/app.js',
 
       'test/unit/**/*_spec.*'

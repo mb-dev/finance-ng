@@ -1,7 +1,9 @@
 class Collection
-  constructor: (sortColumn, extendFunc) ->
+  constructor: ($q, sortColumn, extendFunc) ->
+    @$q = $q
     @collection = []
     @sortColumn = sortColumn
+    @lastInsertedId = null
     if extendFunc
       extendFunc(this)
 
@@ -47,26 +49,31 @@ class Collection
     else
       step1
 
-  insert: (details) ->
+  insert: (details) =>
+    deferred = @$q.defer()
     if !details.id
       id = moment().valueOf()
       details.id = id
+      @lastInsertedId = details.id
     else if @findById(details.id)
-      throw "idAlreadyExists"
+      deferred.reject("ID already exists")
 
     @itemExtendFunc(details) if @itemExtendFunc
     @collection.push(details)
 
-    details.id
+    deferred.resolve(details.id)
+    deferred.promise
 
-  editById: (details) ->
-    item = Lazy(@collection).find (item) -> item.id == id
+  editById: (details) =>
+    deferred = @$q.defer()
+    item = Lazy(@collection).find (item) -> item.id == details.id
     angular.copy(details, item)
+    deferred.resolve()
 
-  length: ->
+  length: =>
     @collection.length
 
-  removeById: (id) ->
+  removeById: (id) =>
     item = @findById(id)
     index = @collection.indexOf(item)
     @collection.splice(index, 1)
@@ -89,12 +96,20 @@ class BudgetItemCollection extends Collection
     Lazy(@collection).pluck('budget_year').uniq().sortBy(Lazy.identity).toArray()
 
 class Database
-  constructor: ->
+  @ACCOUNTS_TBL = "accounts"
+  @LINE_ITEMS_TBL = "lineItems"
+  @BUDGET_ITEMS_TBL = "budgetItems"
+  @PLANNED_ITEMS = "plannedItems"
+  constructor: ($http, $q, $sessionStorage) ->
+    @$http = $http
+    @$q = $q
+    @$sessionStorage = $sessionStorage
+
     @db = {
-      accounts: new Collection('name')
-      lineItems: new LineItemCollection('event_date')
-      budget_items: new BudgetItemCollection('budget_year')
-      plannedItems: new Collection()
+      accounts: new Collection($q, 'name')
+      lineItems: new LineItemCollection($q, 'event_date')
+      budgetItems: new BudgetItemCollection($q, 'budget_year')
+      plannedItems: new Collection($q)
       user: {config: {incomeCategories: ['Salary', 'Investments:Dividend', 'Income:Misc']}}
     }
     @db.lineItems.setItemExtendFunc (item) ->
@@ -126,7 +141,7 @@ class Database
     @db.lineItems
 
   budgetItems: ->
-    @db.budget_items
+    @db.budgetItems
 
   user: ->
     @db.user
@@ -182,22 +197,65 @@ class Database
     
     importDeferred.promise
   
-  saveStateToLocalStorage: ($sessionStorage) ->
-    saveCollectionToLocalStorage = (collectionModel, name) ->
-      return if !collectionModel.collection
-      $sessionStorage[name] = collectionModel.collection
-    
-    saveCollectionToLocalStorage(collectionModel, name) for name, collectionModel of @db
-    null
+  getTables: (tableList) ->
+    deferred = @$q.defer();
+    missingDataSets = []
+    Lazy(tableList).each (dataSet) =>
+      if @$sessionStorage[dataSet]
+        dbModel = @db[dataSet]
+        dbModel.collection = angular.copy(@$sessionStorage[dataSet])
+        dbModel.reExtendItems() if dbModel.reExtendItems
+      else
+        missingDataSets.push(dataSet)
 
-  loadStateFromLocalStorage: ($sessionStorage) ->
-    importCollectionFromLocalStorage =  (collectionModel, name) ->
-      collectionModel.collection = angular.copy($sessionStorage[name]) || []
-      collectionModel.reExtendItems() if collectionModel.reExtendItems
-    
-    importCollectionFromLocalStorage(collectionModel, name) for name, collectionModel of @db    
-    null
+    loadDataSets = (dataSets) ->
+      @$http.get('/data/datasets?' + $.param({dataSets: dataSets}))
+        .success (data, status, headers) =>
+          Lazy(data.data).each (dataSet) =>
+            dbModel = @db[dataSet.name]
+            dbModel.collection = JSON.parse(dataSet.content)
+            dbModel.collection = [] if dbModel.collection == null
+            dbModel.reExtendItems() if dbModel.reExtendItems
+            console.log 'saving dataset:', dataSet.name, 'to session'
+            @$sessionStorage[dataSet.name] = dbModel.collection
+          @db.user.email = data.user.email
+          @$sessionStorage.user = {email: data.user.email}
+          deferred.resolve(this)
+        .error (data, status, headers) ->
+          console.log(data)
+          deferred.reject({data: data, status: status, headers: headers})
 
+    if missingDataSets.length > 0
+      console.log 'loading data sets: ', missingDataSets
+      loadDataSets(missingDataSets)
+    else if @$sessionStorage.user
+      console.log 'all data sets ', tableList, 'and user found in session - resolving'
+      @db.user.email = @$sessionStorage.user.email
+      deferred.resolve(this)
+    else
+      console.log 'user not found in session, loading [] data sets'
+      loadDataSets([])
+
+    deferred.promise
+
+  saveTables: (tableList) ->
+    toParam = (dataSet) =>
+      name: dataSet
+      content: angular.toJson(@db[dataSet].collection)
+
+    deferred = @$q.defer();
+    dataSets = Lazy(tableList).map(toParam).toArray()
+
+    @$http.post('/data/datasets', dataSets)
+      .success (data, status, headers) =>
+        Lazy(tableList).each (dataSet) =>
+          console.log 'saving dataset:', dataSet.name, 'to session'
+          @$sessionStorage[dataSet] = @db[dataSet].collection
+        deferred.resolve(data)
+      .error (data, status, headers) ->
+        deferred.reject({data: data, status: status, headers: headers})
+
+    deferred.promise
   
 class Box
   constructor: ->

@@ -1,4 +1,7 @@
 /app/*
 /public/*
 /vendor/*
+/data/*.data
 config.coffee
+.git
+node_modules

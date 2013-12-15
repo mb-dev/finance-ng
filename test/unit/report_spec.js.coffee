@@ -1,10 +1,17 @@
 root = {}
+root.$q = {}
+root.$http = {}
+root.$sessionStorage = {}
 
 describe 'budget report view', ->
+  beforeEach(module('app'))
+  beforeEach(inject((_$rootScope_, $q) ->
+    root.$q = $q
+  ))
   beforeEach ->
     root.budgetItem = {name: 'Groceries', budget_year: 2012, categories: ['Groceries'] }
 
-    db = new Database
+    db = new Database(root.$http, root.$q, root.$sessionStorage)
     db.lineItems().insert {type: 1, event_date: moment('2012-01-01').valueOf(), amount: '20.0', category_name: 'Groceries'}
     db.lineItems().insert {type: 0, event_date: moment('2012-01-02').valueOf(), amount: '10.0', category_name: 'Groceries'}
     db.lineItems().insert {type: 1, event_date: moment('2012-01-03').valueOf(), amount: '30.0', category_name: 'Hobbies::Travel', grouped_label: 'USA Trip'}

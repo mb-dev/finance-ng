@@ -14,3 +14,5 @@ public
 npm-debug.log
 node_modules
 bower_components
+server/config/config.coffee
+data_files

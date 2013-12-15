@@ -15,8 +15,16 @@
   "dependencies": {
     "less": "*",
     "jade": "0.35",
-    "coffee-script": "~1.6.3",
-    "connect-assets": "git+ssh://git@github.com:adunkman/connect-assets.git#v3"
+    "coffee-script": "latest",
+    "connect-assets": "git+ssh://git@github.com:adunkman/connect-assets.git#v3",
+    "passport-google-oauth": "latest",
+    "passport": "latest",
+    "connect-redis": "latest",
+    "forever": "latest",
+    "mongoose": "latest",
+    "lazy.js": "latest",
+    "moment": "latest",
+    "async": "latest"
   },
   "devDependencies": {
     "express": "~3.4.4",

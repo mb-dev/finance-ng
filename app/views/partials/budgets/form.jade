@@ -15,13 +15,13 @@
       .form-group
         label.col-xs-4.col-sm-2.control-label Budget Year
         .col-xs-8.col-sm-10
-          input.form-control(type='text', placeholder='Budget Year', ng-model='item.budget_year')
+          input.form-control(type='text', placeholder='Budget Year', ng-model='item.budget_year', numbers-only)
       .form-group
         label.col-xs-4.col-sm-2.control-label Limit
         .col-xs-8.col-sm-10
-          input.form-control(type='text', placeholder='Limit', ng-model='item.limit')
+          input.form-control(type='text', placeholder='Limit', ng-model='item.limit', numbers-only)
       .form-group
         label.col-xs-4.col-sm-2.control-label Estimated Min Monthly
         .col-xs-8.col-sm-10
-          input.form-control(type='text', placeholder='Estimated Minimum Amount', ng-model='item.estimated_min_monthly_amount')
+          input.form-control(type='text', placeholder='Estimated Minimum Amount', ng-model='item.estimated_min_monthly_amount', numbers-only)
       button.btn.btn-default(ng-click="onSubmit()") Submit
