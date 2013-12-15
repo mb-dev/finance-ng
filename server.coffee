@@ -23,7 +23,11 @@ require('./server/config/express')(app, config, passport)
 require('./server/config/routes')(app, passport)
   
 port = 3333
-app.listen port
-console.log "Listening on port: #{port}"
+if process.env.NODE_ENV == 'development'
+  app.listen port, "0.0.0.0"
+else
+  app.listen port
+
+console.log "Listening on mode: #{env}, port: #{port}"
 
 exports = module.exports = app

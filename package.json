@@ -16,7 +16,7 @@
     "less": "*",
     "jade": "0.35",
     "coffee-script": "latest",
-    "connect-assets": "git+ssh://git@github.com:adunkman/connect-assets.git#v3",
+    "connect-assets": "git+https://github.com/adunkman/connect-assets.git#v3",
     "passport-google-oauth": "latest",
     "passport": "latest",
     "connect-redis": "latest",
