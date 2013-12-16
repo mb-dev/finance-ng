@@ -18,6 +18,8 @@ App.config ($routeProvider, $locationProvider) ->
       db: (fdb) -> 
         fdb.getTables(tableList)
     }
+
+  memoryNgAllDb = [Database.MEMORIES_TBL, Database.EVENTS_TBL, Database.PEOPLE_TBL, Database.MEMORY_GRAPH_TBL, Database.MEMORY_CATEGORIES_TBL]
   
   $routeProvider
     .when('/', {templateUrl: '/partials/welcome.html'})
@@ -53,12 +55,31 @@ App.config ($routeProvider, $locationProvider) ->
 
     .when('/import', {templateUrl: '/partials/misc/import.html'})    
 
-    .when('/login_success', redirectTo: '/line_items/')
+    .when('/login_success', redirectTo: '/welcome/')
     .when('/login', {templateUrl: '/partials/user/login.html', controller: 'UserController'})
     .when('/register', {templateUrl: '/partials/user/register.html'})
     .when('/edit_profile', {templateUrl: '/partials/user/edit_profile.html'})
 
     # download backup
+
+    # memories
+    .when('/memories/new', {templateUrl: '/partials/memories/form.html', controller: 'MemoriesFormController', resolve: resolveDb(memoryNgAllDb) })
+    .when('/memories/:itemId/edit', {templateUrl: '/partials/memories/form.html', controller: 'MemoriesFormController', resolve: resolveDb(memoryNgAllDb) })
+    .when('/memories/:year/:month', {templateUrl: '/partials/memories/index.html', controller: 'MemoriesIndexController', reloadOnSearch: false, resolve: resolveDb(memoryNgAllDb) })
+    .when('/memories/:itemId', {templateUrl: '/partials/memories/show.html', controller: 'MemoriesShowController', resolve: resolveDb(memoryNgAllDb) })
+    .when('/memories/', {templateUrl: '/partials/memories/index.html', controller: 'MemoriesIndexController', reloadOnSearch: false, resolve: resolveDb(memoryNgAllDb) })
+
+    .when('/events/new', {templateUrl: '/partials/events/form.html', controller: 'EventsFormController', resolve: resolveDb(memoryNgAllDb) })
+    .when('/events/:itemId/edit', {templateUrl: '/partials/events/form.html', controller: 'EventsFormController', resolve: resolveDb(memoryNgAllDb) })
+    .when('/events/:year/:month', {templateUrl: '/partials/events/index.html', controller: 'EventsIndexController', reloadOnSearch: false, resolve: resolveDb(memoryNgAllDb) })
+    .when('/events/:itemId', {templateUrl: '/partials/events/show.html', controller: 'EventsShowController', resolve: resolveDb(memoryNgAllDb) })
+    .when('/events/', {templateUrl: '/partials/events/index.html', controller: 'EventsIndexController', reloadOnSearch: false, resolve: resolveDb(memoryNgAllDb) })
+
+    .when('/people/new', {templateUrl: '/partials/people/form.html', controller: 'PeopleFormController', resolve: resolveDb(memoryNgAllDb) })
+    .when('/people/:itemId/edit', {templateUrl: '/partials/people/form.html', controller: 'PeopleFormController', resolve: resolveDb(memoryNgAllDb) })
+    .when('/people/', {templateUrl: '/partials/people/index.html', controller: 'PeopleIndexController', reloadOnSearch: false, resolve: resolveDb(memoryNgAllDb) })
+    .when('/people/:itemId', {templateUrl: '/partials/people/show.html', controller: 'PeopleShowController', resolve: resolveDb(memoryNgAllDb) })
+
 
     # Catch all
     .otherwise({redirectTo: '/'})

@@ -39,6 +39,17 @@ describe 'line items', ->
       expect(lineItem.$isExpense()).toEqual(true)
       expect(lineItem.$signedAmount()).toEqual(-20)
 
+describe 'graph db', ->
+  beforeEach(module('app'))
+  beforeEach(inject((_$rootScope_, $q) ->
+    root.$q = $q
+  ))
+  it 'should allow associate connections', ->
+    db = new Database(root.$http, root.$q, root.$sessionStorage)
+    db.memoryGraph().associate('memoryToCategory', '1', '1')
+    expect(db.memoryGraph().isAssociated('memoryToCategory', '1', '1')).toEqual(true)
+    expect(db.memoryGraph().getAssociated('memoryToCategory', '1')).toEqual(['1'])
+
 describe 'Box', ->
   it 'should allow setting values', ->
     item = {name: 'Groceries'}

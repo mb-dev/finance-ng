@@ -1,0 +1,24 @@
+ng-include(src="'/partials/common/memory_header.html'")
+.memories_form.container
+  .error {{error}}
+  .panel.panel-default
+    .panel-heading
+      h4.panel-title {{title}}
+    form.panel-body.form-horizontal(role='form')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Category
+        .col-xs-8.col-sm-10
+          input.form-control(type='text', placeholder='Category', ng-model='categoryName')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Title
+        .col-xs-8.col-sm-10
+          input.form-control(type='text', placeholder='Title', ng-model='item.title')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Date
+        .col-xs-8.col-sm-10
+          input.form-control(type='text', placeholder='Date', ng-model='item.event_date', date-format='')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Content
+        .col-xs-8.col-sm-10
+          textarea.form-control(type='text', ng-model='item.content')
+      button.btn.btn-default(ng-click="onSubmit()") Submit

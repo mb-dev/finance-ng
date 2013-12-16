@@ -22,12 +22,17 @@ class Collection
     result = angular.copy(result) if result
     result
 
+  findByIds: (ids) ->
+    result = Lazy(@collection).filter (item) -> ids.indexOf(item.id) >= 0
+    result = angular.copy(result) if result
+    result
+
   getAll: (sortBy) ->
     if !sortBy && @sortColumn
       sortBy = @defaultSortFunction
 
-    result = angular.copy(@collection)
-    result = Lazy(result).sortBy sortBy if sortBy
+    result = Lazy(angular.copy(@collection))
+    result = result.sortBy sortBy if sortBy
     result
 
   defaultSortFunction: (item) ->
@@ -78,6 +83,9 @@ class Collection
     index = @collection.indexOf(item)
     @collection.splice(index, 1)
 
+  reset: =>
+    @collection = []
+
 class LineItemCollection extends Collection
   @EXPENSE = 1
   @INCOME = 0
@@ -95,11 +103,51 @@ class BudgetItemCollection extends Collection
   getYearRange: ->
     Lazy(@collection).pluck('budget_year').uniq().sortBy(Lazy.identity).toArray()
 
+class MemoriesCollection extends Collection
+  getItemsByMonthYear: (month, year, sortBy) ->
+    Lazy(@collection).filter((item) -> 
+      date = moment(item.event_date)
+      date.month() == month && date.year() == year
+    ).sortBy(sortBy)
+
+class MemoryCategories extends Collection
+  addOrInsertCategoryByName: (name) ->
+    result = Lazy(@collection).find (item) -> item.name == name
+    if !result
+      @insert({name: name})
+
+# Graph DB
+class GraphCollection
+  constructor: ($q, graphs) ->
+    @$q = $q
+    @collection = {}
+
+  reset: =>
+    @collection = {}
+
+  associate: (graph, sourceId, destId) =>
+    @collection[graph] = @collection[graph] || {}
+    @collection[graph][sourceId] = @collection[graph][sourceId] || {}
+    @collection[graph][sourceId][destId] = true
+
+  isAssociated: (graph, sourceId, destId) =>
+    return false if !@collection[graph] || !@collection[graph][sourceId]
+    return @collection[graph][sourceId][destId] == true
+
+  getAssociated: (graph, sourceId) =>
+    return false if !@collection[graph] || !@collection[graph][sourceId]
+    return Lazy(@collection[graph][sourceId]).keys().toArray()
+
 class Database
   @ACCOUNTS_TBL = "accounts"
   @LINE_ITEMS_TBL = "lineItems"
   @BUDGET_ITEMS_TBL = "budgetItems"
   @PLANNED_ITEMS = "plannedItems"
+  @MEMORIES_TBL = "memories"
+  @EVENTS_TBL = "events"
+  @PEOPLE_TBL = "people"
+  @MEMORY_CATEGORIES_TBL = "memoryCategories"
+  @MEMORY_GRAPH_TBL = "memoryGraph"
   constructor: ($http, $q, $sessionStorage) ->
     @$http = $http
     @$q = $q
@@ -110,6 +158,11 @@ class Database
       lineItems: new LineItemCollection($q, 'event_date')
       budgetItems: new BudgetItemCollection($q, 'budget_year')
       plannedItems: new Collection($q)
+      memories: new MemoriesCollection($q)
+      events: new Collection($q)
+      people: new Collection($q)
+      memoryCategories: new Collection($q)
+      memoryGraph: new GraphCollection($q, ['memoryToChild', 'eventToMemory', 'eventToPerson', 'personToMemory', 'memoryToCategory'])
       user: {config: {incomeCategories: ['Salary', 'Investments:Dividend', 'Income:Misc']}}
     }
     @db.lineItems.setItemExtendFunc (item) ->
@@ -148,6 +201,21 @@ class Database
 
   plannedItems: ->
     @db.plannedItems
+
+  memories: ->
+    @db.memories
+
+  events: ->
+    @db.events
+
+  people: ->
+    @db.people
+
+  memoryCategories: ->
+    @db.memoryCategories
+
+  memoryGraph: ->
+    @db.memoryGraph
 
   importDatabase: ($q, $sessionStorage) ->
     dateToJsStorage = (dateString) -> 
@@ -214,7 +282,7 @@ class Database
           Lazy(data.data).each (dataSet) =>
             dbModel = @db[dataSet.name]
             dbModel.collection = JSON.parse(dataSet.content)
-            dbModel.collection = [] if dbModel.collection == null
+            dbModel.reset() if dbModel.collection == null
             dbModel.reExtendItems() if dbModel.reExtendItems
             console.log 'saving dataset:', dataSet.name, 'to session'
             @$sessionStorage[dataSet.name] = dbModel.collection

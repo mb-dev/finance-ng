@@ -9,10 +9,14 @@ exports.config =
     public: 'public'
   files:
     javascripts:
-      joinTo:
+      joinTo: 
         'js/app.js': /^app/
         'js/vendor.js': /^(vendor)/
-
+      order:
+        before: [
+          '/app/assets/js/config/app.coffee'
+          '/vendor/js/angular/angular.js'
+        ]
     stylesheets:
       joinTo:
         'css/app.css': /^(app\/assets\/styles\/app-styles.less)/

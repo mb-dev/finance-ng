@@ -6,6 +6,8 @@
 #= require ./sections/budget_items/budget_items
 #= require ./sections/user/user
 
+#= require ./sections/memories/memories
+
 angular.module('app.filters', [])
   .filter 'localDate', ($filter) ->
     angularDateFilter = $filter('date')
