@@ -1,7 +1,4 @@
 exports.config =
-  conventions:
-    assets: /^no_assets/
-    vendor: /^no_vendor/
   modules:
     definition: false
     wrapper: false
@@ -25,6 +22,7 @@ exports.config =
         before: [
           'app/app.less'
         ]
+    
 
   plugins:
     jade:
