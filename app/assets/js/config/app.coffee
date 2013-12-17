@@ -19,7 +19,7 @@ App.config ($routeProvider, $locationProvider) ->
         fdb.getTables(tableList)
     }
 
-  memoryNgAllDb = [Database.MEMORIES_TBL, Database.EVENTS_TBL, Database.PEOPLE_TBL, Database.MEMORY_GRAPH_TBL, Database.MEMORY_CATEGORIES_TBL]
+  memoryNgAllDb = [Database.MEMORIES_TBL, Database.EVENTS_TBL, Database.PEOPLE_TBL, Database.MEMORY_GRAPH_TBL]
   
   $routeProvider
     .when('/', {templateUrl: '/partials/welcome.html'})

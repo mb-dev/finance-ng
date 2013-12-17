@@ -1,0 +1,1403 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"style",
+				"stylesheets"
+			],
+			[
+				"defer",
+				"deferred"
+			],
+			[
+				"access",
+				"access_levels"
+			],
+			[
+				"collec",
+				"collection"
+			],
+			[
+				"collection",
+				"collectionModel"
+			],
+			[
+				"expen",
+				"expenseRow"
+			],
+			[
+				"expense",
+				"expenseColumn"
+			],
+			[
+				"future",
+				"future_expense"
+			],
+			[
+				"rowCol",
+				"rowColumns"
+			],
+			[
+				"budget",
+				"budgetItem"
+			],
+			[
+				"expenseRows",
+				"expenseRowsForBudgetItem"
+			],
+			[
+				"amount",
+				"amountAvailable"
+			],
+			[
+				"planned",
+				"planned_expense"
+			],
+			[
+				"isIn",
+				"isInFuture"
+			],
+			[
+				"cat",
+				"category_name"
+			],
+			[
+				"get",
+				"getReportForYear"
+			],
+			[
+				"pl",
+				"plannedItem"
+			],
+			[
+				"line",
+				"lineItem"
+			],
+			[
+				"cate",
+				"categoryToBudget"
+			],
+			[
+				"sign",
+				"signedAmount"
+			],
+			[
+				"LineIt",
+				"LineItemCollection"
+			],
+			[
+				"sort",
+				"sortColumn"
+			],
+			[
+				"column",
+				"columnVAlues"
+			],
+			[
+				"app",
+				"applyDateChanges"
+			],
+			[
+				"tex",
+				"text-align"
+			],
+			[
+				"Budg",
+				"budget_items"
+			],
+			[
+				"item",
+				"item2Id"
+			],
+			[
+				"line_ite",
+				"line_items_by_id"
+			],
+			[
+				"moshe",
+				"moshebergman"
+			],
+			[
+				"nginx",
+				"nginx_site"
+			],
+			[
+				"run",
+				"run_jenkins_cli"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "app/assets/js/sections/memories/memories.coffee",
+			"settings":
+			{
+				"buffer_size": 2102,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "server/sections/home/index.jade",
+			"settings":
+			{
+				"buffer_size": 951,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "server/config/express.coffee",
+			"settings":
+			{
+				"buffer_size": 1539,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Gruntfile.coffee",
+			"settings":
+			{
+				"buffer_size": 3918,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": ".nodemonignore",
+			"settings":
+			{
+				"buffer_size": 98,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/assets/js/db.coffee",
+			"settings":
+			{
+				"buffer_size": 11122,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/assets/js/reports.coffee",
+			"settings":
+			{
+				"buffer_size": 8173,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "deploy.sh",
+			"settings":
+			{
+				"buffer_size": 183,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/assets/js/sections/common/common.coffee",
+			"settings":
+			{
+				"buffer_size": 2354,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "test/karma.conf.js",
+			"settings":
+			{
+				"buffer_size": 1667,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 267.0,
+		"selected_items":
+		[
+			[
+				"Package Control: ",
+				"Package Control: Remove Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"nsta",
+				"Package Control: Install Package"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib2,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib2.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print 'Please restart Sublime Text to finish installation'"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/moshebergman/workspace/finance-ng/public/partials/memories/form.html",
+		"/Users/moshebergman/workspace/finance-ng/.nodemonignore",
+		"/Users/moshebergman/workspace/finance-ng/Gruntfile.js",
+		"/Users/moshebergman/workspace/finance-ng/test/karma.conf.js",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/db.js.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/common/finance_header.jade",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/common/memory_header.jade",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/memories/form.jade",
+		"/Users/moshebergman/workspace/finance-ng/server/config/routes.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/config/app.coffee",
+		"/Users/moshebergman/workspace/finance-ng/config.coffee",
+		"/Users/moshebergman/workspace/finance-ng/test/unit/db_spec.js.coffee",
+		"/Users/moshebergman/workspace/finance-ng/package.json",
+		"/Users/moshebergman/workspace/finance-ng/server/sections/home/index.jade",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/app.js.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/memories/index.jade",
+		"/Users/moshebergman/workspace/finance-ng/server.coffee",
+		"/Users/moshebergman/workspace/finance-ng/server/config/express.coffee",
+		"/Users/moshebergman/workspace/finance-ng/node_modules/.bin/express",
+		"/Users/moshebergman/workspace/finance-ng/vendor/styles/vendor.less",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/styles/app-styles.less",
+		"/Users/moshebergman/workspace/finance-ng/node_modules/connect-assets/bin/connect-assets.js",
+		"/Users/moshebergman/workspace/finance-ng/node_modules/connect-assets/node_modules/mincer/lib/mincer/context.js",
+		"/Users/moshebergman/workspace/finance-ng/public/js/app.js",
+		"/Users/moshebergman/workspace/finance-ng/server/config/config.coffee",
+		"/Users/moshebergman/workspace/finance-ng/server/sections/home/home.coffee",
+		"/Users/moshebergman/workspace/finance-ng/deploy.sh",
+		"/Users/moshebergman/workspace/finance-ng/server/config/passport.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/line_items/index.jade",
+		"/Users/moshebergman/workspace/finance-ng/server/sections/data/data.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/welcome.jade",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/line_items/form.jade",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/line_items/show.jade",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/accounts/form.jade",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/accounts/show.jade",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/accounts/index.jade",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/budgets/form.jade",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/budgets/index.jade",
+		"/Users/moshebergman/workspace/finance-ng/server/sections/home/memory.jade",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/config/memory-app.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/config/finance-app.coffee",
+		"/Users/moshebergman/workspace/finance-ng/server/sections/home/finance.jade",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/finance.js.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/common/common.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/memory.js.coffee",
+		"/Users/moshebergman/workspace/finance-ng/data_files/52acff535a33d33740000001/lineItems.data",
+		"/Users/moshebergman/workspace/finance-ng/LICENSE.md",
+		"/Users/moshebergman/workspace/finance-ng/node_modules/async/lib/async.js",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/user/user.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/budget_items/budget_items.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/accounts/accounts.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/line_items/line_items.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/user/login.jade",
+		"/Users/moshebergman/workspace/finance-ng/server/models/user.coffee",
+		"/Users/moshebergman/workspace/finance-ng/test/unit/report_spec.js.coffee",
+		"/Users/moshebergman/workspace/finance-ng/LICENSE",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/config/routes.coffee",
+		"/Users/moshebergman/workspace/finance-ng/server/sections/user/user.coffee",
+		"/Users/moshebergman/workspace/finance-ng/bower_components/lazy.js/lazy.js",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/reports.js.coffee",
+		"/Users/moshebergman/workspace/finance-ng/vendor/js/lazy.js",
+		"/Users/moshebergman/workspace/finance-ng/vendor/js/vendor.js.coffee",
+		"/Users/moshebergman/workspace/finance-ng/bower_components/ngstorage/ngStorage.js",
+		"/Users/moshebergman/workspace/finance-ng/app/views/partials/budgets/show.jade",
+		"/Users/moshebergman/workspace/finance-ng/server/sections/home/404.jade",
+		"/Users/moshebergman/workspace/finance-ng/server/sections/home/500.jade",
+		"/Users/moshebergman/workspace/finance-ng/server/models/user.js",
+		"/Users/moshebergman/workspace/finance-ng/server/config/passport.js",
+		"/Users/moshebergman/workspace/finance-ng/bower_components/moment/moment.js",
+		"/Users/moshebergman/workspace/finance-ng/test/unit/app_spec.js.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/views/index.jade",
+		"/Users/moshebergman/workspace/finance-ng/test/unit/services.spec.coffee",
+		"/Users/moshebergman/workspace/finance-ng/test/unit/filter.spec.coffee",
+		"/Users/moshebergman/workspace/finance-ng/test/unit/directive.spec.coffee",
+		"/Users/moshebergman/workspace/finance-ng/test/unit/contoller.spec.coffee",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/public/js/app.js",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/public/css/app.css",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/node_modules/express/lib/router/route.js",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/assets/styles/app-styles.less",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/vendor/styles/vendor.less",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/bower_components/bootstrap/less/variables.less",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/assets/js/app.js.coffee",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/Gruntfile.js",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/package.json",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/views/partials/misc/categories.html",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/views/partials/reports/index.html",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/.nodemonignore",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/assets/styles/line_items.less",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/views/partials/line_items/index.jade",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/views/index.jade",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/node_modules/connect-assets/node_modules/mincer/lib/mincer/processors/directive_processor.js",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/vendor/js/vendor.js.coffee",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/server.coffee",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/vendor/styles/vendor.css.less",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/node_modules/connect-assets/node_modules/mincer/lib/mincer/engines/less_engine.js",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/test.js.coffee",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/assets/js/vendor.js.coffee",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/assets/test.js",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/assets/index.html",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/partials/line_items/index.jade",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/config.coffee",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/app.coffee",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/index.jade",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/styles/line_items.less",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/partials/line_items/new.jade",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/_public/js/app.partials.line_items.templates.js",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/_public/partials/line_items/index.html",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/_public/js/partials.js",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/scripts/controllers.coffee",
+		"/Users/moshebergman/Documents/mbdev/sites/moshebergman-chef/attributes/secret-attributes.rb",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/styles/app.less",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/partials/line_items.jade",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/scripts/directives.coffee",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/scripts/filters.coffee",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/scripts/services.coffee",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/bower.json",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/partials/nav.jade",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/partials/partial1.jade",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/partials/partial2.jade",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/partials/todo.jade",
+		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/bower_components/console-polyfill/component.json",
+		"/Users/moshebergman/Documents/mbdev/sites/financeRails/config/mongoid.yml",
+		"/Users/moshebergman/Documents/mbdev/sites/moshebergman-chef/recipes/linode.rb",
+		"/Users/moshebergman/Documents/mbdev/sites/moshebergman-chef/recipes/localhost.rb",
+		"/Users/moshebergman/Documents/mbdev/sites/moshebergman-chef/attributes/linode.rb",
+		"/Users/moshebergman/Documents/mbdev/sites/moshebergman-chef/attributes/default.rb",
+		"/var/folders/g2/bgc3j29x5v50954l3k7yhllh0000gn/T/knife-edit-121522204406410458781.js",
+		"/var/folders/g2/bgc3j29x5v50954l3k7yhllh0000gn/T/knife-edit-066632591092975.json"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"/Users/moshebergman/Documents/mbdev/sites/finance-ng/node_modules/brunch",
+			"<project>"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"css",
+			"vendor/js",
+			"css",
+			"app.controllers",
+			"alerts",
+			"panel",
+			"Lazy",
+			"source",
+			"doParallel",
+			"map",
+			"doParallel",
+			"sessionStorage",
+			".service",
+			"deserializeUser",
+			"scope",
+			":hover",
+			"Auth",
+			"sessionStore",
+			"budget_items",
+			"authorize",
+			"config",
+			"connect",
+			"editItemBy",
+			"editItemById",
+			"BudgetItemsFormController",
+			"$eventDateStart",
+			"futuremonth",
+			"angular.copy",
+			"accounts",
+			"reExtendItems",
+			"$rootscope",
+			".service",
+			"unix",
+			"LineItemsIndexController",
+			".sort",
+			"identity",
+			"sortFn",
+			"total_bu",
+			"percent_expense",
+			"column",
+			"amountAvailableNow",
+			"months",
+			"income_box",
+			"expense_box",
+			"sortBy",
+			"unix",
+			"valueof",
+			".when('/",
+			".panel-",
+			".panel-d",
+			".panel-default",
+			"brunch",
+			"Unrecognised input",
+			"require",
+			"express",
+			"bootstrap",
+			"angular",
+			"nginx",
+			"-local",
+			"\"wordpress\"",
+			"mysql",
+			"chef_environ",
+			"dev",
+			"nginx",
+			"site",
+			"ssl",
+			"/ssl",
+			"nginx",
+			"redisio",
+			"redis",
+			"default[:nginx][:hostname]",
+			"node[:financeRails][:dir]",
+			"default[:financeRails][:dir]",
+			"mysql",
+			"ipaddress",
+			"nginx",
+			"server_fqdn",
+			"remote_file",
+			".sql",
+			"untar",
+			"deploy",
+			"publishers",
+			"sudo",
+			"rbenv",
+			"nginx",
+			"packages",
+			"jenkins",
+			"moshebergman.com",
+			"Java",
+			"forward",
+			"server_fqdn",
+			"hostname",
+			"nginx",
+			"Passenger",
+			"updates",
+			".erb",
+			"wordpress.",
+			"delete line"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"js/vendor",
+			"expenseColumn",
+			"incomeBox",
+			"expenseBox",
+			".when('/app/"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "app/assets/js/sections/memories/memories.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2102,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1670,
+								1670
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "server/sections/home/index.jade",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 951,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								681,
+								705
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Jade/Syntaxes/Jade.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "server/config/express.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1539,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								162,
+								162
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "Gruntfile.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3918,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								798,
+								798
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 77.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": ".nodemonignore",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 98,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								98,
+								98
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "app/assets/js/db.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11122,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								9944,
+								9944
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4530.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "app/assets/js/reports.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8173,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								13,
+								13
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 310.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "deploy.sh",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 183,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								125,
+								182
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/ShellScript/Shell-Unix-Generic.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "app/assets/js/sections/common/common.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2354,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1109,
+								1109
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "test/karma.conf.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1667,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								339,
+								339
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"project": "financeNg.sublime-project",
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"form",
+				"public/partials/memories/form.html"
+			],
+			[
+				"de",
+				"deploy.sh"
+			],
+			[
+				"nodemonig",
+				".nodemonignore"
+			],
+			[
+				"index.jad",
+				"server/sections/home/index.jade"
+			],
+			[
+				"db.",
+				"app/assets/js/db.js.coffee"
+			],
+			[
+				"index.jade",
+				"server/sections/home/index.jade"
+			],
+			[
+				"karma",
+				"test/karma.conf.js"
+			],
+			[
+				"exp",
+				"server/config/express.coffee"
+			],
+			[
+				"pack",
+				"package.json"
+			],
+			[
+				"routes",
+				"server/config/routes.coffee"
+			],
+			[
+				"express.co",
+				"server/config/express.coffee"
+			],
+			[
+				"expre",
+				"node_modules/.bin/express"
+			],
+			[
+				"grunt",
+				"Gruntfile.js"
+			],
+			[
+				"connect-assets",
+				"node_modules/connect-assets/bin/connect-assets.js"
+			],
+			[
+				"server",
+				"server.coffee"
+			],
+			[
+				"context.js",
+				"node_modules/connect-assets/node_modules/mincer/lib/mincer/context.js"
+			],
+			[
+				"packa",
+				"package.json"
+			],
+			[
+				"db",
+				"app/assets/js/db.js.coffee"
+			],
+			[
+				"db_sp",
+				"test/unit/db_spec.js.coffee"
+			],
+			[
+				"app.js",
+				"public/js/app.js"
+			],
+			[
+				"app.",
+				"public/js/app.js"
+			],
+			[
+				"app.less",
+				"app/assets/styles/app-styles.less"
+			],
+			[
+				"finance",
+				"server/sections/home/finance.jade"
+			],
+			[
+				"memory.",
+				"server/sections/home/memory.jade"
+			],
+			[
+				"home/index",
+				"server/sections/home/index.jade"
+			],
+			[
+				"dep",
+				"deploy.sh"
+			],
+			[
+				"depl",
+				"deploy.sh"
+			],
+			[
+				"data.c",
+				"server/sections/data/data.coffee"
+			],
+			[
+				"ser",
+				"server.coffee"
+			],
+			[
+				"",
+				"server/sections/home/home.coffee"
+			],
+			[
+				"server.coff",
+				"server.coffee"
+			],
+			[
+				"config.coff",
+				"server/config/config.coffee"
+			],
+			[
+				"passport.",
+				"server/config/passport.coffee"
+			],
+			[
+				"config.",
+				"server/config/config.coffee"
+			],
+			[
+				"passport",
+				"server/config/passport.coffee"
+			],
+			[
+				"line_items",
+				"app/views/partials/line_items/index.jade"
+			],
+			[
+				"data",
+				"server/sections/data/data.coffee"
+			],
+			[
+				"license",
+				"LICENSE"
+			],
+			[
+				"async.js",
+				"node_modules/async/lib/async.js"
+			],
+			[
+				"report_sp",
+				"test/unit/report_spec.js.coffee"
+			],
+			[
+				"app.js.cof",
+				"app/assets/js/app.js.coffee"
+			],
+			[
+				"config",
+				"server/config/config.coffee"
+			],
+			[
+				"db.c",
+				"app/assets/js/db.js.coffee"
+			],
+			[
+				"user",
+				"server/models/user.coffee"
+			],
+			[
+				"login",
+				"app/views/partials/user/login.jade"
+			],
+			[
+				"hom",
+				"server/sections/home/home.coffee"
+			],
+			[
+				"app",
+				"app/assets/js/app.js.coffee"
+			],
+			[
+				"ap",
+				"app/assets/js/app.js.coffee"
+			],
+			[
+				"serv",
+				"server.coffee"
+			],
+			[
+				"package",
+				"package.json"
+			],
+			[
+				"report",
+				"app/assets/js/reports.js.coffee"
+			],
+			[
+				"lazyjs",
+				"vendor/js/lazy.js"
+			],
+			[
+				"inde",
+				"app/views/index.jade"
+			],
+			[
+				"db_",
+				"test/unit/db_spec.js.coffee"
+			],
+			[
+				"index",
+				"app/views/index.jade"
+			],
+			[
+				"ngstora",
+				"bower_components/ngstorage/ngStorage.js"
+			],
+			[
+				"lazy",
+				"vendor/js/lazy.js"
+			],
+			[
+				"db..",
+				"app/assets/js/db.js.coffee"
+			],
+			[
+				"app.s",
+				"public/js/app.js"
+			],
+			[
+				"report_",
+				"test/unit/report_spec.js.coffee"
+			],
+			[
+				"reports",
+				"app/assets/js/reports.js.coffee"
+			],
+			[
+				"db.j",
+				"app/assets/js/db.js.coffee"
+			],
+			[
+				"db_spe",
+				"test/unit/db_spec.js.coffee"
+			],
+			[
+				"reports.js",
+				"app/assets/js/reports.js.coffee"
+			],
+			[
+				"db.js.cof",
+				"app/assets/js/db.js.coffee"
+			],
+			[
+				"app.js.co",
+				"app/assets/js/app.js.coffee"
+			],
+			[
+				"db.js",
+				"app/assets/js/db.js.coffee"
+			],
+			[
+				"app.js.coff",
+				"app/assets/js/app.js.coffee"
+			],
+			[
+				"karm",
+				"test/karma.conf.js"
+			],
+			[
+				"app.js.c",
+				"app/assets/js/app.js.coffee"
+			],
+			[
+				"kar",
+				"test/karma.conf.js"
+			],
+			[
+				"vendor.",
+				"vendor/js/vendor.js.coffee"
+			],
+			[
+				"lazy.js",
+				"bower_components/lazy.js/lazy.js"
+			],
+			[
+				"moment.js",
+				"bower_components/moment/moment.js"
+			],
+			[
+				"vendor.js",
+				"vendor/js/vendor.js.coffee"
+			],
+			[
+				"karma.js",
+				"test/karma.conf.js"
+			],
+			[
+				"app.coff",
+				"app/assets/js/app.js.coffee"
+			],
+			[
+				"route",
+				"node_modules/express/lib/router/route.js"
+			],
+			[
+				"server.",
+				"server.coffee"
+			],
+			[
+				"line_items/index",
+				"app/views/partials/line_items/index.jade"
+			],
+			[
+				"vendo",
+				"vendor/styles/vendor.less"
+			],
+			[
+				"config.c",
+				"config.coffee"
+			],
+			[
+				"panel",
+				"bower_components/bootstrap/less/panels.less"
+			],
+			[
+				"variab",
+				"bower_components/bootstrap/less/variables.less"
+			],
+			[
+				"mixins",
+				"bower_components/bootstrap/less/mixins.less"
+			],
+			[
+				"new.ja",
+				"app/views/partials/line_items/new.jade"
+			],
+			[
+				"new",
+				"app/views/partials/line_items/new.jade"
+			],
+			[
+				"line",
+				"app/styles/line_items.less"
+			],
+			[
+				"nodemonigno",
+				".nodemonignore"
+			],
+			[
+				"less_engine.js",
+				"node_modules/connect-assets/node_modules/mincer/lib/mincer/engines/less_engine.js"
+			],
+			[
+				"directive",
+				"node_modules/connect-assets/node_modules/mincer/lib/mincer/processors/directive_processor.js"
+			],
+			[
+				"index.j",
+				"app/views/index.jade"
+			],
+			[
+				"bower.js",
+				"bower.json"
+			],
+			[
+				"compone",
+				"bower_components/console-polyfill/component.json"
+			],
+			[
+				"app.co",
+				"app/app.coffee"
+			],
+			[
+				"production.rb",
+				"config/environments/production.rb"
+			],
+			[
+				"development.rb",
+				"config/environments/development.rb"
+			],
+			[
+				"mongoid",
+				"config/mongoid.yml"
+			],
+			[
+				"me",
+				"metadata.rb"
+			],
+			[
+				"meta",
+				"metadata.rb"
+			],
+			[
+				"berks",
+				"Berksfile.lock"
+			],
+			[
+				"berk",
+				"Berksfile"
+			],
+			[
+				"ber",
+				"Berksfile"
+			],
+			[
+				"changes",
+				"templates/default/wordpress.changes.sql.erb"
+			],
+			[
+				"sec",
+				"attributes/secret-attributes.rb"
+			],
+			[
+				"gemf",
+				"Gemfile"
+			],
+			[
+				"gemfile.lo",
+				"Gemfile.lock"
+			],
+			[
+				"nginx",
+				"recipes/nginx.rb"
+			],
+			[
+				"defa",
+				"attributes/default.rb"
+			],
+			[
+				"finan",
+				"recipes/financeRails.rb"
+			],
+			[
+				"m",
+				"metadata.rb"
+			],
+			[
+				"gem",
+				"Gemfile"
+			],
+			[
+				"vagra",
+				"Vagrantfile"
+			],
+			[
+				"ngin",
+				"templates/default/nginx.conf.erb"
+			],
+			[
+				"wo",
+				"recipes/wordpress.rb"
+			],
+			[
+				"word",
+				"recipes/wordpress.rb"
+			],
+			[
+				"vag",
+				"Vagrantfile"
+			],
+			[
+				"deep_create_folder",
+				"definitions/deep_create_folder.rb"
+			],
+			[
+				"jenkin",
+				"recipes/jenkins.rb"
+			],
+			[
+				"va",
+				"Vagrantfile"
+			],
+			[
+				"jenkins.bas",
+				"templates/default/jenkins.bash_profile.sh.erb"
+			],
+			[
+				"vagran",
+				"Vagrantfile"
+			],
+			[
+				"word.",
+				"templates/default/wordpress.nginx.erb"
+			],
+			[
+				"gemfie",
+				"Gemfile.lock"
+			],
+			[
+				"ng",
+				"~/Documents/mbdev/sites/moshebergman-chef/templates/wordpress/nginx.erb"
+			],
+			[
+				"gemfi",
+				"Gemfile"
+			],
+			[
+				"user.rb",
+				"app/models/user.rb"
+			],
+			[
+				"investment_a",
+				"app/controllers/investment_assets_controller.rb"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 193.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

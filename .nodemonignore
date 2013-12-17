@@ -7,3 +7,4 @@ config.coffee
 .git
 node_modules
 Gruntfile.*
+.sublime-project

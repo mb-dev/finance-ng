@@ -1,0 +1,14 @@
+ng-include(src="'/partials/common/memory_header.html'")
+.people_index.container.index_page
+  .new.row
+    a.btn.btn-primary.col-xs-12.add_transaction(ng-href='/people/new') Add Person
+
+  .main_list.list-group   
+    .list-group-item.row.header
+      .icons.col-xs-1 &nbsp;
+      .date.col-xs-11 Name
+    a.list-group-item.row(ng-href='/people/{{item.id}}', ng-repeat='item in items')
+      .icons.col-xs-1 
+        i.fa.fa-user
+        |&nbsp;
+      .date.col-xs-11 {{item.name }}

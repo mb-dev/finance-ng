@@ -1,24 +1,25 @@
-ng-include(src="'/partials/common/finance_header.html'")
-.line_item_show.container
+ng-include(src="'/partials/common/memory_header.html'")
+.accounts_show.container
   .panel.panel-default
     .panel-heading
-      h4.panel-title {{item.event_date | localDate}} - {{item.type | typeString}}
-    .panel-body    
-      .row
-        .col-xs-6.price
-          {{item.amount | currency}}
-        .col-xs-6.well
-          div Account: {{account.name}}
-          div Category: {{item.category_name}}
-          div Payee: {{item.payee_name}}
-          div(ng-show='item.comment.length > 0') Comment: {{item.comment}}
-          div(ng-show='item.grouped_label.length > 0') Highlight Group: {{item.grouped_label}}
-          div(ng-show='item.tags.length > 0') Tags: {{item.tags}}
-          hr/
-          div Balance: {{item.balance | currency}}
+      h4.panel-title Memory Details
+    .panel-body
+      table.table.table-hover.no-header
+        tr
+          td.col-xs-4 Title
+          td.col-xs-6 {{item.title}}
+        tr
+          td.col-xs-4 Date
+          td.col-xs-6 {{item.event_date | localDate}}
+        tr
+          td.col-xs-4 Categories
+          td.col-xs-6 {{categories}}
 
-      .row.form_area
-        .col-xs-3.col-xs-offset-3
-          a.btn.btn-primary.form-control(ng-href='/line_items/{{item.id}}/edit') Edit
-        .col-xs-3
-          a.btn.btn-primary.form-control(ng-href='/line_items/{{item.id}}') Delete
+        tr
+          td.col-xs-12(colspan='2') {{item.content}}
+
+  .row.form_area
+    .col-xs-3.col-xs-offset-3
+      a.btn.btn-primary.form-control.edit(ng-href='/memories/{{item.id}}/edit') Edit
+    .col-xs-3
+      a.btn.btn-primary.form-control.delete(ng-href='/memories/{{item.id}}/delete') Delete

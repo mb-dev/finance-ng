@@ -30,6 +30,14 @@ module.exports = (grunt) ->
           dest: "build/css/vendor"
           cwd: "vendor/css"
         ]
+      fonts:
+        files: [
+          expand: true
+          flatten: true
+          src: "**/*.*"
+          dest: "public/fonts"
+          cwd: "app/assets/fonts" 
+        ]
 
     less:
       dev:
@@ -138,4 +146,5 @@ module.exports = (grunt) ->
   grunt.registerTask "scripts", "", ["copy:scripts", "coffee", "concat:scripts"]
   grunt.registerTask "css", "", ["copy:css", "less", "concat:css"]
   grunt.registerTask "templates", "", ["jade"]
-  grunt.registerTask "build", "", ["scripts", "css", "templates"]
+  grunt.registerTask "fonts", "", ["copy:fonts"]
+  grunt.registerTask "build", "", ["scripts", "css", "templates", "fonts"]

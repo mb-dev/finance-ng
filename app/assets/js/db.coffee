@@ -18,7 +18,7 @@ class window.Collection
       @itemExtendFunc(item)
 
   findById: (id) ->
-    result = Lazy(@collection).find (item) -> item.id == id
+    result = Lazy(@collection).find (item) -> item.id.toString() == id.toString()
     result = angular.copy(result) if result
     result
 
@@ -58,7 +58,7 @@ class window.Collection
     deferred = @$q.defer()
     if !details.id
       id = moment().valueOf()
-      details.id = id
+      details.id = id.toString()
       @lastInsertedId = details.id
     else if @findById(details.id)
       deferred.reject("ID already exists")
@@ -110,12 +110,6 @@ class MemoriesCollection extends Collection
       date.month() == month && date.year() == year
     ).sortBy(sortBy)
 
-class MemoryCategories extends Collection
-  addOrInsertCategoryByName: (name) ->
-    result = Lazy(@collection).find (item) -> item.name == name
-    if !result
-      @insert({name: name})
-
 # Graph DB
 class GraphCollection
   constructor: ($q, graphs) ->
@@ -135,7 +129,8 @@ class GraphCollection
     return @collection[graph][sourceId][destId] == true
 
   getAssociated: (graph, sourceId) =>
-    return false if !@collection[graph] || !@collection[graph][sourceId]
+    sourceId = sourceId.toString()
+    return [] if !@collection[graph] || !@collection[graph][sourceId]
     return Lazy(@collection[graph][sourceId]).keys().toArray()
 
 class window.Database
@@ -146,7 +141,6 @@ class window.Database
   @MEMORIES_TBL = "memories"
   @EVENTS_TBL = "events"
   @PEOPLE_TBL = "people"
-  @MEMORY_CATEGORIES_TBL = "memoryCategories"
   @MEMORY_GRAPH_TBL = "memoryGraph"
   constructor: ($http, $q, $sessionStorage) ->
     @$http = $http
@@ -161,7 +155,6 @@ class window.Database
       memories: new MemoriesCollection($q)
       events: new Collection($q)
       people: new Collection($q)
-      memoryCategories: new Collection($q)
       memoryGraph: new GraphCollection($q, ['memoryToChild', 'eventToMemory', 'eventToPerson', 'personToMemory', 'memoryToCategory'])
       user: {config: {incomeCategories: ['Salary', 'Investments:Dividend', 'Income:Misc']}}
     }
@@ -210,9 +203,6 @@ class window.Database
 
   people: ->
     @db.people
-
-  memoryCategories: ->
-    @db.memoryCategories
 
   memoryGraph: ->
     @db.memoryGraph

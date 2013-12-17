@@ -1,0 +1,20 @@
+ng-include(src="'/partials/common/memory_header.html'")
+.people_show.container
+  .panel.panel-default
+    .panel-heading
+      h4.panel-title Person Details
+    .panel-body
+      table.table.table-hover.no-header
+        tr
+          td.col-xs-4 Name
+          td.col-xs-6 {{item.name}}
+        tr
+          td.col-xs-4 Groups
+          td.col-xs-6 {{groups}}
+        tr
+          td.col-xs-12(colspan='2') {{item.comments}}
+  .row.form_area
+    .col-xs-3.col-xs-offset-3
+      a.btn.btn-primary.form-control.edit(ng-href='/people/{{item.id}}/edit') Edit
+    .col-xs-3
+      a.btn.btn-primary.form-control.delete(ng-href='/people/{{item.id}}/delete') Delete

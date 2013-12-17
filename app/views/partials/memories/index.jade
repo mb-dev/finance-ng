@@ -13,7 +13,7 @@ ng-include(src="'/partials/common/memory_header.html'")
       .icons.col-xs-1 &nbsp;
       .date.col-xs-3 Date
       .payee.col-xs-8 Summary
-    a.list-group-item.row(ng-href='/line_items/{{item.id}}', ng-repeat='item in lineItems')
+    a.list-group-item.row(ng-href='/memories/{{item.id}}', ng-repeat='item in items')
       .icons.col-xs-1 
         i.fa.fa-sun-o
         |&nbsp;

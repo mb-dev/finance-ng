@@ -1,0 +1,20 @@
+ng-include(src="'/partials/common/memory_header.html'")
+.people_form.container
+  .error {{error}}
+  .panel.panel-default
+    .panel-heading
+      h4.panel-title {{title}}
+    form.panel-body.form-horizontal(role='form')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Groups
+        .col-xs-8.col-sm-10
+          input.form-control(type='text', placeholder='Groups', ng-model='groupNames')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Name
+        .col-xs-8.col-sm-10
+          input.form-control(type='text', placeholder='Name', ng-model='item.name')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Comments
+        .col-xs-8.col-sm-10
+          textarea.form-control(type='text', ng-model='item.comments')
+      button.btn.btn-default(ng-click="onSubmit()") Submit
