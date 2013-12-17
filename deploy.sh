@@ -2,5 +2,5 @@
 # copy config
 npm install
 bower install
-brunch build --production
+grunt build
 NODE_ENV=production forever start -c coffee server.coffee
