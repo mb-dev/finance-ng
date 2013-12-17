@@ -15,19 +15,7 @@ module.exports = function(karma) {
     files: [
 
       // Program files
-      'vendor/js/jquery.js',
-      'vendor/js/bootstrap.js',
-      'vendor/js/moment.js',
-      'vendor/js/bignumber.js',
-      'vendor/js/lazy.js',
-      'vendor/js/angular/_angular.js',
-      'vendor/js/angular/angular-mocks.js',
-      'vendor/js/angular/angular-resource.js',
-      'vendor/js/angular/angular-cookies.js',
-      'vendor/js/angular/angular-moment.js',
-      'vendor/js/angular/angular-route.js',
-      'vendor/js/angular/angular-sanitize.js',
-      'vendor/js/angular/ngStorage.js',
+      'public/js/vendor.js',
       'public/js/app.js',
 
       'test/unit/**/*_spec.*'

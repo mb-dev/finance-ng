@@ -19,5 +19,4 @@ module.exports = (app, passport) ->
   app.get '/data/datasets', dataSection.getDataSets
   app.post '/data/datasets', dataSection.postDataSets
 
-  app.get /\/partials\/(.*).html$/, homeSection.partials
   app.all '/*', homeSection.index

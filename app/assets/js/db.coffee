@@ -1,4 +1,4 @@
-class Collection
+class window.Collection
   constructor: ($q, sortColumn, extendFunc) ->
     @$q = $q
     @collection = []
@@ -138,7 +138,7 @@ class GraphCollection
     return false if !@collection[graph] || !@collection[graph][sourceId]
     return Lazy(@collection[graph][sourceId]).keys().toArray()
 
-class Database
+class window.Database
   @ACCOUNTS_TBL = "accounts"
   @LINE_ITEMS_TBL = "lineItems"
   @BUDGET_ITEMS_TBL = "budgetItems"
@@ -325,7 +325,7 @@ class Database
 
     deferred.promise
   
-class Box
+class window.Box
   constructor: ->
     @rows = []
     @rowByHash = {}

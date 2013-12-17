@@ -5,15 +5,8 @@ RedisStore = require('connect-redis')(express)
 module.exports = (app, config, passport) ->
   app.use(express.favicon())
 
-  app.use(require("connect-assets")({
-    paths: ["app/assets/js", "app/assets/styles", "vendor"]
-  }));
-
-  app.use('/css', express.static(config.root + '/public/css'))
-  app.use('/fonts', express.static(config.root + '/public/fonts'))
-  app.use('/js', express.static(config.root + '/public/js'))
-  app.use('/dumps', express.static(config.root + '/public/dumps'))
-
+  app.use(express.static(config.root + '/public'))
+  
   if (process.env.NODE_ENV != 'test')
     app.use(express.logger('dev'))
   

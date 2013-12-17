@@ -1,13 +1,3 @@
-#= require ./db
-#= require ./reports
-#= require ./config/app
-#= require ./sections/accounts/accounts
-#= require ./sections/line_items/line_items  
-#= require ./sections/budget_items/budget_items
-#= require ./sections/user/user
-
-#= require ./sections/memories/memories
-
 angular.module('app.filters', [])
   .filter 'localDate', ($filter) ->
     angularDateFilter = $filter('date')

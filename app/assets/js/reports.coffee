@@ -1,4 +1,4 @@
-class BudgetReportView
+class window.BudgetReportView
   constructor: (db, year) ->
     @db = db
     @year = year
