@@ -1,6 +1,5 @@
 {
-  "name": "angular-brunch-seed",
-  "repo": "scotch/angular-brunch-seed",
+  "name": "ngFinance",
   "version": "0.3.0",
   "main": "_public/js/app.js",
   "ignore": [
@@ -11,21 +10,20 @@
   "dependencies": {
     "console-polyfill": "~0.1.0",
     "jquery": "~2.0.3",
-    "bootstrap": "~3.0.2",
+    "bootstrap": "3.0.3",
     "angular-bootstrap": "~0.6.0",
-    "angular": "1.2.1",
-    "angular-sanitize": "1.2.1",
-    "angular-resource": "1.2.1",
-    "angular-route": "1.2.1",
-    "angular-cookies": "1.2.1",
-    "angular-mocks": "1.2.1"
+    "angular": "1.2.4",
+    "angular-sanitize": "1.2.4",
+    "angular-resource": "1.2.4",
+    "angular-route": "1.2.4",
+    "angular-cookies": "1.2.4",
+    "angular-mocks": "1.2.4",
+    "angular-ui-select2": "0.0.5",
+    "select2": "3.4.5",
+    "pickadate": "3.3.1"
+
   },
   "overrides": {
-    "bootstrap-less": {
-      "ignore": [
-        "*"
-      ]
-    },
     "angular-mocks": {
       "main": "README.md"
     }

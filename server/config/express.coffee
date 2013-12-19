@@ -18,7 +18,7 @@ module.exports = (app, config, passport) ->
 
     app.use(express.bodyParser());
 
-    sessionStore = new RedisStore(host: config.redis.host, port: config.redis.port, db: config.redis.db, ttl: 3600000)
+    sessionStore = new RedisStore(host: config.redis.host, port: config.redis.port, db: config.redis.db, ttl: (60*60*24*7))
     sessionStore.on 'disconnect', () ->
       console.log('Could not connect to redis/got disconnected');
       process.exit(1);
@@ -26,7 +26,7 @@ module.exports = (app, config, passport) ->
     app.use(express.session({
       secret: config.sessionSecret
       store: sessionStore
-      cookie: { maxAge: 3600000 }
+      cookie: { maxAge: 60*60*24*7*1000 }
     }))
 
     app.use(passport.initialize());

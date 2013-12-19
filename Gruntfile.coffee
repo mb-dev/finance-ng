@@ -68,6 +68,7 @@ module.exports = (grunt) ->
             'build/js/vendor/moment.js',
             'build/js/vendor/bignumber.js',
             'build/js/vendor/lazy.js',
+            'build/js/vendor/select2.js',
             'build/js/vendor/angular.js'
             'build/js/vendor/angular-mocks.js'
             'build/js/vendor/angular-resource.js'
@@ -75,7 +76,11 @@ module.exports = (grunt) ->
             'build/js/vendor/angular-moment.js'
             'build/js/vendor/angular-route.js'
             'build/js/vendor/angular-sanitize.js'
+            'build/js/vendor/angular-select2.js'
             'build/js/vendor/ngStorage.js'
+            'build/js/vendor/pickadate.js'
+            'build/js/vendor/pickadate.date.js'
+            'build/js/vendor/pickadate.time.js'
           ]
       css:
         files: [

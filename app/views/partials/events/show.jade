@@ -1,0 +1,32 @@
+ng-include(src="'/partials/common/memory_header.html'")
+.event_show.container
+  .panel.panel-default
+    .panel-heading
+      h4.panel-title Event Details
+    .panel-body
+      table.table.table-hover.no-header
+        tr
+          td.col-xs-4 Title
+          td.col-xs-6 {{item.title}}
+        tr
+          td.col-xs-4 Date
+          td.col-xs-6 {{item.event_date | localDate}}
+        tr
+          td.col-xs-4 Categories
+          td.col-xs-6 {{categories}}
+        tr
+          td.col-xs-4 Participants
+          td.col-xs-6 {{participants}}
+        tr
+          td.col-xs-12(colspan='2') {{item.content}}
+
+      h2 Associated memories
+      ul
+        li(ng-repeat='memory in associatedMemories')
+          span(ng-include='/partials/memories/item')
+
+  .row.form_area
+    .col-xs-3.col-xs-offset-3
+      a.btn.btn-primary.form-control.edit(ng-href='/events/{{item.id}}/edit') Edit
+    .col-xs-3
+      a.btn.btn-primary.form-control.delete(ng-href='/events/{{item.id}}/delete') Delete

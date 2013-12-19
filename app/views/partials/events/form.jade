@@ -1,0 +1,29 @@
+ng-include(src="'/partials/common/memory_header.html'")
+.events_form.container
+  .error {{error}}
+  .panel.panel-default
+    .panel-heading
+      h4.panel-title {{title}}
+    form.panel-body.form-horizontal(role='form')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Categories
+        .col-xs-8.col-sm-10
+          input.form-control(type='text', placeholder='Categories', ng-model='categories', ui-select2='categoriesOptions')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Participants
+        .col-xs-8.col-sm-10
+          select(ui-select2='participantsOptions', ng-model='participants')
+            option(ng-repeat='person in people', value='{{person.id}}') {{person.name}}
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Title
+        .col-xs-8.col-sm-10
+          input.form-control(type='text', placeholder='Title', ng-model='item.title')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Date
+        .col-xs-8.col-sm-10
+          input.form-control(pickadate, type='text', placeholder='Date', ng-model='item.date', date-format='')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Content
+        .col-xs-8.col-sm-10
+          textarea.form-control(type='text', ng-model='item.content')
+      button.btn.btn-default(ng-click="onSubmit()") Submit

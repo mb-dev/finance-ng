@@ -4,6 +4,7 @@ class window.Collection
     @collection = []
     @sortColumn = sortColumn
     @lastInsertedId = null
+    @associations = {}
     if extendFunc
       extendFunc(this)
 
@@ -23,7 +24,7 @@ class window.Collection
     result
 
   findByIds: (ids) ->
-    result = Lazy(@collection).filter (item) -> ids.indexOf(item.id) >= 0
+    result = Lazy(@collection).filter((item) -> ids.indexOf(item.id) >= 0).toArray()
     result = angular.copy(result) if result
     result
 
@@ -86,6 +87,14 @@ class window.Collection
   reset: =>
     @collection = []
 
+  getAssociatedMany: (itemId, db, dbCollection, associatedCollection) ->
+    dbResults = db.getAssociated(dbCollection, itemId)
+    if associatedCollection
+      return [] if dbResults.length == 0
+      associatedCollection.findByIds(dbResults)
+    else
+      dbResults
+
 class LineItemCollection extends Collection
   @EXPENSE = 1
   @INCOME = 0
@@ -109,6 +118,19 @@ class MemoriesCollection extends Collection
       date = moment(item.event_date)
       date.month() == month && date.year() == year
     ).sortBy(sortBy)
+
+class EventsCollection extends Collection
+  getItemsByMonthYear: (month, year, sortBy) ->
+    if !sortBy && @sortColumn
+      sortBy = @defaultSortFunction
+
+    Lazy(@collection).filter((item) -> 
+      date = moment(item.date)
+      date.month() == month && date.year() == year
+    ).sortBy(sortBy)
+
+  getCategories: () ->
+    Lazy(@collection).map((item) -> item.category_name).uniq().sortBy(Lazy.identity).toArray()
 
 # Graph DB
 class GraphCollection
@@ -153,7 +175,7 @@ class window.Database
       budgetItems: new BudgetItemCollection($q, 'budget_year')
       plannedItems: new Collection($q)
       memories: new MemoriesCollection($q)
-      events: new Collection($q)
+      events: new EventsCollection($q, 'date')
       people: new Collection($q)
       memoryGraph: new GraphCollection($q, ['memoryToChild', 'eventToMemory', 'eventToPerson', 'personToMemory', 'memoryToCategory'])
       user: {config: {incomeCategories: ['Salary', 'Investments:Dividend', 'Income:Misc']}}
@@ -179,7 +201,7 @@ class window.Database
         moment(@event_date_start)
       item.$eventDateEnd = ->
         moment(@event_date_end)
-    
+
   accounts: ->
     @db.accounts
 

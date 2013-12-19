@@ -29,13 +29,13 @@ angular.module('app.controllers')
     else
       $scope.title = 'Edit memory'
       $scope.item = db.memories().findById($routeParams.itemId)
-      $scope.categoryNames = db.memoryGraph().getAssociated('memoryToCategory', $scope.item.id).join(', ')
+      $scope.categoryNames = db.memoryGraph().getAssociated(db.graphs.memoryToCategory, $scope.item.id).join(', ')
       updateFunc = db.memories().editById
 
     $scope.onSubmit = ->
       updateFunc($scope.item)
       Lazy($scope.categoryNames.split(',')).each (item) ->
-        db.memoryGraph().associate('memoryToCategory', $scope.item.id, item)
+        db.memoryGraph().associate(db.graphs.memoryToCategory, $scope.item.id, item)
 
       onSuccess = -> $location.path('/memories/')
       saveTables = -> db.saveTables([Database.MEMORIES_TBL, Database.MEMORY_GRAPH_TBL])
@@ -43,4 +43,4 @@ angular.module('app.controllers')
 
   .controller 'MemoriesShowController', ($scope, $routeParams, db) ->
     $scope.item = db.memories().findById($routeParams.itemId)
-    $scope.categories = db.memoryGraph().getAssociated('memoryToCategory', $scope.item.id).join(', ')
+    $scope.categories = db.memoryGraph().getAssociated(db.graphs.memoryToCategory, $scope.item.id).join(', ')

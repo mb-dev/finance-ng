@@ -1,0 +1,21 @@
+ng-include(src="'/partials/common/memory_header.html'")
+.events_index.container.index_page
+  .new.row
+    a.btn.btn-primary.col-xs-12.add_transaction(ng-href='/events/new') Add Event
+
+  .month-nav.row.well.wells-sm
+    a.col-xs-3.prev_month(ng-click='prevMonth()', href='#') &lt;&lt; Prev
+    span.col-xs-6.current_month {{currentDate | amDateFormat:'MMMM, YYYY'}}
+    a.col-xs-3.next_month(ng-click='nextMonth()', href='#') Next &gt;&gt;
+
+  .main_list.list-group   
+    .list-group-item.row.header
+      .icons.col-xs-1 &nbsp;
+      .date.col-xs-3 Date
+      .payee.col-xs-8 Title
+    a.list-group-item.row(ng-href='/events/{{item.id}}', ng-repeat='item in items')
+      .icons.col-xs-1 
+        i.fa.fa-calendar
+        |&nbsp;
+      .date.col-xs-3 {{item.event | amDateFormat:'DD' }}
+      .payee.col-xs-8 {{item.title}}

@@ -23,7 +23,7 @@ angular.module('app.controllers')
     updateFunc = null
     if Lazy($location.$$url).endsWith('new')
       $scope.title = 'New line item'
-      $scope.item = {date: moment().format('L'), tags: []}
+      $scope.item = {event_date: moment().format('L'), tags: []}
       updateFunc = db.lineItems().insert
     else
       $scope.title = 'Edit line item'

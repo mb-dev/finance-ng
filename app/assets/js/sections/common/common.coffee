@@ -18,7 +18,49 @@ angular.module('app.filters', [])
 
 angular.module('app.services', ['ngStorage'])
   .factory 'fdb', ($http, $q, $sessionStorage, $rootScope) ->
-    new Database($http, $q, $sessionStorage)
+    graphs = {
+      memoryToCategory: 'memoryToCategory',
+      eventToCategory: 'eventToCategory',
+      eventToPerson: 'eventToPerson',
+      eventToMemory: 'eventToMemory'
+    }
+    db = new Database($http, $q, $sessionStorage)
+
+    # events
+    db.events().setItemExtendFunc (item) ->
+      item.$participants = ->
+        @db.events.getAssociatedMany(item.id, db.memoryGraph(), graphs.eventToPerson, db.people())
+      item.$categories = ->
+        @db.events.getAssociatedMany(item.id, db.memoryGraph(), graphs.eventToCategory, null)
+      item.$memories = ->
+        @db.events.getAssociatedMany(item.id, db.memoryGraph(), graphs.eventToMemory, null)
+
+    {
+      graphs: ->
+        graphs
+      lineItems: ->
+        db.lineItems()
+      accounts: ->
+        db.accounts()
+      budgetItems: ->
+        db.budgetItems()
+      user: ->
+        db.user()
+      plannedItems: ->
+        db.plannedItems()
+      memories: ->
+        db.memories()
+      events: ->
+        db.events()
+      people: ->
+        db.people()
+      memoryGraph: ->
+        db.memoryGraph()
+      getTables: (tableList) ->
+        db.getTables(tableList)
+      saveTables: (tableList) ->
+        db.saveTables(tableList)
+    }
   .factory 'budgetReportService', () ->
     getReportForYear: (db, year) ->
       budgetReport = new BudgetReportView(db, year)
@@ -72,5 +114,13 @@ angular.module('app.directives', ['app.services', 'app.filters'])
       link: (scope, element, attrs, modelCtrl) ->
         modelCtrl.$parsers.push (inputValue) -> 
           parseInt(inputValue, 10)
+    }
+
+  .directive 'pickadate', () ->
+    {
+      link: (scope, element, attrs, modelCtrl) ->
+        element.pickadate({
+          format: 'mm/dd/yyyy'
+        })
     }
  
