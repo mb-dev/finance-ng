@@ -27,7 +27,7 @@ class window.Collection
   getAvailableId: ->
     return 1 if @collection.length == 0
     lastId = @collection[@collection.length - 1].id
-    lastId
+    lastId + 1
 
   findById: (id) ->
     result = Lazy(@collection).find (item) -> item.id.toString() == id.toString()
