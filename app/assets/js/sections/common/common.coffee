@@ -113,6 +113,7 @@ angular.module('app.services', ['ngStorage'])
       getTables: (tableList) =>
         defer = $q.defer()
         db.getTables(tableList).then((db) =>
+          $rootScope.user = accessFunc.user()
           defer.resolve(accessFunc)
         , (err) =>
           defer.reject(err)
@@ -121,6 +122,8 @@ angular.module('app.services', ['ngStorage'])
 
       saveTables: (tableList) ->
         db.saveTables(tableList)
+      dumpAllCollections: (tableList) -> 
+        db.dumpAllCollections(tableList)
     }
 
   .factory 'fdb', ($http, $q, $sessionStorage, $localStorage, $rootScope) ->
@@ -138,7 +141,7 @@ angular.module('app.services', ['ngStorage'])
       lineItems: db.createCollection(tablesList.lineItems, new LineItemCollection($q, 'event_date'))
       budgetItems: db.createCollection(tablesList.budgetItems, new BudgetItemCollection($q, 'budget_year'))
       plannedItems: db.createCollection(tablesList.plannedItems, new Collection($q))
-      categories: db.createCollection(tablesList.plannedItems, new SimpleCollection($q))
+      categories: db.createCollection(tablesList.categories, new SimpleCollection($q))
     }
     
     tables.lineItems.setItemExtendFunc (item) ->
@@ -180,6 +183,7 @@ angular.module('app.services', ['ngStorage'])
       getTables: (tableList) =>
         defer = $q.defer()
         db.getTables(tableList).then((db) =>
+          $rootScope.user = accessFunc.user()
           defer.resolve(accessFunc)
         , (err) =>
           defer.reject(err)
@@ -188,6 +192,8 @@ angular.module('app.services', ['ngStorage'])
 
       saveTables: (tableList) ->
         db.saveTables(tableList)
+      dumpAllCollections: (tableList) -> 
+        db.dumpAllCollections(tableList)
     }
   .factory 'budgetReportService', () ->
     getReportForYear: (db, year) ->

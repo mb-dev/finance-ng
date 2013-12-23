@@ -18,3 +18,18 @@ nav.navbar-default(role='navigation')
         a(href='/people') People
       li(ng-class="{active: isActive('events')}")
         a(href='/events') Events
+    ul.nav.navbar-nav.navbar-right
+      li.dropdown
+        a.dropdown-toggle(href='#', data-toggle='dropdown')
+          | Welcome!
+          b.caret
+        ul.dropdown-menu
+          li
+            a(href='/profile') 
+              i.fa.fa-cog.fa-fw.fa-sr
+              | Profile
+          li.divider
+          li
+            a(href='/logout') 
+              i.fa.fa-power-off.fa-fw.fa-sr
+              | Logout

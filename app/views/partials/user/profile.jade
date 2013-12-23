@@ -1,0 +1,17 @@
+ng-include(src="'/partials/common/finance_header.html'")
+.profile_show.container.show_page
+  div.error(ng-if="error")
+    {{error}}
+  .panel.panel-default.clearfix
+    .panel-heading
+      .btns-parent.pull-right
+        a.btn.btn-default.btn-sm.edit(ng-href='/memories/{{item.id}}/edit') Edit  
+      h4.panel-title View Profile
+    .panel-body.as-prop-columns.col-xs-12
+      .row
+        .left-pane E-Mail
+        .right-pane {{$root.user.email}}
+      .row
+        .left-pane Backup
+        .right-pane
+          a.btn.btn-primary(href='', ng-click="downloadBackup()") Download Backup

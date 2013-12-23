@@ -66,7 +66,8 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/login', {templateUrl: '/partials/user/login.html', controller: 'UserLoginController'})
     .when('/key', {templateUrl: '/partials/user/key.html', controller: 'UserKeyController'})
     .when('/register', {templateUrl: '/partials/user/register.html'})
-    .when('/edit_profile', {templateUrl: '/partials/user/edit_profile.html'})
+    .when('/profile', {templateUrl: '/partials/user/profile.html', controller: 'UserProfileController' })
+    .when('/edit_profile', {templateUrl: '/partials/user/edit_profile.html', controller: 'UserEditProfileController'})
 
     # download backup
 

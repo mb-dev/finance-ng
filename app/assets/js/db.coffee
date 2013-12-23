@@ -6,7 +6,6 @@ class window.Collection
     @collection = []
     @sortColumn = sortColumn
     @lastInsertedId = null
-    @associations = {}
     if extendFunc
       extendFunc(this)
 
@@ -233,6 +232,16 @@ class window.Database
       data: dbModel.collection
     }
 
+  dumpAllCollections: (tableList) =>
+    result = {}
+    result[@appName] = Lazy(tableList).map((tableName) =>
+      {
+        name: tableName
+        content: @collectionToStorage(@db[tableName])
+      }
+    ).toArray()
+    result
+
   getTables: (tableList) ->
     deferred = @$q.defer();
     missingDataSets = []
@@ -240,11 +249,8 @@ class window.Database
       if @$sessionStorage[@appName + '-' + tableName]
         dbModel = @db[tableName]
         collectionFromSession = angular.copy(@$sessionStorage[@appName + '-' + tableName])
-        if collectionFromSession
-          if collectionFromSession.version
-            dbModel.collection = collectionFromSession.data
-          else
-            dbModel.collection = collectionFromSession
+        if collectionFromSession && collectionFromSession.version     
+          dbModel.collection = collectionFromSession.data
           dbModel.migrateIfNeeded(collectionFromSession.version)
           dbModel.reExtendItems()
       else
