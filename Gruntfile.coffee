@@ -161,5 +161,5 @@ module.exports = (grunt) ->
   grunt.registerTask "css", "", ["copy:css", "less", "concat:css"]
   grunt.registerTask "templates", "", ["jade"]
   grunt.registerTask "fonts", "", ["copy:fonts"]
-  grunt.registerTask "fonts", "", ["copy:images"]
+  grunt.registerTask "images", "", ["copy:images"]
   grunt.registerTask "build", "", ["scripts", "css", "templates", "fonts", "images"]
