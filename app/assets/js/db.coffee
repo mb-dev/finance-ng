@@ -286,7 +286,7 @@ class window.Database
           @db.user.email = response.user.email
           @$sessionStorage.user = {email: response.user.email}
           if !@$localStorage.encryptionKey
-            deferred.reject({data: {reason: 'missing_key'}, status: 403, headers: headers})
+            deferred.reject({data: {reason: 'missing_key'}, status: 403})
           else
             deferred.resolve(this)
         .error (data, status, headers) ->
@@ -297,9 +297,12 @@ class window.Database
       console.log 'loading data sets: ', missingDataSets
       fetchTables(missingDataSets)
     else if @$sessionStorage.user
-      console.log 'all data sets ', tableList, 'and user found in session - resolving'
-      @db.user.email = @$sessionStorage.user.email
-      deferred.resolve(this)
+      if !@$localStorage.encryptionKey
+        deferred.reject({data: {reason: 'missing_key'}, status: 403})
+      else
+        console.log 'all data sets ', tableList, 'and user found in session - resolving'
+        @db.user.email = @$sessionStorage.user.email
+        deferred.resolve(this)
     else
       console.log 'user not found in session, loading [] data sets'
       fetchTables([])
