@@ -25,7 +25,7 @@ ng-include(src="'/partials/common/finance_header.html'")
       .form-group
         label.col-xs-4.col-sm-2.control-label Date
         .col-xs-8.col-sm-10
-          input.form-control(type='text', placeholder='Date', ng-model='item.event_date', date-format='')
+          input.form-control(pickadate, type='text', placeholder='Date', ng-model='item.event_date', date-format='')
       .form-group
         label.col-xs-4.col-sm-2.control-label Payee
         .col-xs-8.col-sm-10
