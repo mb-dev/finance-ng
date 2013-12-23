@@ -5,10 +5,10 @@ ng-include(src="'/partials/common/memory_header.html'")
 
   .main_list.list-group   
     .list-group-item.row.header
-      .icons.col-xs-1 &nbsp;
-      .date.col-xs-11 Name
-    a.list-group-item.row(ng-href='/people/{{item.id}}', ng-repeat='item in items')
-      .icons.col-xs-1 
+      .icons.col-xs-2 &nbsp;
+      .date.col-xs-10 Name
+    a.list-group-item.fixed-row(ng-href='/people/{{item.id}}', ng-repeat='item in items')
+      .icons.col-90 
         i.fa.fa-user
         |&nbsp;
-      .date.col-xs-11 {{item.name }}
+      .date.rest-90 {{item.name }}

@@ -20,40 +20,43 @@ angular.module('app.controllers')
     return
 
   .controller 'EventsFormController', ($scope, $routeParams, $location, db, errorReporter) ->
+    $scope.people = db.people().getAll().toArray()
+    $scope.allCategories = db.categories().getAll().toArray()
     updateFunc = null
     $scope.categoriesOptions = {
       multiple: true,
       simple_tags: true,
-      tags: []
+      tags: $scope.allCategories
     }
-    $scope.participantsOptions = {
+    $scope.peopleOptions = {
       multiple: true
     }
-    $scope.people = db.people().getAll().toArray()
 
     if Lazy($location.$$url).endsWith('new')
       $scope.title = 'New event'
-      $scope.item = {date: moment().format('L')}
-      $scope.categories = []
+      $scope.item = {date: moment().format('L'), associatedMemories: []}
       $scope.participants = []
       updateFunc = db.events().insert
+      $scope.item.participantIds = [$routeParams.personId] if $routeParams.personId
     else
       $scope.title = 'Edit event'
       $scope.item = db.events().findById($routeParams.itemId)
-      $scope.categories = $scope.item.$categories()
+      $scope.categories = $scope.item.categories
       $scope.participants = $scope.item.$participants()
       updateFunc = db.events().editById
 
     $scope.onSubmit = ->
-      updateFunc($scope.item)
-      Lazy($scope.categories.split(',')).each (category) ->
-        db.memoryGraph().associate(db.graphs.eventToCategory, $scope.item.id, category)
+      db.categories().findOrCreate($scope.item.categories)
       onSuccess = -> $location.path('/events/')
-      saveTables = -> db.saveTables([Database.EVENTS_TBL])
+      saveTables = -> db.saveTables([db.tables.events, db.tables.categories])
       updateFunc($scope.item).then(saveTables).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
   .controller 'EventsShowController', ($scope, $routeParams, db) ->
     $scope.item = db.events().findById($routeParams.itemId)
-    $scope.categories = $scope.item.$categories()
-    $scope.participants = $scope.item.$participants()
-    $scope.associatedMemories = $scope.item.$memories()
+    $scope.participants = $scope.item.$participants().getAll()
+    $scope.associatedMemories = $scope.item.$memories().getAll().toArray()
+
+    $scope.deleteItem = () ->
+      db.events().deleteById($scope.item.id)
+      db.saveTables([db.tables.events])
+      $location.path('/events/')

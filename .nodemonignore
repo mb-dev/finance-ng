@@ -1,10 +1,11 @@
 /app/*
 /public/*
 /vendor/*
-/data/*.data
+/data_files/*.data
 /server/*.jade
 config.coffee
 .git
 node_modules
 Gruntfile.*
 .sublime-project
+bower.json

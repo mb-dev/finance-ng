@@ -1,25 +1,41 @@
 ng-include(src="'/partials/common/memory_header.html'")
-.accounts_show.container
-  .panel.panel-default
+.accounts_show.container.show_page
+  .panel.panel-default.clearfix
     .panel-heading
+      .btns-parent.pull-right
+        a.btn.btn-default.btn-sm.edit(ng-href='/memories/{{item.id}}/edit') Edit  
+        a.btn.btn-default.btn-sm.delete(ng-href='/memories/{{item.id}}/delete') Delete
       h4.panel-title Memory Details
-    .panel-body
-      table.table.table-hover.no-header
-        tr
-          td.col-xs-4 Title
-          td.col-xs-6 {{item.title}}
-        tr
-          td.col-xs-4 Date
-          td.col-xs-6 {{item.event_date | localDate}}
-        tr
-          td.col-xs-4 Categories
-          td.col-xs-6 {{categories}}
+    .panel-body.as-prop-columns.col-xs-12
+      .row(ng-if="!!parentMemory")
+        .left-pane Parent
+        .right-pane
+          a(ng-href='/memories/{{parentMemory.id}}')
+            {{parentMemory.title}}
+      .row(ng-if="!!event")
+        .left-pane Events
+        .right-pane 
+          a(ng-repeat='event in events', ng-href='/events/{{event.id}}')
+            {{event.title}}{{$last ? '' : ', '}}
+      .row
+        .left-pane Title
+        .right-pane {{item.title}}
+      .row
+        .left-pane Date
+        .right-pane {{item.date | localDate}}
+      .row
+        .left-pane Categories
+        .right-pane {{item.categories | joinBy}}
+      .row
+        .left-pane People
+        .right-pane 
+          a(ng-repeat='person in people', ng-href='/people/{{person.id}}')
+            {{person.name}}{{$last ? '' : ', '}}
+      .row
+        .col-xs-12(colspan='2') {{item.content}}
 
-        tr
-          td.col-xs-12(colspan='2') {{item.content}}
-
-  .row.form_area
-    .col-xs-3.col-xs-offset-3
-      a.btn.btn-primary.form-control.edit(ng-href='/memories/{{item.id}}/edit') Edit
-    .col-xs-3
-      a.btn.btn-primary.form-control.delete(ng-href='/memories/{{item.id}}/delete') Delete
+  a.btn.btn-primary.pull-right(ng-href='/memories/new?parentMemoryId={{item.id}}') Add
+  h3 Child memories
+  .list-group
+    a.list-group-item.fixed-row(ng-repeat='item in childMemories', ng-href="/memories/{{item.id}}")
+      span(ng-include="'/partials/memories/itemSmall.html'")

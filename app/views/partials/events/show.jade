@@ -1,32 +1,32 @@
 ng-include(src="'/partials/common/memory_header.html'")
-.event_show.container
+.event_show.container.show_page
   .panel.panel-default
     .panel-heading
-      h4.panel-title Event Details
-    .panel-body
-      table.table.table-hover.no-header
-        tr
-          td.col-xs-4 Title
-          td.col-xs-6 {{item.title}}
-        tr
-          td.col-xs-4 Date
-          td.col-xs-6 {{item.event_date | localDate}}
-        tr
-          td.col-xs-4 Categories
-          td.col-xs-6 {{categories}}
-        tr
-          td.col-xs-4 Participants
-          td.col-xs-6 {{participants}}
-        tr
-          td.col-xs-12(colspan='2') {{item.content}}
+      .btns-parent.pull-right
+        a.btn.btn-default.btn-sm.edit(ng-href='/events/{{item.id}}/edit') Edit  
+        a.btn.btn-default.btn-sm.delete(ng-href='/events/{{item.id}}/delete') Delete
+      h4.panel-title
+        |Event Details
+    .panel-body.as-prop-columns.col-xs-12
+      .row
+        .left-pane Title
+        .right-pane {{item.title}}
+      .row
+        .left-pane Date
+        .right-pane {{item.date | localDate}}
+      .row
+        .left-pane Categories
+        .right-pane {{item.categories | joinBy}}
+      .row
+        .left-pane Participants
+        .right-pane 
+          a(ng-repeat='person in participants', ng-href='/people/{{person.id}}')
+            {{person.name}}{{$last ? '' : ', '}}
+      .row
+        td.col-xs-12(colspan='2') {{item.content}}
 
-      h2 Associated memories
-      ul
-        li(ng-repeat='memory in associatedMemories')
-          span(ng-include='/partials/memories/item')
-
-  .row.form_area
-    .col-xs-3.col-xs-offset-3
-      a.btn.btn-primary.form-control.edit(ng-href='/events/{{item.id}}/edit') Edit
-    .col-xs-3
-      a.btn.btn-primary.form-control.delete(ng-href='/events/{{item.id}}/delete') Delete
+  a.btn.btn-primary.pull-right(ng-href='/memories/new?eventId={{item.id}}') Add
+  h3 Associated memories
+  .list-group
+    .list-group-item.fixed_row(ng-repeat='item in associatedMemories', ng-href="/memories/{{item.id}}")
+      span(ng-include="'/partials/memories/itemSmall.html'")      

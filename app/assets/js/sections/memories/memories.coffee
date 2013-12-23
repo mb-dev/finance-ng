@@ -1,7 +1,7 @@
 angular.module('app.controllers')
   .controller 'MemoriesIndexController', ($scope, $routeParams, $location, db) ->
     applyDateChanges = ->
-      $scope.items = db.memories().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year(), (item) -> item.event_date).toArray()
+      $scope.items = db.memories().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).toArray()
 
     $scope.currentDate = moment()
     if $routeParams.month && $routeParams.year
@@ -20,27 +20,56 @@ angular.module('app.controllers')
     return
 
   .controller 'MemoriesFormController', ($scope, $routeParams, $location, db, errorReporter) ->
+    $scope.allCategories = db.categories().getAll().toArray()
+    $scope.people = db.people().getAll().toArray()
+    $scope.categoriesOptions = {
+      multiple: true,
+      simple_tags: true,
+      tags: $scope.allCategories
+    }
+    $scope.peopleOptions = {
+      multiple: true
+    }
     updateFunc = null
-    if Lazy($location.$$url).endsWith('new')
+    if Lazy($location.$$url).indexOf('new') > 0
       $scope.categoryNames = ''
       $scope.title = 'New memory'
-      $scope.item = {event_date: moment().valueOf()}
+      $scope.item = {date: moment().valueOf()}
       updateFunc = db.memories().insert
+      $scope.item.people = [$routeParams.personId] if $routeParams.personId
     else
       $scope.title = 'Edit memory'
       $scope.item = db.memories().findById($routeParams.itemId)
-      $scope.categoryNames = db.memoryGraph().getAssociated(db.graphs.memoryToCategory, $scope.item.id).join(', ')
       updateFunc = db.memories().editById
+
+    if $routeParams.eventId
+      $scope.event = db.events().findById($routeParams.eventId)
+      $scope.item.events ||= []
+      $scope.item.events.push($routeParams.eventId) if $scope.item.events.indexOf($routeParams.eventId) < 0
+
+    if $routeParams.category
+      $scope.item.categories ||= []
+      $scope.item.categories.push($routeParams.category) if $scope.item.categories.indexOf($routeParams.category) < 0
+
+    if $routeParams.parentMemoryId
+      $scope.parentMemory = db.memories().findById($routeParams.parentMemoryId)
+      $scope.item.parentMemoryId = $routeParams.parentMemoryId
 
     $scope.onSubmit = ->
       updateFunc($scope.item)
-      Lazy($scope.categoryNames.split(',')).each (item) ->
-        db.memoryGraph().associate(db.graphs.memoryToCategory, $scope.item.id, item)
+      db.categories().findOrCreate($scope.item.categories)
 
-      onSuccess = -> $location.path('/memories/')
-      saveTables = -> db.saveTables([Database.MEMORIES_TBL, Database.MEMORY_GRAPH_TBL])
+      onSuccess = -> 
+        $location.path('/' + ($routeParams.returnto || 'memories') + '/')
+      saveTables = -> db.saveTables([db.tables.memories, db.tables.categories])
       saveTables().then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
   .controller 'MemoriesShowController', ($scope, $routeParams, db) ->
     $scope.item = db.memories().findById($routeParams.itemId)
-    $scope.categories = db.memoryGraph().getAssociated(db.graphs.memoryToCategory, $scope.item.id).join(', ')
+    $scope.people = db.people().findByIds($scope.item.people)
+    if $scope.item.eventId
+      $scope.event = db.events().findById($scope.item.eventId)
+      console.log('event')
+    if $scope.item.parentMemoryId
+      $scope.parentMemory = db.memories().findById($scope.item.parentMemoryId)
+    $scope.childMemories = db.memories().getItemsByParentMemoryId($scope.item.id).toArray()

@@ -10,12 +10,10 @@ ng-include(src="'/partials/common/memory_header.html'")
 
   .main_list.list-group   
     .list-group-item.row.header
-      .icons.col-xs-1 &nbsp;
-      .date.col-xs-3 Date
-      .payee.col-xs-8 Title
-    a.list-group-item.row(ng-href='/events/{{item.id}}', ng-repeat='item in items')
-      .icons.col-xs-1 
-        i.fa.fa-calendar
-        |&nbsp;
-      .date.col-xs-3 {{item.event | amDateFormat:'DD' }}
-      .payee.col-xs-8 {{item.title}}
+      .date.col-xs-2 Date
+      .payee.col-xs-10 Title
+    a.list-group-item.fixed-row(ng-href='/events/{{item.id}}', ng-repeat='item in items')
+      .icons.col-90
+        i.fa.fa-calendar.fa-sr
+        span {{item.date | monthDay }}
+      .payee.rest-90 {{item.title}}

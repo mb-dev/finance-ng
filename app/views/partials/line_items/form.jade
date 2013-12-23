@@ -33,7 +33,7 @@ ng-include(src="'/partials/common/finance_header.html'")
       .form-group
         label.col-xs-4.col-sm-2.control-label Category
         .col-xs-8.col-sm-10
-          input.form-control(type='text', ng-model='item.category_name')
+          input.form-control(type='text', ng-model='item.category_name', bs-typeahead="allCategories")
       hr/
       .form-group
         label.col-xs-4.col-sm-2.control-label Comment

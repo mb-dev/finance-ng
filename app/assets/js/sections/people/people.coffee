@@ -5,6 +5,13 @@ angular.module('app.controllers')
     return
 
   .controller 'PeopleFormController', ($scope, $routeParams, $location, db, errorReporter) ->
+    $scope.allCategories = db.categories().getAll().toArray()
+    $scope.categoriesOptions = {
+      multiple: true,
+      simple_tags: true,
+      tags: $scope.allCategories
+    }
+
     updateFunc = null
     if Lazy($location.$$url).endsWith('new')
       $scope.groupNames = ''
@@ -14,18 +21,18 @@ angular.module('app.controllers')
     else
       $scope.title = 'Edit person'
       $scope.item = db.people().findById($routeParams.itemId)
-      $scope.categoryNames = db.memoryGraph().getAssociated('personToGroup', $scope.item.id).join(', ')
       updateFunc = db.people().editById
 
     $scope.onSubmit = ->
       updateFunc($scope.item)
-      Lazy($scope.groupNames.split(',')).each (item) ->
-        db.memoryGraph().associate('personToGroup', $scope.item.id, item)
+      db.categories().findOrCreate($scope.item.categories)
 
       onSuccess = -> $location.path('/people/')
-      saveTables = -> db.saveTables([Database.PEOPLE_TBL, Database.MEMORY_GRAPH_TBL])
+      saveTables = -> db.saveTables([db.tables.people, db.tables.categories])
       saveTables().then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
   .controller 'PeopleShowController', ($scope, $routeParams, db) ->
     $scope.item = db.people().findById($routeParams.itemId)
-    $scope.groups = db.memoryGraph().getAssociated('personToGroup', $scope.item.id).join(', ')
+
+    $scope.events = db.events().getEventsByParticipantId($scope.item.id).toArray()
+    $scope.memories = db.memories().getMemoriesByPersonId($scope.item.id).toArray()

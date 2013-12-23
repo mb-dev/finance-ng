@@ -1,7 +1,7 @@
 angular.module('app.controllers')
   .controller 'LineItemsIndexController', ($scope, $routeParams, $location, db) ->
     applyDateChanges = ->
-      $scope.lineItems = db.lineItems().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year(), (item) -> item.event_date).toArray()
+      $scope.lineItems = db.lineItems().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).toArray()
 
     $scope.currentDate = moment('2012-01-01')
     if $routeParams.month && $routeParams.year
@@ -20,6 +20,8 @@ angular.module('app.controllers')
     return
 
   .controller 'LineItemsFormController', ($scope, $routeParams, $location, db, errorReporter) ->
+    $scope.allCategories = db.categories().getAll().toArray()  
+
     updateFunc = null
     if Lazy($location.$$url).endsWith('new')
       $scope.title = 'New line item'
@@ -33,7 +35,7 @@ angular.module('app.controllers')
 
     $scope.onSubmit = ->
       onSuccess = -> $location.path('/line_items/')
-      saveTables = -> db.saveTables([Database.LINE_ITEMS_TBL])
+      saveTables = -> db.saveTables([db.tables.lineItems])
       updateFunc($scope.item).then(saveTables).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
   .controller 'LineItemShowController', ($scope, $routeParams, db) ->

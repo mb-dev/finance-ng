@@ -1,0 +1,9 @@
+ng-include(src="'/partials/common/logged_out_header.html'")
+.login_page.container
+  .panel.panel-default
+    .panel-heading
+      h4.panel-title Please enter encryption key
+    form.panel-body.form_inline(role='form')
+      .form-group
+        input.form-control(type='password', placeholder='Encryption Key', ng-model='key')
+      a.btn.btn-default(ng-click='onSubmit()') Submit 

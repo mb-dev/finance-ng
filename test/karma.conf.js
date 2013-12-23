@@ -13,7 +13,9 @@ module.exports = function(karma) {
 
     // list of files / patterns to load in the browser
     files: [
-
+      'http://code.jquery.com/jquery-2.0.3.min.js',
+      'http://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js',
+      'http://cdn.jsdelivr.net/sjcl/1.0.0/sjcl.js',
       // Program files
       'public/js/vendor.js',
       'public/js/app.js',

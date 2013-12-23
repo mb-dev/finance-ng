@@ -1,20 +1,29 @@
 ng-include(src="'/partials/common/memory_header.html'")
-.people_show.container
-  .panel.panel-default
+.people_show.container.show_page
+  .panel.panel-default.clearfix
     .panel-heading
+      .btns-parent.pull-right
+        a.btn.btn-default.btn-sm.edit(ng-href='/people/{{item.id}}/edit') Edit  
+        a.btn.btn-default.btn-sm.delete(ng-href='/people/{{item.id}}/delete') Delete
       h4.panel-title Person Details
-    .panel-body
-      table.table.table-hover.no-header
-        tr
-          td.col-xs-4 Name
-          td.col-xs-6 {{item.name}}
-        tr
-          td.col-xs-4 Groups
-          td.col-xs-6 {{groups}}
-        tr
-          td.col-xs-12(colspan='2') {{item.comments}}
-  .row.form_area
-    .col-xs-3.col-xs-offset-3
-      a.btn.btn-primary.form-control.edit(ng-href='/people/{{item.id}}/edit') Edit
-    .col-xs-3
-      a.btn.btn-primary.form-control.delete(ng-href='/people/{{item.id}}/delete') Delete
+    .panel-body.as-prop-columns.col-xs-12
+      .row
+        .left-pane Name
+        .right-pane {{item.name}}
+      .row
+        .left-pane Categories
+        .right-pane {{item.categories | joinBy}}
+      .row
+        td.col-xs-12(colspan='2') {{item.comments}}
+
+  a.btn.btn-primary.pull-right(ng-href='/memories/new?personId={{item.id}}') Add
+  h3 Memories:
+  .list-group
+    a.list-group-item.fixed-row(ng-repeat='item in memories', ng-href="/memories/{{item.id}}")
+      span(ng-include="'/partials/memories/itemSmall.html'")
+
+  a.btn.btn-primary.pull-right(ng-href='/events/new?personId={{item.id}}') Add
+  h3 Events:
+  .list-group
+    a.list-group-item.fixed-row(ng-repeat='item in events', ng-href="/events/{{item.id}}")
+      span(ng-include="'/partials/events/itemSmall.html'")

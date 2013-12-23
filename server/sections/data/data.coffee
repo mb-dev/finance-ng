@@ -1,43 +1,60 @@
 fs = require('fs')
 async = require('async')
 path = require('path')
+Lazy = require('lazy.js')
 
 filePrefix = path.normalize(__dirname + '../../../../data_files')
 
-fileLocation = (userId, fileName) ->
+fileLocation = (appName, userId, fileName, createIfMissing) ->
   folder = filePrefix 
-  if !fs.existsSync(folder)
+  if !fs.existsSync(folder) && createIfMissing
     fs.mkdirSync(folder)
   folder = folder + '/' + userId.toString()
-  if !fs.existsSync(folder)
+  if !fs.existsSync(folder) && createIfMissing
+    fs.mkdirSync(folder)
+  folder = folder + '/' + appName
+  if !fs.existsSync(folder) && createIfMissing
     fs.mkdirSync(folder)
 
   folder + '/' + fileName + '.data'
+
+validLocation = (appName, userId, fileName) ->
+  location = fileLocation(appName, userId, fileName, false)
+  location = path.normalize(location)
+
+  if(!Lazy(location).startsWith(filePrefix))
+    console.log('invalid location: ' + location)
+    return false
+
+  return true
 
 exports.getDataSets = (req, res) ->
   if !req.isAuthenticated()
     res.json 403, { reason: 'not_logged_in' }
     return
 
-  dataSets = req.query.dataSets || []
+  tableList = req.query.tableList || []
   
-  readFile = (dataSet, callback) -> 
-    fs.readFile fileLocation(req.user.id, dataSet), 'utf8', (err, data) ->
+  readFile = (tableName, callback) -> 
+    if(!validLocation(req.query.appName, req.user.id, tableName))
+      callback({ reason: 'invalid_location' })
+      return
+
+    fs.readFile fileLocation(req.query.appName, req.user.id, tableName, true), 'utf8', (err, data) ->
       if(err && err.errno == 34)
-        console.log 'return empty content for file', dataSet
-        callback(null, {name: dataSet, content: null})
+        console.log 'return empty content for file', tableName
+        callback(null, {name: tableName, content: null})
       else if(err)
-        console.log 'error reading file', err
+        console.log 'error reading file: ' + err
         callback(err)
       else
-        callback(null, {name: dataSet, content: data})
+        callback(null, {name: tableName, content: data})
 
-  async.map dataSets, readFile, (err, dataSets) ->
+  async.map tableList, readFile, (err, dataSets) ->
     if err
-      console.log('read failed', err)
       res.json 400, {reason: "read_failed"}
     else
-      response = {data: dataSets, user: {email: req.user.email}}
+      response = {tablesResponse: dataSets, user: {email: req.user.email}}
       res.json 200, response
 
 exports.postDataSets = (req, res) ->
@@ -49,7 +66,11 @@ exports.postDataSets = (req, res) ->
     res.json 400, { reason: 'data_sets_missing' }
     return
 
-  saveFile = (dataSet, callback) -> fs.writeFile fileLocation(req.user.id, dataSet.name), dataSet.content, callback
+  if !req.query.appName
+    res.json 400, { reason: 'app_name_missing' }
+    return
+
+  saveFile = (dataSet, callback) -> fs.writeFile fileLocation(req.query.appName, req.user.id, dataSet.name, true), dataSet.content, callback
   async.each req.body, saveFile, (err) ->
     if err
       console.log('Write failed', err)

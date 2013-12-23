@@ -5,10 +5,21 @@ ng-include(src="'/partials/common/memory_header.html'")
     .panel-heading
       h4.panel-title {{title}}
     form.panel-body.form-horizontal(role='form')
+      .form-group(ng-if='!!event')
+        label.col-xs-4.col-sm-2.control-label Event
+        .col-xs-8.col-sm-10.form-label {{event.title}}
+      .form-group(ng-if='!!parentMemory')
+        label.col-xs-4.col-sm-2.control-label Parent Memory
+        .col-xs-8.col-sm-10.form-label {{parentMemory.title}}
       .form-group
         label.col-xs-4.col-sm-2.control-label Categories
         .col-xs-8.col-sm-10
-          input.form-control(type='text', placeholder='Category', ng-model='categoryNames')
+          input.form-control(type='text', placeholder='Categories', ng-model='item.categories', ui-select2='categoriesOptions')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Associated People
+        .col-xs-8.col-sm-10
+          select(ui-select2='peopleOptions', ng-model='item.people', multiple)
+            option(ng-repeat='person in people', value='{{person.id}}') {{person.name}}
       .form-group
         label.col-xs-4.col-sm-2.control-label Title
         .col-xs-8.col-sm-10
@@ -16,7 +27,7 @@ ng-include(src="'/partials/common/memory_header.html'")
       .form-group
         label.col-xs-4.col-sm-2.control-label Date
         .col-xs-8.col-sm-10
-          input.form-control(type='text', placeholder='Date', ng-model='item.event_date', date-format='')
+          input.form-control(type='text', placeholder='Date', ng-model='item.date', date-format='')
       .form-group
         label.col-xs-4.col-sm-2.control-label Content
         .col-xs-8.col-sm-10

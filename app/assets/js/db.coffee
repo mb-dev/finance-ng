@@ -1,4 +1,6 @@
 class window.Collection
+  VERSION = '1.0'
+
   constructor: ($q, sortColumn, extendFunc) ->
     @$q = $q
     @collection = []
@@ -10,6 +12,11 @@ class window.Collection
 
   @doNotConvertFunc = (item) -> item
 
+  version: -> VERSION
+
+  migrateIfNeeded: (fromVersion) ->
+    # no migrations are available yet
+
   setItemExtendFunc: (extendFunc) ->
     @itemExtendFunc = extendFunc
 
@@ -18,12 +25,18 @@ class window.Collection
     Lazy(@collection).each (item) =>
       @itemExtendFunc(item)
 
+  getAvailableId: ->
+    return 1 if @collection.length == 0
+    lastId = @collection[@collection.length - 1].id
+    lastId
+
   findById: (id) ->
     result = Lazy(@collection).find (item) -> item.id.toString() == id.toString()
     result = angular.copy(result) if result
     result
 
   findByIds: (ids) ->
+    return [] if !ids
     result = Lazy(@collection).filter((item) -> ids.indexOf(item.id) >= 0).toArray()
     result = angular.copy(result) if result
     result
@@ -58,8 +71,10 @@ class window.Collection
   insert: (details) =>
     deferred = @$q.defer()
     if !details.id
-      id = moment().valueOf()
+      id = @getAvailableId()
       details.id = id.toString()
+      details.createdAt = moment().valueOf()
+      details.modifiedAt = moment().valueOf()
       @lastInsertedId = details.id
     else if @findById(details.id)
       deferred.reject("ID already exists")
@@ -74,7 +89,14 @@ class window.Collection
     deferred = @$q.defer()
     item = Lazy(@collection).find (item) -> item.id == details.id
     angular.copy(details, item)
+    item.modifiedAt = moment().valueOf()
     deferred.resolve()
+    deferred.promise
+
+  deleteById: (itemId) =>
+    itemIndex = Lazy(@collection).pluck('id').indexOf(itemId)
+    if itemIndex
+      @collection.slice(itemIndex, 1)
 
   length: =>
     @collection.length
@@ -95,42 +117,25 @@ class window.Collection
     else
       dbResults
 
-class LineItemCollection extends Collection
-  @EXPENSE = 1
-  @INCOME = 0
+class window.SimpleCollection
+  VERSION = '1.0'
 
-  getItemsByMonthYear: (month, year, sortBy) ->
-    Lazy(@collection).filter((item) -> 
-      date = moment(item.event_date)
-      date.month() == month && date.year() == year
-    ).sortBy(sortBy)
+  constructor:  ($q) ->
+    @collection = {}
 
-  getCategories: () ->
-    Lazy(@collection).map((item) -> item.category_name).uniq().sortBy(Lazy.identity).toArray()
+  version: -> VERSION
 
-class BudgetItemCollection extends Collection
-  getYearRange: ->
-    Lazy(@collection).pluck('budget_year').uniq().sortBy(Lazy.identity).toArray()
+  migrateIfNeeded: =>
 
-class MemoriesCollection extends Collection
-  getItemsByMonthYear: (month, year, sortBy) ->
-    Lazy(@collection).filter((item) -> 
-      date = moment(item.event_date)
-      date.month() == month && date.year() == year
-    ).sortBy(sortBy)
+  reExtendItems: =>
 
-class EventsCollection extends Collection
-  getItemsByMonthYear: (month, year, sortBy) ->
-    if !sortBy && @sortColumn
-      sortBy = @defaultSortFunction
+  getAll: =>
+    Lazy(@collection).keys()
 
-    Lazy(@collection).filter((item) -> 
-      date = moment(item.date)
-      date.month() == month && date.year() == year
-    ).sortBy(sortBy)
-
-  getCategories: () ->
-    Lazy(@collection).map((item) -> item.category_name).uniq().sortBy(Lazy.identity).toArray()
+  findOrCreate: (items) =>
+    Lazy(items).each (item) =>
+      if(!@collection[item])
+        @collection[item] = true  
 
 # Graph DB
 class GraphCollection
@@ -156,78 +161,23 @@ class GraphCollection
     return Lazy(@collection[graph][sourceId]).keys().toArray()
 
 class window.Database
-  @ACCOUNTS_TBL = "accounts"
-  @LINE_ITEMS_TBL = "lineItems"
-  @BUDGET_ITEMS_TBL = "budgetItems"
-  @PLANNED_ITEMS = "plannedItems"
-  @MEMORIES_TBL = "memories"
-  @EVENTS_TBL = "events"
-  @PEOPLE_TBL = "people"
-  @MEMORY_GRAPH_TBL = "memoryGraph"
-  constructor: ($http, $q, $sessionStorage) ->
+  constructor: (appName, $http, $q, $sessionStorage, $localStorage) ->
     @$http = $http
     @$q = $q
     @$sessionStorage = $sessionStorage
+    @$localStorage = $localStorage
+    @appName = appName
 
     @db = {
-      accounts: new Collection($q, 'name')
-      lineItems: new LineItemCollection($q, 'event_date')
-      budgetItems: new BudgetItemCollection($q, 'budget_year')
-      plannedItems: new Collection($q)
-      memories: new MemoriesCollection($q)
-      events: new EventsCollection($q, 'date')
-      people: new Collection($q)
-      memoryGraph: new GraphCollection($q, ['memoryToChild', 'eventToMemory', 'eventToPerson', 'personToMemory', 'memoryToCategory'])
-      user: {config: {incomeCategories: ['Salary', 'Investments:Dividend', 'Income:Misc']}}
+      user: {config: {incomeCategories: ['Salary', 'Investments:Dividend', 'Income:Misc']}} 
     }
-    @db.lineItems.setItemExtendFunc (item) ->
-      item.$isExpense = ->
-        @type == LineItemCollection.EXPENSE
-      item.$isIncome = ->
-        @type == LineItemCollection.INCOME
-      item.$eventDate = ->
-        moment(@event_date)
-      item.$multiplier = ->
-        if @type == LineItemCollection.EXPENSE then -1 else 1
-      item.$signedAmount = ->
-        parseFloat(@amount) * @$multiplier()
 
-    @db.plannedItems.setItemExtendFunc (item) ->
-      item.$isIncome = ->
-        @type == 'income'
-      item.$isExpense = ->
-        @type == 'expense'
-      item.$eventDateStart = ->
-        moment(@event_date_start)
-      item.$eventDateEnd = ->
-        moment(@event_date_end)
-
-  accounts: ->
-    @db.accounts
-
-  lineItems: ->
-    @db.lineItems
-
-  budgetItems: ->
-    @db.budgetItems
-
-  user: ->
+  user: =>
     @db.user
 
-  plannedItems: ->
-    @db.plannedItems
-
-  memories: ->
-    @db.memories
-
-  events: ->
-    @db.events
-
-  people: ->
-    @db.people
-
-  memoryGraph: ->
-    @db.memoryGraph
+  createCollection: (name, collectionInstance) =>
+    @db[name] = collectionInstance
+    collectionInstance
 
   importDatabase: ($q, $sessionStorage) ->
     dateToJsStorage = (dateString) -> 
@@ -277,60 +227,92 @@ class window.Database
     
     importDeferred.promise
   
+  collectionToStorage: (dbModel) ->
+    {
+      version: dbModel.version()
+      data: dbModel.collection
+    }
+
   getTables: (tableList) ->
     deferred = @$q.defer();
     missingDataSets = []
-    Lazy(tableList).each (dataSet) =>
-      if @$sessionStorage[dataSet]
-        dbModel = @db[dataSet]
-        dbModel.collection = angular.copy(@$sessionStorage[dataSet])
-        dbModel.reExtendItems() if dbModel.reExtendItems
+    Lazy(tableList).each (tableName) =>
+      if @$sessionStorage[@appName + '-' + tableName]
+        dbModel = @db[tableName]
+        collectionFromSession = angular.copy(@$sessionStorage[@appName + '-' + tableName])
+        if collectionFromSession
+          if collectionFromSession.version
+            dbModel.collection = collectionFromSession.data
+          else
+            dbModel.collection = collectionFromSession
+          dbModel.migrateIfNeeded(collectionFromSession.version)
+          dbModel.reExtendItems()
       else
-        missingDataSets.push(dataSet)
+        missingDataSets.push(tableName)
 
-    loadDataSets = (dataSets) =>
-      @$http.get('/data/datasets?' + $.param({dataSets: dataSets}))
-        .success (data, status, headers) =>
-          Lazy(data.data).each (dataSet) =>
-            dbModel = @db[dataSet.name]
-            dbModel.collection = JSON.parse(dataSet.content)
-            dbModel.reset() if dbModel.collection == null
-            dbModel.reExtendItems() if dbModel.reExtendItems
-            console.log 'saving dataset:', dataSet.name, 'to session'
-            @$sessionStorage[dataSet.name] = dbModel.collection
-          @db.user.email = data.user.email
-          @$sessionStorage.user = {email: data.user.email}
-          deferred.resolve(this)
+    loadDataSet = (dataSet) =>
+      dbModel = @db[dataSet.name]
+      if !dataSet.content
+        console.log('failed to load ' + dataSet.name)
+        return
+      if dataSet.content.indexOf('"iv":') >= 0
+        try
+          dataSet.content = JSON.parse(sjcl.decrypt(@$localStorage.encryptionKey, dataSet.content))
+        catch err
+          console.log('failed to decrypt ' + dataSet.name)
+          return
+      else
+        dataSet.content = JSON.parse(dataSet.content)
+      if !dataSet.content.version
+        console.log('failed to load ' + dataSet.name + ' - version missing')
+        return
+      
+      dbModel.collection = dataSet.content.data
+      dbModel.migrateIfNeeded()
+      dbModel.reExtendItems()
+      console.log 'saving dataset:', dataSet.name, 'to session'
+      @$sessionStorage[@appName + '-' + dataSet.name] = angular.copy(@collectionToStorage(dbModel))
+
+    fetchTables = (tableList) =>
+      @$http.get('/data/datasets?' + $.param({appName: @appName, tableList: tableList}))
+        .success (response, status, headers) =>
+          Lazy(response.tablesResponse).each(loadDataSet)
+          @db.user.email = response.user.email
+          @$sessionStorage.user = {email: response.user.email}
+          if !@$localStorage.encryptionKey
+            deferred.reject({data: {reason: 'missing_key'}, status: 403, headers: headers})
+          else
+            deferred.resolve(this)
         .error (data, status, headers) ->
           console.log(data)
           deferred.reject({data: data, status: status, headers: headers})
 
     if missingDataSets.length > 0
       console.log 'loading data sets: ', missingDataSets
-      loadDataSets(missingDataSets)
+      fetchTables(missingDataSets)
     else if @$sessionStorage.user
       console.log 'all data sets ', tableList, 'and user found in session - resolving'
       @db.user.email = @$sessionStorage.user.email
       deferred.resolve(this)
     else
       console.log 'user not found in session, loading [] data sets'
-      loadDataSets([])
+      fetchTables([])
 
     deferred.promise
 
   saveTables: (tableList) =>
     toParam = (dataSet) =>
       name: dataSet
-      content: angular.toJson(@db[dataSet].collection)
+      content: sjcl.encrypt(@$localStorage.encryptionKey, angular.toJson(@collectionToStorage(@db[dataSet])))
 
     deferred = @$q.defer();
     dataSets = Lazy(tableList).map(toParam).toArray()
 
-    @$http.post('/data/datasets', dataSets)
+    @$http.post('/data/datasets?' + $.param({appName: @appName}), dataSets)
       .success (data, status, headers) =>
-        Lazy(tableList).each (dataSet) =>
-          console.log 'saving dataset:', dataSet.name, 'to session'
-          @$sessionStorage[dataSet] = @db[dataSet].collection
+        Lazy(tableList).each (tableName) =>
+          console.log 'saving dataset:', tableName, 'to session'
+          @$sessionStorage[@appName + '-' + tableName] = angular.copy(@collectionToStorage(@db[tableName]))
         deferred.resolve(data)
       .error (data, status, headers) ->
         deferred.reject({data: data, status: status, headers: headers})

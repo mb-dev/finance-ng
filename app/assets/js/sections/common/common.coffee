@@ -1,63 +1,191 @@
-angular.module('app.filters', [])
-  .filter 'localDate', ($filter) ->
-    angularDateFilter = $filter('date')
-    (theDate) ->
-      angularDateFilter(theDate, 'MM/dd/yyyy')
+# JS Functions
 
-  .filter 'typeString', ($filter) ->
-    (typeInt) ->
-      if typeInt == LineItemCollection.EXPENSE then 'Expense' else 'Income'
+# Other
 
-   .filter 'bnToFixed', ($window) ->
-     (value, format) -> 
-      if (typeof value == 'undefined' || value == null)
-        return ''
+class window.LineItemCollection extends Collection
+  @EXPENSE = 1
+  @INCOME = 0
 
-      value.toFixed(2)
+  getItemsByMonthYear: (month, year, sortBy) ->
+    Lazy(@collection).filter((item) -> 
+      date = moment(item.event_date)
+      date.month() == month && date.year() == year
+    ).sortBy(sortBy)
 
+  getCategories: () ->
+    Lazy(@collection).map((item) -> item.category_name).uniq().sortBy(Lazy.identity).toArray()
+
+class BudgetItemCollection extends Collection
+  getYearRange: ->
+    Lazy(@collection).pluck('budget_year').uniq().sortBy(Lazy.identity).toArray()
+
+class MemoriesCollection extends Collection
+
+  migrateIfNeeded: ->
+    Lazy(@collection).each (item) ->
+      if item.event_date
+        item.date = item.event_date
+        delete item.event_date
+      if item.eventId
+        item.events = [item.eventId]
+        delete item.eventId
+
+  getItemsByMonthYear: (month, year, sortBy) ->
+    results = Lazy(@collection).filter((item) -> 
+      date = moment(item.event_date)
+      date.month() == month && date.year() == year
+    )
+    results = results.sortBy sortBy if sortBy
+    results
+
+  getItemsByEventId: (eventId, sortBy) ->
+    results = Lazy(@collection).filter((item) -> item.events && item.events.indexOf(eventId) >= 0 )
+    results = results.sortBy sortBy if sortBy
+    results
+
+  getItemsByParentMemoryId: (parentMemoryId, sortBy) ->
+    results = Lazy(@collection).filter((item) -> item.parentMemoryId == parentMemoryId)
+    results = results.sortBy sortBy if sortBy
+    results
+
+  getMemoriesByPersonId: (personId, sortBy) ->
+    results = Lazy(@collection).filter((item) -> item.people && item.people.indexOf(personId) >= 0 )
+    results = results.sortBy sortBy if sortBy
+    results
+
+  getAllParentMemories: (sortBy) ->
+    results = Lazy(@collection).filter((item) -> !item.parentMemoryId && (!item.events || item.events.length == 0) )
+    results = results.sortBy sortBy if sortBy
+    results   
+
+class EventsCollection extends Collection
+  getItemsByMonthYear: (month, year, sortBy) ->
+    if !sortBy && @sortColumn
+      sortBy = @defaultSortFunction
+
+    Lazy(@collection).filter((item) -> 
+      date = moment(item.date)
+      date.month() == month && date.year() == year
+    ).sortBy(sortBy)
+
+  getEventsByParticipantId: (participantId, sortBy) ->
+    results = Lazy(@collection).filter((item) -> item.participantIds && item.participantIds.indexOf(participantId) >= 0 )
+    results = results.sortBy sortBy if sortBy
+    results 
 
 angular.module('app.services', ['ngStorage'])
-  .factory 'fdb', ($http, $q, $sessionStorage, $rootScope) ->
-    graphs = {
-      memoryToCategory: 'memoryToCategory',
-      eventToCategory: 'eventToCategory',
-      eventToPerson: 'eventToPerson',
-      eventToMemory: 'eventToMemory'
+  .factory 'mdb', ($http, $q, $sessionStorage, $localStorage, $rootScope) ->
+    tablesList = {
+      memories: 'memories'
+      events: 'events'
+      people: 'people'
+      categories: 'categories'
     }
-    db = new Database($http, $q, $sessionStorage)
+    db = new Database('memoryng', $http, $q, $sessionStorage, $localStorage)
+    tables = {
+      memories: db.createCollection(tablesList.memories, new MemoriesCollection($q, 'date'))
+      events: db.createCollection(tablesList.events, new EventsCollection($q, 'date'))
+      people: db.createCollection(tablesList.people, new Collection($q)),
+      categories: db.createCollection(tablesList.categories, new SimpleCollection($q))
+    }
 
     # events
-    db.events().setItemExtendFunc (item) ->
+    tables.events.setItemExtendFunc (item) ->
       item.$participants = ->
-        @db.events.getAssociatedMany(item.id, db.memoryGraph(), graphs.eventToPerson, db.people())
-      item.$categories = ->
-        @db.events.getAssociatedMany(item.id, db.memoryGraph(), graphs.eventToCategory, null)
+        getAll: ->
+          tables.people.findByIds(item.participantIds)
       item.$memories = ->
-        @db.events.getAssociatedMany(item.id, db.memoryGraph(), graphs.eventToMemory, null)
+        getAll: ->
+          tables.memories.getItemsByEventId(item.id)
 
-    {
-      graphs: ->
-        graphs
+    accessFunc = {
+      tables: tablesList
+      memories: ->
+        tables.memories
+      events: ->
+        tables.events
+      people: ->
+        tables.people
+      categories: ->
+        tables.categories
+      user: ->
+        db.user()
+      getTables: (tableList) =>
+        defer = $q.defer()
+        db.getTables(tableList).then((db) =>
+          defer.resolve(accessFunc)
+        , (err) =>
+          defer.reject(err)
+        )
+        defer.promise
+
+      saveTables: (tableList) ->
+        db.saveTables(tableList)
+    }
+
+  .factory 'fdb', ($http, $q, $sessionStorage, $localStorage, $rootScope) ->
+    db = new Database('financeng', $http, $q, $sessionStorage, $localStorage)
+
+    tablesList = {
+      accounts: 'accounts',
+      lineItems: 'lineItems',
+      budgetItems: 'budgetItems',
+      plannedItems: 'plannedItems'
+      categories: 'categories'
+    }
+    tables = {
+      accounts: db.createCollection(tablesList.accounts, new Collection($q, 'name'))
+      lineItems: db.createCollection(tablesList.lineItems, new LineItemCollection($q, 'event_date'))
+      budgetItems: db.createCollection(tablesList.budgetItems, new BudgetItemCollection($q, 'budget_year'))
+      plannedItems: db.createCollection(tablesList.plannedItems, new Collection($q))
+      categories: db.createCollection(tablesList.plannedItems, new SimpleCollection($q))
+    }
+    
+    tables.lineItems.setItemExtendFunc (item) ->
+      item.$isExpense = ->
+        @type == LineItemCollection.EXPENSE
+      item.$isIncome = ->
+        @type == LineItemCollection.INCOME
+      item.$eventDate = ->
+        moment(@event_date)
+      item.$multiplier = ->
+        if @type == LineItemCollection.EXPENSE then -1 else 1
+      item.$signedAmount = ->
+        parseFloat(@amount) * @$multiplier()
+
+    tables.plannedItems.setItemExtendFunc (item) ->
+      item.$isIncome = ->
+        @type == 'income'
+      item.$isExpense = ->
+        @type == 'expense'
+      item.$eventDateStart = ->
+        moment(@event_date_start)
+      item.$eventDateEnd = ->
+        moment(@event_date_end)
+    
+    accessFunc = {
+      tables: tablesList
+      categories: ->
+        tables.categories
       lineItems: ->
-        db.lineItems()
+        tables.lineItems
       accounts: ->
-        db.accounts()
+        tables.accounts
       budgetItems: ->
-        db.budgetItems()
+        tables.budgetItems
       user: ->
         db.user()
       plannedItems: ->
-        db.plannedItems()
-      memories: ->
-        db.memories()
-      events: ->
-        db.events()
-      people: ->
-        db.people()
-      memoryGraph: ->
-        db.memoryGraph()
-      getTables: (tableList) ->
-        db.getTables(tableList)
+        tables.plannedItems
+      getTables: (tableList) =>
+        defer = $q.defer()
+        db.getTables(tableList).then((db) =>
+          defer.resolve(accessFunc)
+        , (err) =>
+          defer.reject(err)
+        )
+        defer.promise
+
       saveTables: (tableList) ->
         db.saveTables(tableList)
     }
@@ -124,3 +252,28 @@ angular.module('app.directives', ['app.services', 'app.filters'])
         })
     }
  
+ angular.module('app.filters', [])
+  .filter 'localDate', ($filter) ->
+    angularDateFilter = $filter('date')
+    (theDate) ->
+      angularDateFilter(theDate, 'MM/dd/yyyy')
+
+  .filter 'monthDay', ($filter) ->
+    angularDateFilter = $filter('date')
+    (theDate) ->
+      angularDateFilter(theDate, 'MM/dd')
+
+  .filter 'typeString', ($filter) ->
+    (typeInt) ->
+      if typeInt == LineItemCollection.EXPENSE then 'Expense' else 'Income'
+
+   .filter 'bnToFixed', ($window) ->
+     (value, format) -> 
+      if (typeof value == 'undefined' || value == null)
+        return ''
+
+      value.toFixed(2)
+
+  .filter 'joinBy', () ->
+    (input, delimiter) ->
+      (input || []).join(delimiter || ',')

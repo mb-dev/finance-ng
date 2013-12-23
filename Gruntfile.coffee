@@ -55,21 +55,21 @@ module.exports = (grunt) ->
               "build/js/app/accounts.js"
               "build/js/app/budget_items.js"
               "build/js/app/events.js"
+              "build/js/app/categories.js"
               "build/js/app/line_items.js"
               "build/js/app/memories.js"
               "build/js/app/people.js"
+              "build/js/app/journal.js"
               "build/js/app/reports.js"
               "build/js/app/user.js"
               "build/js/app/common.js" 
             ]
           "public/js/vendor.js": [
-            'build/js/vendor/jquery.js',
             'build/js/vendor/bootstrap.js',
             'build/js/vendor/moment.js',
             'build/js/vendor/bignumber.js',
             'build/js/vendor/lazy.js',
             'build/js/vendor/select2.js',
-            'build/js/vendor/angular.js'
             'build/js/vendor/angular-mocks.js'
             'build/js/vendor/angular-resource.js'
             'build/js/vendor/angular-cookies.js'
@@ -77,6 +77,7 @@ module.exports = (grunt) ->
             'build/js/vendor/angular-route.js'
             'build/js/vendor/angular-sanitize.js'
             'build/js/vendor/angular-select2.js'
+            'build/js/vendor/angular-strap-typeahead.js'
             'build/js/vendor/ngStorage.js'
             'build/js/vendor/pickadate.js'
             'build/js/vendor/pickadate.date.js'

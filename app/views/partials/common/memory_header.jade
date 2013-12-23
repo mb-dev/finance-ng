@@ -8,9 +8,13 @@ nav.navbar-default(role='navigation')
     a.navbar-brand(href='/') Memory
   .collapse.navbar-collapse
     ul.nav.navbar-nav
-      li
+      li(ng-class="{active: isActive('journal')}")
+        a(href='/journal') Journal
+      li(ng-class="{active: isActive('categories')}")
+        a(href='/categories') Categories
+      li(ng-class="{active: isActive('memories')}")
         a(href='/memories') Memories
-      li.active
+      li(ng-class="{active: isActive('people')}")
         a(href='/people') People
-      li
+      li(ng-class="{active: isActive('events')}")
         a(href='/events') Events
