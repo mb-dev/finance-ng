@@ -3,7 +3,7 @@ ng-include(src="'/partials/common/memory_header.html'")
   .panel.panel-default.clearfix
     .panel-heading
       .btns-parent.pull-right
-        a.btn.btn-default.btn-sm.edit(ng-href='/memories/{{item.id}}/edit') Edit  
+        a.btn.btn-default.btn-sm.edit(ng-href='/memories/{{item.id}}/edit?returnto=memories/{{item.id}}') Edit  
         a.btn.btn-default.btn-sm.delete(ng-href='/memories/{{item.id}}/delete') Delete
       h4.panel-title Memory Details
     .panel-body.as-prop-columns.col-xs-12

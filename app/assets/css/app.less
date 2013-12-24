@@ -57,8 +57,10 @@ form .select2-container {
 }
 
 .fixed-row {
-  margin-left: -15px;
-  margin-right: -15px;
+  @media (max-width: @screen-xs-min) {
+    margin-left: -15px;
+    margin-right: -15px;
+  }
   .col-90 {
     width: 90px;
     padding-left: 15px;

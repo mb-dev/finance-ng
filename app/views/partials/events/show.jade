@@ -3,7 +3,7 @@ ng-include(src="'/partials/common/memory_header.html'")
   .panel.panel-default.clearfix
     .panel-heading
       .btns-parent.pull-right
-        a.btn.btn-default.btn-sm.edit(ng-href='/events/{{item.id}}/edit') Edit  
+        a.btn.btn-default.btn-sm.edit(ng-href='/events/{{item.id}}/edit?returnto=events/{{item.id}}') Edit  
         a.btn.btn-default.btn-sm.delete(ng-href='/events/{{item.id}}/delete') Delete
       h4.panel-title
         |Event Details

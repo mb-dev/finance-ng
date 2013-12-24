@@ -47,7 +47,7 @@ angular.module('app.controllers')
 
     $scope.onSubmit = ->
       db.categories().findOrCreate($scope.item.categories)
-      onSuccess = -> $location.path('/events/')
+      onSuccess = -> $location.path('/' + ($routeParams.returnto || 'events') + '/')
       saveTables = -> db.saveTables([db.tables.events, db.tables.categories])
       updateFunc($scope.item).then(saveTables).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
