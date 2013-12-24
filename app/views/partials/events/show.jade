@@ -1,6 +1,6 @@
 ng-include(src="'/partials/common/memory_header.html'")
 .event_show.container.show_page
-  .panel.panel-default
+  .panel.panel-default.clearfix
     .panel-heading
       .btns-parent.pull-right
         a.btn.btn-default.btn-sm.edit(ng-href='/events/{{item.id}}/edit') Edit  
@@ -25,8 +25,8 @@ ng-include(src="'/partials/common/memory_header.html'")
       .row
         td.col-xs-12(colspan='2') {{item.content}}
 
-  a.btn.btn-primary.pull-right(ng-href='/memories/new?eventId={{item.id}}') Add
+  a.btn.btn-primary.pull-right(ng-href='/memories/new?eventId={{item.id}}&returnto=events/{{item.id}}') Add
   h3 Associated memories
   .list-group
-    .list-group-item.fixed_row(ng-repeat='item in associatedMemories', ng-href="/memories/{{item.id}}")
+    a.list-group-item.fixed-row(ng-repeat='item in associatedMemories', ng-href="/memories/{{item.id}}")
       span(ng-include="'/partials/memories/itemSmall.html'")      

@@ -15,7 +15,10 @@ angular.module('app.controllers')
         categoryData[categoryName].push({type: 'events', modifiedAt: item.modifiedAt, data: item, date: moment(item.modifiedAt).format('L')})
 
     categories.each (item) ->
-      categoryData[item].sort().reverse()
+      if categoryData[item].length == 0
+        delete categoryData[item]
+      else
+        categoryData[item].sort().reverse()
 
     $scope.categories = categories.toArray().sort()
     $scope.categoryData = categoryData

@@ -32,12 +32,14 @@ angular.module('app.controllers')
     }
     updateFunc = null
     if Lazy($location.$$url).indexOf('new') > 0
+      $scope.type = 'new'
       $scope.categoryNames = ''
       $scope.title = 'New memory'
       $scope.item = {date: moment().valueOf()}
       updateFunc = db.memories().insert
       $scope.item.people = [$routeParams.personId] if $routeParams.personId
     else
+      $scope.type = 'edit'
       $scope.title = 'Edit memory'
       $scope.item = db.memories().findById($routeParams.itemId)
       updateFunc = db.memories().editById
@@ -46,6 +48,7 @@ angular.module('app.controllers')
       $scope.event = db.events().findById($routeParams.eventId)
       $scope.item.events ||= []
       $scope.item.events.push($routeParams.eventId) if $scope.item.events.indexOf($routeParams.eventId) < 0
+      $scope.item.date = $scope.event.date if $scope.type == 'new'
 
     if $routeParams.category
       $scope.item.categories ||= []
