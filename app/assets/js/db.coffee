@@ -1,3 +1,7 @@
+# weird functions to fix issues:
+# convertId = function(id) { return parseInt(id[0], 10) + id.length - 1 }
+# angular.element('.list-group').injector().get('mdb').events().collection.forEach(function(item, index) { if(item.participantIds && item.participantIds[0]) { console.log(item.participantIds[0], convertId(item.participantIds[0])); } })
+
 class window.Collection
   VERSION = '1.0'
 
@@ -37,7 +41,8 @@ class window.Collection
 
   findByIds: (ids) ->
     return [] if !ids
-    result = Lazy(@collection).filter((item) -> ids.indexOf(item.id) >= 0).toArray()
+    ids = ids.map (id) -> id.toString()
+    result = Lazy(@collection).filter((item) -> ids.indexOf(item.id.toString()) >= 0).toArray()
     result = angular.copy(result) if result
     result
 
@@ -88,7 +93,7 @@ class window.Collection
 
   editById: (details) =>
     deferred = @$q.defer()
-    item = Lazy(@collection).find (item) -> item.id == details.id
+    item = Lazy(@collection).find (item) -> item.id.toString() == details.id.toString()
     angular.copy(details, item)
     item.modifiedAt = moment().valueOf()
     @onModified()
@@ -96,7 +101,7 @@ class window.Collection
     deferred.promise
 
   deleteById: (itemId) =>
-    itemIndex = Lazy(@collection).pluck('id').indexOf(itemId)
+    itemIndex = Lazy(@collection).pluck('id').indexOf(itemId.toString())
     if itemIndex >= 0
       @collection.splice(itemIndex, 1)
     @onModified()
