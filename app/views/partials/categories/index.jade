@@ -6,5 +6,5 @@ ng-include(src="'/partials/common/memory_header.html'")
         .btns-parent.pull-right
           a.btn.btn-default.btn-xs(ng-href='/memories/new?category={{category}}&returnto=categories') +Memory
         b {{category}}
-      a.list-group-item.fixed-row.row(ng-repeat='itemMeta in categoryData[category]', ng-class="itemMeta.type", ng-href="/{{itemMeta.type}}/{{item.id}}", ng-init="item = itemMeta.data") 
+      a.list-group-item.fixed-row(ng-repeat='itemMeta in categoryData[category]', ng-class="itemMeta.type", ng-href="/{{itemMeta.type}}/{{item.id}}", ng-init="item = itemMeta.data") 
         ng-include(src="'/partials/' + itemMeta.type + '/itemSmall.html'")

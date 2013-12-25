@@ -25,5 +25,5 @@ ng-include(src="'/partials/common/memory_header.html'")
   a.btn.btn-primary.pull-right(ng-href='/events/new?personId={{item.id}}') Add
   h3 Events:
   .list-group
-    a.list-group-item.fixed-row.row(ng-repeat='item in events', ng-href="/events/{{item.id}}")
+    a.list-group-item.fixed-row(ng-repeat='item in events', ng-href="/events/{{item.id}}")
       span(ng-include="'/partials/events/itemSmall.html'")

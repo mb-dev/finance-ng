@@ -12,7 +12,7 @@ ng-include(src="'/partials/common/memory_header.html'")
     .list-group-item.row.header
       .date.col-xs-3 Date
       .payee.col-xs-9 Summary
-    a.list-group-item.fixed-row.row(ng-href='/memories/{{item.id}}', ng-repeat='item in items')
+    a.list-group-item.fixed-row(ng-href='/memories/{{item.id}}', ng-repeat='item in items')
       .icons.col-90
         i.fa.fa-sun-o.fa-fw.fa-sr
         span {{item.date | amDateFormat:'DD' }}
