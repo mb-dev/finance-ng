@@ -1,6 +1,6 @@
 ng-include(src="'/partials/common/memory_header.html'")
 .people_show.container.show_page
-  .panel.panel-default.clearfix
+  .panel.panel-default.row
     .panel-heading
       .btns-parent.pull-right
         a.btn.btn-default.btn-sm.edit(ng-href='/people/{{item.id}}/edit') Edit  
@@ -19,11 +19,11 @@ ng-include(src="'/partials/common/memory_header.html'")
   a.btn.btn-primary.pull-right(ng-href='/memories/new?personId={{item.id}}') Add
   h3 Memories:
   .list-group
-    a.list-group-item.fixed-row(ng-repeat='item in memories', ng-href="/memories/{{item.id}}")
+    a.list-group-item.fixed-row.row(ng-repeat='item in memories', ng-href="/memories/{{item.id}}")
       span(ng-include="'/partials/memories/itemSmall.html'")
 
   a.btn.btn-primary.pull-right(ng-href='/events/new?personId={{item.id}}') Add
   h3 Events:
   .list-group
-    a.list-group-item.fixed-row(ng-repeat='item in events', ng-href="/events/{{item.id}}")
+    a.list-group-item.fixed-row.row(ng-repeat='item in events', ng-href="/events/{{item.id}}")
       span(ng-include="'/partials/events/itemSmall.html'")
