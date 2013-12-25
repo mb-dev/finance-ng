@@ -35,7 +35,7 @@ angular.module('app.controllers')
       $scope.type = 'new'
       $scope.categoryNames = ''
       $scope.title = 'New memory'
-      $scope.item = {date: moment().valueOf()}
+      $scope.item = {date: moment().valueOf().toString()}
       updateFunc = db.memories().insert
       $scope.item.people = [$routeParams.personId] if $routeParams.personId
     else
