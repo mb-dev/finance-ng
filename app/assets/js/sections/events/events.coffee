@@ -34,7 +34,7 @@ angular.module('app.controllers')
 
     if Lazy($location.$$url).endsWith('new')
       $scope.title = 'New event'
-      $scope.item = {date: moment().valueOf().toString(), associatedMemories: []}
+      $scope.item = {date: moment().valueOf(), associatedMemories: []}
       $scope.participants = []
       updateFunc = db.events().insert
       $scope.item.participantIds = [$routeParams.personId] if $routeParams.personId
