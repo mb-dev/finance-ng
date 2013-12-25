@@ -28,6 +28,14 @@ validLocation = (appName, userId, fileName) ->
 
   return true
 
+
+exports.authenticate = (req, res) ->
+  if !req.isAuthenticated()
+    res.json 403, { reason: 'not_logged_in' }
+    return
+
+  res.json 200, {user: {email: req.user.email, lastModifiedDate: req.user.lastModifiedDate }}
+
 exports.getDataSets = (req, res) ->
   if !req.isAuthenticated()
     res.json 403, { reason: 'not_logged_in' }
@@ -54,10 +62,11 @@ exports.getDataSets = (req, res) ->
     if err
       res.json 400, {reason: "read_failed"}
     else
-      response = {tablesResponse: dataSets, user: {email: req.user.email}}
-      res.json 200, response
+      res.json 200, {tablesResponse: dataSets}
 
 exports.postDataSets = (req, res) ->
+  saveFile = (dataSet, callback) -> fs.writeFile fileLocation(req.query.appName, req.user.id, dataSet.name, true), dataSet.content, callback
+
   if !req.isAuthenticated()
     res.json 403, { reason: 'not_logged_in' }
     return
@@ -69,11 +78,13 @@ exports.postDataSets = (req, res) ->
   if !req.query.appName
     res.json 400, { reason: 'app_name_missing' }
     return
-
-  saveFile = (dataSet, callback) -> fs.writeFile fileLocation(req.query.appName, req.user.id, dataSet.name, true), dataSet.content, callback
+  
   async.each req.body, saveFile, (err) ->
     if err
       console.log('Write failed', err)
       res.json 400, {reason: "write_failed"}
     else
-      res.json 200, {message: "write_ok"}
+      req.user.last_modified_date = Date.now()
+      req.user.save (err) ->
+        if(err) res.json 400, {reason: "write_failed"}
+        else res.json 200, {message: "write_ok"}

@@ -1,5 +1,7 @@
 ng-include(src="'/partials/common/logged_out_header.html'")
 .login_page.container
+  .error(ng-if='error')
+    {{error}}
   .panel.panel-default
     .panel-heading
       h4.panel-title Please enter encryption key

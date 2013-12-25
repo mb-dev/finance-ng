@@ -10,7 +10,8 @@ App = angular.module('app', [
   'app.services'
   'ngRoute'
   'angularMoment'
-  'ui.select2'
+  'ui.select2',
+  'fileSystem'
 ])
 
 App.config ($routeProvider, $locationProvider) ->

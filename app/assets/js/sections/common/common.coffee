@@ -74,14 +74,14 @@ class EventsCollection extends Collection
     results 
 
 angular.module('app.services', ['ngStorage'])
-  .factory 'mdb', ($http, $q, $sessionStorage, $localStorage, $rootScope) ->
+  .factory 'mdb', ($http, $q, $sessionStorage, $localStorage, $rootScope, fileSystem) ->
     tablesList = {
       memories: 'memories'
       events: 'events'
       people: 'people'
       categories: 'categories'
     }
-    db = new Database('memoryng', $http, $q, $sessionStorage, $localStorage)
+    db = new Database('memoryng', $http, $q, $sessionStorage, $localStorage, fileSystem)
     tables = {
       memories: db.createCollection(tablesList.memories, new MemoriesCollection($q, 'date'))
       events: db.createCollection(tablesList.events, new EventsCollection($q, 'date'))
@@ -126,8 +126,8 @@ angular.module('app.services', ['ngStorage'])
         db.dumpAllCollections(tableList)
     }
 
-  .factory 'fdb', ($http, $q, $sessionStorage, $localStorage, $rootScope) ->
-    db = new Database('financeng', $http, $q, $sessionStorage, $localStorage)
+  .factory 'fdb', ($http, $q, $sessionStorage, $localStorage, $rootScope, fileSystem) ->
+    db = new Database('financeng', $http, $q, $sessionStorage, $localStorage, fileSystem)
 
     tablesList = {
       accounts: 'accounts',

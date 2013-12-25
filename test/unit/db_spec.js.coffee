@@ -14,78 +14,87 @@ root = {}
 
 describe 'Database', ->
   beforeEach(module('app'))
-  beforeEach(inject(($httpBackend, $http) ->
+  beforeEach(inject(($httpBackend, $http, $q) ->
+    root.timeNow = Date.now()
     root.$httpBackend = $httpBackend
     root.$http = $http
     root.appName = 'finance'
+    root.fileSystemFileName = '/db/finance-people.json'
     root.tableName = 'people'
+    root.authenticateURL = '/data/authenticate'
     root.getURL = '/data/datasets?' + $.param({appName: root.appName, tableList: [root.tableName]})
     root.postURL = '/data/datasets?' + $.param({appName: root.appName})
-    root.getResponse = {user: {email: 'a@a.com'}, tablesResponse: []}
+    root.authenticateOkResponseDataStale = {user: {email: 'a@a.com', lastModifiedDate: root.timeNow}}
+    root.authenticateOkResponseDataOk = {user: {email: 'a@a.com', lastModifiedDate: 1}}
+    root.getResponse = {tablesResponse: []}
     root.postResponse = {success: true}
     root.item = {name: 'Moshe'}
     root.originalName = 'Moshe'
     root.encryptionKey = "ABC"
     root.storageContent = {
       version: '1.0'
-      data: [{id: 1, name: 'Moshe'}]
+      data: [{id: 1, name: 'Moshe'}],
+      modifiedAt: root.timeNow
     }
     root.sessionKey = root.appName + '-' + root.tableName
     root.getResponse.tablesResponse.push {
       name: root.tableName,
       content: sjcl.encrypt(root.encryptionKey, angular.toJson(root.storageContent))
     }
+    
     root.$httpBackend.when('GET', root.getURL).respond(root.getResponse)
     root.$httpBackend.when('POST', root.postURL).respond(root.postResponse)
-    root.$q = $q = {
-      defer: ->
-        { 
-          promise: true, 
-          resolve: -> 
-          reject: -> console.log 'something got rejected'; raise 'error'
-        }
-    }
+    root.$q = $q
     root.$sessionStorage = {}
     root.$localStorage = {encryptionKey: root.encryptionKey}
+    root.fileSystemContent = {}
+    root.fileSystem = {
+      readFile: (fileName) =>
+        defer = root.$q.defer()
+        if root.fileSystemContent[fileName]
+          defer.resolve(root.fileSystemContent[fileName])
+        else
+          defer.reject('no_file')
+        defer.promise
+      writeText: (fileName, content) =>
+        defer = root.$q.defer()
+        root.fileSystemContent[fileName] = content
+        defer.resolve()
+        defer.promise
+    }
   ))
   afterEach ->
    root.$httpBackend.verifyNoOutstandingExpectation();
    root.$httpBackend.verifyNoOutstandingRequest();
   describe 'loadTables', ->
     it 'should load data from the network when session has no data', ->
+      root.$httpBackend.when('GET', root.authenticateURL).respond(root.authenticateOkResponseDataOk)
+      root.$httpBackend.expectGET(root.authenticateURL)
       root.$httpBackend.expectGET(root.getURL)
-      db = new Database(root.appName, root.$http, root.$q, root.$sessionStorage, root.$localStorage)
+      db = new Database(root.appName, root.$http, root.$q, root.$sessionStorage, root.$localStorage, root.fileSystem)
       testCollection = db.createCollection(root.tableName, new Collection(root.$q, 'name'))
       db.getTables([root.tableName])
       root.$httpBackend.flush()
       expect(testCollection.getAll().toArray()).toEqual([{id: 1, name: 'Moshe'}])
-      expect(root.$sessionStorage[root.sessionKey]).toEqual(root.storageContent)
-      # test session storage isolated
-      testCollection.collection[0].name = 'Daniel'
-      expect(root.$sessionStorage[root.sessionKey]).toEqual(root.storageContent)
+      expect(root.fileSystemContent[root.fileSystemFileName]).toEqual(angular.toJson(root.storageContent))
     it 'should load data from the session when session has data', ->
-      root.$sessionStorage[root.sessionKey] = root.storageContent
-      root.$sessionStorage['user'] = {email: 'a@a.com'}
-      db = new Database(root.appName, root.$http, root.$q, root.$sessionStorage, root.$localStorage)
+      root.$httpBackend.when('GET', root.authenticateURL).respond(root.authenticateOkResponseDataOk)
+      root.$httpBackend.expectGET(root.authenticateURL)
+      root.fileSystemContent[root.fileSystemFileName] = angular.toJson(root.storageContent)
+      db = new Database(root.appName, root.$http, root.$q, root.$sessionStorage, root.$localStorage, root.fileSystem)
       testCollection = db.createCollection(root.tableName, new Collection(root.$q, 'name'))
       db.getTables([root.tableName])
+      root.$httpBackend.flush()
       expect(testCollection.getAll().toArray()).toEqual([{id: 1, name: 'Moshe'}])
-      # test session storage isolated
-      testCollection.collection[0].name = 'Daniel'
-      expect(root.$sessionStorage[root.sessionKey]).toEqual(root.storageContent)
   describe 'saveTables', ->
     it 'should save to the server', ->
       root.$httpBackend.expectPOST(root.postURL)
-      db = new Database(root.appName, root.$http, root.$q, root.$sessionStorage, root.$localStorage)
+      db = new Database(root.appName, root.$http, root.$q, root.$sessionStorage, root.$localStorage, root.fileSystem)
       testCollection = db.createCollection(root.tableName, new Collection(root.$q, 'name'))
       testCollection.insert(root.item)
       db.saveTables([root.tableName])
       root.$httpBackend.flush()
-      expect(root.$sessionStorage[root.sessionKey].data[0].name).toEqual(root.item.name)
-      # test session storage isolated
-      testCollection.collection[0].name = 'Daniel'
-      expect(root.$sessionStorage[root.sessionKey].data[0].name).toEqual(root.originalName)
-
+      expect(JSON.parse(root.fileSystemContent[root.fileSystemFileName]).data[0].name).toEqual('Moshe')
 describe 'Box', ->
   it 'should allow setting values', ->
     item = {name: 'Groceries'}

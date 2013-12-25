@@ -1,14 +1,29 @@
+setupFilesystem = ($q, fileSystem) =>
+  defer = $q.defer()
+
+  fileSystem.getFolderContents('/db').then ->
+    defer.resolve('ok')
+  , ->
+    fileSystem.requestQuotaIncrease(20).then(fileSystem.createFolder('/db')).then ->
+      defer.resolve('ok')
+    , ->
+      defer.reject('failed')
+
 angular.module('app.controllers')
    .controller 'UserLoginController', ($scope, $window) ->
     $scope.loginOauth = (provider) ->
       $window.location.href = '/auth/' + provider;
 
-  .controller 'UserKeyController', ($scope, $window, $localStorage, $location) ->
+  .controller 'UserKeyController', ($scope, $window, $localStorage, $location, fileSystem, $q) ->
     $scope.key = ''
 
     $scope.onSubmit = ->
       $localStorage.encryptionKey = $scope.key
-      $location.path('/line_items')
+
+      setupFilesystem($q, fileSystem).then ->
+        $location.path('/line_items')
+      , () ->
+        $scope.error = 'Failed to set file system'
 
   .controller 'UserProfileController', ($scope, $window, $localStorage, $location, fdb, mdb) ->
     fdb.getTables(financeTables).then(mdb.getTables(memoryTables)).then( ->

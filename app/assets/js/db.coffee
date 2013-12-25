@@ -6,6 +6,7 @@ class window.Collection
     @collection = []
     @sortColumn = sortColumn
     @lastInsertedId = null
+    @modifiedAt = Date.now()
     if extendFunc
       extendFunc(this)
 
@@ -21,13 +22,13 @@ class window.Collection
 
   reExtendItems: ->
     return if !@itemExtendFunc
-    Lazy(@collection).each (item) =>
+    @collection.forEach (item) =>
       @itemExtendFunc(item)
 
   getAvailableId: ->
     return 1 if @collection.length == 0
     lastId = @collection[@collection.length - 1].id
-    lastId + 1
+    parseInt(lastId, 10) + 1
 
   findById: (id) ->
     result = Lazy(@collection).find (item) -> item.id.toString() == id.toString()
@@ -80,6 +81,7 @@ class window.Collection
 
     @itemExtendFunc(details) if @itemExtendFunc
     @collection.push(details)
+    @onModified()
 
     deferred.resolve(details.id)
     deferred.promise
@@ -89,32 +91,24 @@ class window.Collection
     item = Lazy(@collection).find (item) -> item.id == details.id
     angular.copy(details, item)
     item.modifiedAt = moment().valueOf()
+    @onModified()
     deferred.resolve()
     deferred.promise
 
   deleteById: (itemId) =>
     itemIndex = Lazy(@collection).pluck('id').indexOf(itemId)
-    if itemIndex
-      @collection.slice(itemIndex, 1)
+    if itemIndex >= 0
+      @collection.splice(itemIndex, 1)
+    @onModified()
 
   length: =>
     @collection.length
 
-  removeById: (id) =>
-    item = @findById(id)
-    index = @collection.indexOf(item)
-    @collection.splice(index, 1)
-
   reset: =>
     @collection = []
 
-  getAssociatedMany: (itemId, db, dbCollection, associatedCollection) ->
-    dbResults = db.getAssociated(dbCollection, itemId)
-    if associatedCollection
-      return [] if dbResults.length == 0
-      associatedCollection.findByIds(dbResults)
-    else
-      dbResults
+  onModified: =>
+    @modifiedAt = Date.now()
 
 class window.SimpleCollection
   VERSION = '1.0'
@@ -132,9 +126,13 @@ class window.SimpleCollection
     Lazy(@collection).keys()
 
   findOrCreate: (items) =>
-    Lazy(items).each (item) =>
+    items.forEach (item) =>
       if(!@collection[item])
-        @collection[item] = true  
+        @collection[item] = true
+        @onModified()
+
+  onModified: =>
+    @modifiedAt = Date.now()  
 
 # Graph DB
 class GraphCollection
@@ -160,12 +158,13 @@ class GraphCollection
     return Lazy(@collection[graph][sourceId]).keys().toArray()
 
 class window.Database
-  constructor: (appName, $http, $q, $sessionStorage, $localStorage) ->
+  constructor: (appName, $http, $q, $sessionStorage, $localStorage, fileSystem) ->
     @$http = $http
     @$q = $q
     @$sessionStorage = $sessionStorage
     @$localStorage = $localStorage
     @appName = appName
+    @fileSystem = fileSystem
 
     @db = {
       user: {config: {incomeCategories: ['Salary', 'Investments:Dividend', 'Income:Misc']}} 
@@ -178,58 +177,82 @@ class window.Database
     @db[name] = collectionInstance
     collectionInstance
 
-  importDatabase: ($q, $sessionStorage) ->
-    dateToJsStorage = (dateString) -> 
-      moment(dateString).valueOf()
 
-    cleanItem = (item) ->
-      item.id = item['_id']
-      item.created_at = moment(item.created_at).valueOf() if item.created_at
-      item.updated_at = moment(item.updated_at).valueOf() if item.updated_at
+  # file system API
+  fileName: (tableName) ->
+    "#{@appName}-#{tableName}.json"
 
-      delete item['_id']
-      delete item['processing_rule_ids']
-      delete item['encrypted_password']
+  readTablesFromFS: (tableNames) =>
+    promises = tableNames.map (tableName) => 
+      @fileSystem.readFile('/db/' + @fileName(tableName)).then (content) ->
+        {name: tableName, content: JSON.parse(content)}
 
-    importFile = (fileName, collectionModel, itemConvert) ->
-      deferred = $q.defer();
-      $.getJSON fileName, (data) ->
-        Lazy(data).each (item) ->
-          cleanItem(item)
-          itemConvert(item) if itemConvert
-          collectionModel.insert(item)
-        
-        deferred.resolve(true)
-      deferred.promise
+    @$q.all(promises)
 
-    importDeferred = $q.defer()
+  writeTablesToFS: (tableNames) =>
+    promises = tableNames.map (tableName) =>
+      @fileSystem.writeText('/db/' + @fileName(tableName), angular.toJson(@collectionToStorage(tableName))).then () ->
+        console.log('write', tableName, 'to FS')
+      , (err) ->
+        console.log('failed to write', tableName, 'to FS', err)
 
-    @loadStateFromLocalStorage($sessionStorage)
-    if @db.lineItems.collection && @db.lineItems.collection.length > 1
-      importDeferred.resolve(this)
-    else
-      file1 = importFile '/dumps/Account.json', @accounts()
-      file2 = importFile '/dumps/LineItem.json', @lineItems(), (item) ->
-        item.event_date = dateToJsStorage(item.event_date)
-        if item.original_event_date
-          item.original_event_date = dateToJsStorage(item.original_event_date) 
-        else
-          item.original_event_date = item.event_date
-      file3 = importFile '/dumps/BudgetItem.json', @budgetItems()
-      file4 = importFile '/dumps/PlannedItem.json', @plannedItems(), (item) ->
-        item.event_date_start = dateToJsStorage(item.event_date)
-        item.event_date_end = dateToJsStorage(item.event_date)
-
-      $q.all([file1, file2, file3, file4]).then (values) => 
-        @saveStateToLocalStorage($sessionStorage)
-        importDeferred.resolve(this)
-    
-    importDeferred.promise
+    @$q.all(promises)
   
-  collectionToStorage: (dbModel) ->
+
+  # importDatabase: ($q, $sessionStorage) ->
+  #   dateToJsStorage = (dateString) -> 
+  #     moment(dateString).valueOf()
+
+  #   cleanItem = (item) ->
+  #     item.id = item['_id']
+  #     item.created_at = moment(item.created_at).valueOf() if item.created_at
+  #     item.updated_at = moment(item.updated_at).valueOf() if item.updated_at
+
+  #     delete item['_id']
+  #     delete item['processing_rule_ids']
+  #     delete item['encrypted_password']
+
+  #   importFile = (fileName, collectionModel, itemConvert) ->
+  #     deferred = $q.defer();
+  #     $.getJSON fileName, (data) ->
+  #       Lazy(data).each (item) ->
+  #         cleanItem(item)
+  #         itemConvert(item) if itemConvert
+  #         collectionModel.insert(item)
+        
+  #       deferred.resolve(true)
+  #     deferred.promise
+
+  #   importDeferred = $q.defer()
+
+  #   @loadStateFromLocalStorage($sessionStorage)
+  #   if @db.lineItems.collection && @db.lineItems.collection.length > 1
+  #     importDeferred.resolve(this)
+  #   else
+  #     file1 = importFile '/dumps/Account.json', @accounts()
+  #     file2 = importFile '/dumps/LineItem.json', @lineItems(), (item) ->
+  #       item.event_date = dateToJsStorage(item.event_date)
+  #       if item.original_event_date
+  #         item.original_event_date = dateToJsStorage(item.original_event_date) 
+  #       else
+  #         item.original_event_date = item.event_date
+  #     file3 = importFile '/dumps/BudgetItem.json', @budgetItems()
+  #     file4 = importFile '/dumps/PlannedItem.json', @plannedItems(), (item) ->
+  #       item.event_date_start = dateToJsStorage(item.event_date)
+  #       item.event_date_end = dateToJsStorage(item.event_date)
+
+  #     $q.all([file1, file2, file3, file4]).then (values) => 
+  #       @saveStateToLocalStorage($sessionStorage)
+  #       importDeferred.resolve(this)
+    
+  #   importDeferred.promise
+  
+  collectionToStorage: (tableName) =>
+    dbModel = @db[tableName]
     {
       version: dbModel.version()
       data: dbModel.collection
+      modifiedAt: dbModel.modifiedAt
     }
 
   dumpAllCollections: (tableList) =>
@@ -237,92 +260,110 @@ class window.Database
     result[@appName] = Lazy(tableList).map((tableName) =>
       {
         name: tableName
-        content: @collectionToStorage(@db[tableName])
+        content: @collectionToStorage(tableName)
       }
     ).toArray()
     result
 
+  authenticate: =>
+    defer = @$q.defer()
+
+    @$http.get('/data/authenticate')
+      .success (response, status, headers) =>
+        @db.user.email = response.user.email
+        @$sessionStorage.user = {email: response.user.email, lastModifiedDate: response.user.lastModifiedDate}
+        defer.resolve()
+      .error (data, status, headers) ->
+        console.log(data)
+        deferred.reject({data: data, status: status, headers: headers})
+
+    defer.promise
+
+  readTablesFromWeb: (tableList) =>
+    defer = @$q.defer()
+    
+    @$http.get('/data/datasets?' + $.param({appName: @appName, tableList: tableList}))
+      .success (response, status, headers) =>
+        defer.resolve(response.tablesResponse)
+      .error (data, status, headers) ->
+        console.log(data)
+        defer.reject({data: data, status: status, headers: headers})
+
+    defer.promise
+      
   getTables: (tableList) ->
     deferred = @$q.defer();
-    missingDataSets = []
-    Lazy(tableList).each (tableName) =>
-      if @$sessionStorage[@appName + '-' + tableName]
-        dbModel = @db[tableName]
-        collectionFromSession = angular.copy(@$sessionStorage[@appName + '-' + tableName])
-        if collectionFromSession && collectionFromSession.version     
-          dbModel.collection = collectionFromSession.data
-          dbModel.migrateIfNeeded(collectionFromSession.version)
-          dbModel.reExtendItems()
+    
+    onAuthenticated = =>
+      if !@$localStorage.encryptionKey
+        defer.reject({data: {reason: 'missing_key'}, status: 403})
       else
-        missingDataSets.push(tableName)
+        @readTablesFromFS(tableList).then(onReadTablesFromFS, onFailedReadTablesFromFS)
+
+    onFailedAuthenticate = (response) =>
+      deferred.reject(response)
+
+    onReadTablesFromFS = (fileContents) =>
+      if @db.user.lastModifiedDate > Lazy(fileContents).pluck('content').pluck('modifiedAt').max()  # if the web has more up to date version of data
+        @readTablesFromWeb(tableList).then(onReadTablesFromWeb, onFailedReadTablesFromWeb)
+      else
+        fileContents.forEach(loadDataSet)
+        console.log 'all data sets ', tableList, ' found in file system - resolving'
+        deferred.resolve(this)
+
+    onFailedReadTablesFromFS = () =>
+      @readTablesFromWeb(tableList).then(onReadTablesFromWeb, onFailedReadTablesFromWeb)
+
+    onReadTablesFromWeb = (fileContents) =>
+      fileContents.forEach(loadDataSet)
+      @writeTablesToFS(tableList)
+      console.log 'all data sets ', tableList, ' were retrieved from the web - resolving'
+      deferred.resolve(this)
+
+    onFailedReadTablesFromWeb = (response) =>
+      deferred.reject(response)
 
     loadDataSet = (dataSet) =>
       dbModel = @db[dataSet.name]
       if !dataSet.content
         console.log('failed to load ' + dataSet.name)
         return
-      if dataSet.content.indexOf('"iv":') >= 0
+      
+      if typeof(dataSet.content) == 'string'
         try
           dataSet.content = JSON.parse(sjcl.decrypt(@$localStorage.encryptionKey, dataSet.content))
         catch err
           console.log('failed to decrypt ' + dataSet.name)
           return
-      else
-        dataSet.content = JSON.parse(dataSet.content)
+
       if !dataSet.content.version
         console.log('failed to load ' + dataSet.name + ' - version missing')
         return
-      
+    
+      dbModel.modifiedAt = dataSet.content.modifiedAt
       dbModel.collection = dataSet.content.data
       dbModel.migrateIfNeeded()
       dbModel.reExtendItems()
-      console.log 'saving dataset:', dataSet.name, 'to session'
-      @$sessionStorage[@appName + '-' + dataSet.name] = angular.copy(@collectionToStorage(dbModel))
-
-    fetchTables = (tableList) =>
-      @$http.get('/data/datasets?' + $.param({appName: @appName, tableList: tableList}))
-        .success (response, status, headers) =>
-          Lazy(response.tablesResponse).each(loadDataSet)
-          @db.user.email = response.user.email
-          @$sessionStorage.user = {email: response.user.email}
-          if !@$localStorage.encryptionKey
-            deferred.reject({data: {reason: 'missing_key'}, status: 403})
-          else
-            deferred.resolve(this)
-        .error (data, status, headers) ->
-          console.log(data)
-          deferred.reject({data: data, status: status, headers: headers})
-
-    if missingDataSets.length > 0
-      console.log 'loading data sets: ', missingDataSets
-      fetchTables(missingDataSets)
-    else if @$sessionStorage.user
-      if !@$localStorage.encryptionKey
-        deferred.reject({data: {reason: 'missing_key'}, status: 403})
-      else
-        console.log 'all data sets ', tableList, 'and user found in session - resolving'
-        @db.user.email = @$sessionStorage.user.email
-        deferred.resolve(this)
-    else
-      console.log 'user not found in session, loading [] data sets'
-      fetchTables([])
-
+      
+    # actual getTables code start shere
+    @authenticate().then(onAuthenticated, onFailedAuthenticate)
     deferred.promise
 
   saveTables: (tableList) =>
-    toParam = (dataSet) =>
-      name: dataSet
-      content: sjcl.encrypt(@$localStorage.encryptionKey, angular.toJson(@collectionToStorage(@db[dataSet])))
-
     deferred = @$q.defer();
-    dataSets = Lazy(tableList).map(toParam).toArray()
+
+    dataSets = @dumpAllCollections(tableList)[@appName]
+    dataSets.forEach (dataSet) =>
+      dataSet.content = sjcl.encrypt(@$localStorage.encryptionKey, angular.toJson(dataSet.content))
 
     @$http.post('/data/datasets?' + $.param({appName: @appName}), dataSets)
       .success (data, status, headers) =>
-        Lazy(tableList).each (tableName) =>
-          console.log 'saving dataset:', tableName, 'to session'
-          @$sessionStorage[@appName + '-' + tableName] = angular.copy(@collectionToStorage(@db[tableName]))
-        deferred.resolve(data)
+        console.log 'saving datasets:', tableList, 'to session'
+        @writeTablesToFS(tableList).then ->
+          deferred.resolve(data)
+        , (error) ->
+          console.log('failed to write files to file system', error)
+          deferred.reject('failed to write to file system')
       .error (data, status, headers) ->
         deferred.reject({data: data, status: status, headers: headers})
 

@@ -86,6 +86,7 @@ module.exports = (grunt) ->
             'build/js/vendor/angular-sanitize.js'
             'build/js/vendor/angular-select2.js'
             'build/js/vendor/angular-strap-typeahead.js'
+            'build/js/vendor/angular-filesystem.js'
             'build/js/vendor/ngStorage.js'
             'build/js/vendor/pickadate.js'
             'build/js/vendor/pickadate.date.js'

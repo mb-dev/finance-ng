@@ -30,7 +30,7 @@ describe 'line items', ->
 
     it 'should delete an item', ->
       expect(root.db.lineItems().length()).toEqual(2)
-      root.db.lineItems().removeById(root.item1Id)
+      root.db.lineItems().deleteById(root.item1Id)
       expect(root.db.lineItems().length()).toEqual(1)
 
     it 'should return items by month', ->
