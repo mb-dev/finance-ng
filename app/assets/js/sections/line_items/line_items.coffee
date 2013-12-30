@@ -3,7 +3,7 @@ angular.module('app.controllers')
     applyDateChanges = ->
       $scope.lineItems = db.lineItems().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).toArray()
 
-    $scope.currentDate = moment('2012-01-01')
+    $scope.currentDate = moment()
     if $routeParams.month && $routeParams.year
       $scope.currentDate.year(+$routeParams.year).month(+$routeParams.month - 1)
 
@@ -20,24 +20,45 @@ angular.module('app.controllers')
     return
 
   .controller 'LineItemsFormController', ($scope, $routeParams, $location, db, errorReporter) ->
-    $scope.allCategories = db.categories().getAll().toArray()  
+    $scope.allCategories = {
+      name: 'categories'
+      local: db.categories().getAll().toArray()
+    }
+    $scope.allPayees = {
+      name: 'payees'
+      local: db.payees().getAll().toArray()
+    }
+    $scope.accounts = db.accounts().getAll().toArray()
 
     updateFunc = null
     if Lazy($location.$$url).endsWith('new')
+      $scope.type = 'new'
       $scope.title = 'New line item'
-      $scope.item = {event_date: moment().format('L'), tags: []}
+      $scope.item = {date: moment().valueOf(), tags: [], accountId: $scope.accounts[0].id}
       updateFunc = db.lineItems().insert
     else
+      $scope.type = 'edit'
       $scope.title = 'Edit line item'
       $scope.item = db.lineItems().findById($routeParams.itemId)
       updateFunc = db.lineItems().editById
-    $scope.accounts = db.accounts().getAll().toArray()
+
+    $scope.onChangePayee = ->
+      # not sure if I want this:
+      
+      # return if !$scope.item.payeeName
+      # processingRule = fdb.processingRules().get('name:' + $scope.item.payeeName)
+
 
     $scope.onSubmit = ->
+      db.categories().findOrCreate($scope.item.categoryName)
+      db.payees().findOrCreate($scope.item.payeeName)
+      if $scope.type == 'new'
+        $scope.item.originalDate = $scope.item.date
+      updateFunc($scope.item)
+      db.lineItems().reBalance($scope.item)
       onSuccess = -> $location.path('/line_items/')
-      saveTables = -> db.saveTables([db.tables.lineItems])
-      updateFunc($scope.item).then(saveTables).then(onSuccess, errorReporter.errorCallbackToScope($scope))
+      db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees]).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
   .controller 'LineItemShowController', ($scope, $routeParams, db) ->
     $scope.item = db.lineItems().findById($routeParams.itemId)
-    $scope.account = db.accounts().findById($scope.item.account_id)
+    $scope.account = db.accounts().findById($scope.item.accountId)

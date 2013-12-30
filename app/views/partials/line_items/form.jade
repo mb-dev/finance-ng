@@ -8,7 +8,7 @@ ng-include(src="'/partials/common/finance_header.html'")
       .form-group
         label.col-xs-4.col-sm-2.control-label Account
         .col-xs-8.col-sm-10
-          select.form-control(ng-model='item.account_id', ng-options="account.id as account.name for account in accounts")
+          select.form-control(ng-model='item.accountId', ng-options="account.id as account.name for account in accounts")
       .form-group
         label.col-xs-4.col-sm-2.control-label Type
         .col-xs-8.col-sm-10
@@ -21,19 +21,19 @@ ng-include(src="'/partials/common/finance_header.html'")
       .form-group
         label.col-xs-4.col-sm-2.control-label Amount
         .col-xs-8.col-sm-10
-          input.form-control(type='text', placeholder='Amount', ng-model='item.amount')
+          input.form-control(type='number', placeholder='Amount', ng-model='item.amount')
       .form-group
         label.col-xs-4.col-sm-2.control-label Date
         .col-xs-8.col-sm-10
-          input.form-control(pickadate, type='text', placeholder='Date', ng-model='item.event_date', date-format='')
+          input.form-control(pickadate, type='text', placeholder='Date', ng-model='item.date', date-format='', ng-change='onChangeDate()')
       .form-group
         label.col-xs-4.col-sm-2.control-label Payee
         .col-xs-8.col-sm-10
-          input.form-control(type='text', ng-model='item.payee_name')
+          input.sfTypeahead.form-control(type='text', ng-model='item.payeeName', datasets="allPayees", ng-trim='false', ng-change="onChangePayee()")
       .form-group
         label.col-xs-4.col-sm-2.control-label Category
         .col-xs-8.col-sm-10
-          input.form-control(type='text', ng-model='item.category_name', bs-typeahead="allCategories")
+          input.sfTypeahead.form-control(type='text', ng-model='item.categoryName', datasets="allCategories", ng-trim='false')
       hr/
       .form-group
         label.col-xs-4.col-sm-2.control-label Comment
@@ -42,7 +42,11 @@ ng-include(src="'/partials/common/finance_header.html'")
       .form-group
         label.col-xs-4.col-sm-2.control-label Highlight Group
         .col-xs-8.col-sm-10
-          input.form-control(type='text', ng-model='item.grouped_label')
+          input.form-control(type='text', ng-model='item.groupedLabel')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Add Rule
+        .col-xs-8.col-sm-10
+          input.form-control(type='checkbox', ng-model='item.$addRule', value='true')
       .form-group
         label.col-xs-4.col-sm-2.control-label Tags
         .col-xs-8.col-sm-10
@@ -52,4 +56,8 @@ ng-include(src="'/partials/common/finance_header.html'")
           label.checkbox-inline
             input(type='checkbox', class='', ng-model='item.tags', value="Exclude from Reports") 
             |Exclude from Reports
+      .form-group(ng-show="item.type === 'edit'")
+        label.col-xs-4.col-sm-2.control-label Original Date
+        .col-xs-8.col-sm-10
+          input.form-control(pickadate, type='text', placeholder='Date', ng-model='item.originalDate', date-format='')
       button.btn.btn-default(ng-click="onSubmit()") Submit

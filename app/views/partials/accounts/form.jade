@@ -12,5 +12,5 @@ ng-include(src="'/partials/common/finance_header.html'")
       .form-group
         label.col-xs-4.col-sm-2.control-label Import Format
         .col-xs-8.col-sm-10
-          select.form-control(ng-model='item.import_format', ng-options="id as label for (id,label) in importFormats")
+          select.form-control(ng-model='item.importFormat', ng-options="id as label for (id,label) in importFormats")
       button.btn.btn-default(ng-click="onSubmit()") Submit

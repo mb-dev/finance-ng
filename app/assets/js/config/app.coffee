@@ -11,7 +11,8 @@ App = angular.module('app', [
   'ngRoute'
   'angularMoment'
   'ui.select2',
-  'fileSystem'
+  'fileSystem',
+  'siyfion.sfTypeahead'
 ])
 
 App.config ($routeProvider, $locationProvider) ->
@@ -37,8 +38,8 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/accounts/:itemId/edit', {templateUrl: '/partials/accounts/form.html', controller: 'AccountsFormController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
     .when('/accounts/:itemId', {templateUrl: '/partials/accounts/show.html', controller: 'AccountsShowController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
 
-    .when('/line_items/new', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories, fdb.tables.accounts]) })
-    .when('/line_items/:itemId/edit', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories, fdb.tables.accounts]) })
+    .when('/line_items/new', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories, fdb.tables.payees, fdb.tables.accounts]) })
+    .when('/line_items/:itemId/edit', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories, fdb.tables.payees, fdb.tables.accounts, fdb.tables.processingRules]) })
     .when('/line_items/:itemId', {templateUrl: '/partials/line_items/show.html', controller: 'LineItemShowController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.accounts]) })
     .when('/line_items/:year/:month', {templateUrl: '/partials/line_items/index.html', controller: 'LineItemsIndexController', reloadOnSearch: false, resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.accounts]) })
     .when('/line_items/', {templateUrl: '/partials/line_items/index.html', controller: 'LineItemsIndexController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems]) })
@@ -61,7 +62,8 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/reports/:year?/:month?', {templateUrl: '/partials/reports/index.html'})
     .when('/reports/:year/categories/:item', {templateUrl: '/partials/reports/show.html'})
 
-    .when('/import', {templateUrl: '/partials/misc/import.html'})    
+    .when('/misc', {templateUrl: '/partials/misc/index.html'})    
+    .when('/misc/import', {templateUrl: '/partials/misc/import.html', controller: 'ImportItemsController', resolve: resolveFDb((fdb) ->[fdb.tables.accounts, fdb.tables.categories, fdb.tables.payees, fdb.tables.lineItems, fdb.tables.importedLines, fdb.tables.processingRules]) })    
 
     .when('/login_success', redirectTo: '/welcome/')
     .when('/login', {templateUrl: '/partials/user/login.html', controller: 'UserLoginController'})
@@ -101,15 +103,30 @@ App.config ($routeProvider, $locationProvider) ->
   # Without server side support html5 must be disabled.
   $locationProvider.html5Mode(true)
 
-App.run ($rootScope, $location) ->
+App.run ($rootScope, $location, $injector) ->
   $rootScope.$on "$routeChangeError", (event, current, previous, rejection) ->
     if rejection.status == 403 && rejection.data.reason == 'not_logged_in'
       $location.path '/login'
 
     if rejection.status == 403 && rejection.data.reason == 'missing_key'
       $location.path '/key'
+  
+  $rootScope.$on '$routeChangeStart', ->
+    $sessionStorage = $injector.get('$sessionStorage')
+    if $sessionStorage.successMsg
+      $rootScope.successMsg = $sessionStorage.successMsg
+      $sessionStorage.successMsg = null
 
   $rootScope.isActive = (urlPart) =>
     $location.path().indexOf(urlPart) > 0
 
-angular.module('app.controllers', ['app.services'])
+  $rootScope.flashSuccess = (msg) ->
+    $sessionStorage = $injector.get('$sessionStorage')
+    $sessionStorage.successMsg = msg
+
+  $rootScope.$on '$viewContentLoaded', ->
+    $sessionStorage = $injector.get('$sessionStorage')
+    $sessionStorage.successMsg = null
+    $sessionStorage.errorMsg = null    
+
+angular.module('app.controllers', ['app.services', 'app.importers'])

@@ -6,7 +6,7 @@ html(lang='en', ng-app='app')
     meta(name='viewport', content='width=device-width', initial-scale='1.0')
     meta(name='description', content='')
     meta(name='author', content='')
-    title(ng-bind-template='{{pageTitle}}')
+    title ngFinance
     script.
       window.brunch = window.brunch || {};
       window.brunch['auto-reload'] = {
@@ -26,6 +26,4 @@ html(lang='en', ng-app='app')
     ng-view
     footer.footer
       .container
-        p
-          small
-            a(href='https://github.com/scotch/angular-brunch-seed') angular-brunch-seed | source
+        span By Moshe Bergman

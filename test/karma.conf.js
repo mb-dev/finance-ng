@@ -14,13 +14,15 @@ module.exports = function(karma) {
     // list of files / patterns to load in the browser
     files: [
       'http://code.jquery.com/jquery-2.0.3.min.js',
+      'test/lib/jasmine-jquery.js',
       'http://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js',
       'http://cdn.jsdelivr.net/sjcl/1.0.0/sjcl.js',
       // Program files
       'public/js/vendor.js',
       'public/js/app.js',
 
-      'test/unit/**/*_spec.*'
+      'test/unit/**/*_spec.*',
+      {pattern: 'test/fixtures/*.csv', watched: true, served: true, included: false}
     ],
 
 
@@ -75,7 +77,8 @@ module.exports = function(karma) {
       'karma-jasmine',
       'karma-coffee-preprocessor',
       'karma-chrome-launcher',
-      'karma-osx-reporter'
+      'karma-osx-reporter',
+      'jasmine-jquery'
     ],
 
 

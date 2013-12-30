@@ -24,6 +24,9 @@ class window.Collection
   setItemExtendFunc: (extendFunc) ->
     @itemExtendFunc = extendFunc
 
+  extendItem: (item) ->
+    @itemExtendFunc(item)
+
   reExtendItems: ->
     return if !@itemExtendFunc
     @collection.forEach (item) =>
@@ -130,7 +133,18 @@ class window.SimpleCollection
   getAll: =>
     Lazy(@collection).keys()
 
+  has: (key) =>
+    !!@collection[key]
+
+  get: (key) =>
+    angular.copy(@collection[key])
+
+  set: (key, value) =>
+    @collection[key] = value
+
   findOrCreate: (items) =>
+    return if !items
+    items = [items] if !(items instanceof Array)
     items.forEach (item) =>
       if(!@collection[item])
         @collection[item] = true
@@ -280,7 +294,7 @@ class window.Database
         defer.resolve()
       .error (data, status, headers) ->
         console.log(data)
-        deferred.reject({data: data, status: status, headers: headers})
+        defer.reject({data: data, status: status, headers: headers})
 
     defer.promise
 

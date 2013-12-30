@@ -14,3 +14,14 @@ nav.navbar-default(role='navigation')
         a(href='/line_items') Line Items
       li(ng-class="{active: isActive('budgets')}")
         a(href='/budgets') Budgets
+      li(ng-class="{active: isActive('reports')}")
+        a(href='/reports') Reports
+      li(ng-class="{active: isActive('other')}")
+        a(href='/misc') More Actions
+
+div.alert.alert-success(ng-if="successMsg && successMsg.length > 0")
+  span.fa-stack.fa-lg
+    i.fa.fa-circle.fa-stack-2x
+    i.fa.fa-check.fa-stack-1x.fa-inverse
+  |&nbsp;
+  span {{$root.successMsg}}

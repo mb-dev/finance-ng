@@ -1,0 +1,78 @@
+ng-include(src="'/partials/common/finance_header.html'")
+.accounts_form.container
+  .error {{error}}
+  
+  .select_file(ng-show="state == states.SELECT_FILE")
+    
+    .panel.panel-default.row
+      .panel-heading
+        h4.panel-title Import Line Items
+      form.panel-body.form-horizontal(role='form')
+        .form-group
+          label.col-xs-4.col-sm-2.control-label Account
+          .col-xs-8.col-sm-10
+            select.form-control(ng-model='accountId', ng-options="account.id as account.name for account in accounts")
+        .form-group
+          label.col-xs-4.col-sm-2.control-label File: 
+          .col-xs-8.col-sm-10
+            input.form-control(type="file", fileread='fileToImport')
+        .text-center
+          button.btn.btn-default(ng-click="onSubmitFile()") Submit
+  
+  .review_items(ng-show="state == states.REVIEW_ITEMS")
+
+    .row.btn-toolbar.text-center
+      button.btn.btn-default(ng-click="onBackToSelectFile()") &lt;&lt; Back to select file
+      button.btn.btn-primary(ng-click="onAcceptItems()") Confirm Items
+
+    br/
+    
+    .main_list.list-group
+      .list-group-item.row.header
+        .date.col-xs-2.col-md-1 Date
+        .payee.col-xs-5.col-md-6 Payee Name
+        .amount.col-xs-3.col-md-1 Amount
+        .comment.hidden-xs.col-md-4 Comment
+      a.list-group-item.row(ng-repeat='item in items')
+        .date.col-xs-4.col-md-1
+          {{item.date | amDateFormat:'MM/DD/YYYY' }}
+        .payee.col-xs-5.col-md-6 {{item.payeeName}}
+        .amount.col-xs-3.col-md-1 {{item.$signedAmount()}}
+        .comment.hidden-xs.col-md-4 
+          {{item.comment}}
+          .badge(ng-if='item.$ignore') ignored
+    
+    .row.btn-toolbar.text-center
+      button.btn.btn-default(ng-click="onBackToSelectFile()") &lt;&lt; Back to select file
+      button.btn.btn-primary(ng-click="onAcceptItems()") Confirm Items
+
+  .review_items(ng-show="state == states.RENAME_ITEMS")
+
+    .row.btn-toolbar.text-center
+      button.btn.btn-default(ng-click="onBackToReviewItems()") &lt;&lt; Back to review items
+      button.btn.btn-primary(ng-click="onConfirmImport()") Perform Import
+
+    br/
+    
+    form.main_list.list-group(role='form')
+      .list-group-item.row.header
+        .date.col-xs-2.col-md-1 Date
+        .payee.col-xs-5.col-md-3 Payee Name (Add Rule)
+        .payee.col-xs-5.col-md-3 Category Name
+        .amount.col-xs-3.col-md-1 Amount
+        .comment.hidden-xs.col-md-4 Comment
+      a.list-group-item.row(ng-repeat='item in items | notIgnored')
+        .date.col-xs-4.col-md-1
+          {{item.date | amDateFormat:'MM/DD/YYYY' }}
+        .payee.col-xs-5.col-md-3
+          .inline-controls
+            input.sfTypeahead.form-control(type='text', ng-model='item.payeeName', datasets="$parent.allPayees", ng-trim='false')
+            input.form-control(type='checkbox', ng-model='item.$addRule')
+        .payee.col-xs-5.col-md-3
+          input.sfTypeahead.form-control(type='text', ng-model='item.categoryName', datasets="$parent.allCategories", ng-trim='false')
+        .amount.col-xs-3.col-md-1 {{item.$signedAmount()}}
+        .comment.hidden-xs.col-md-4 {{item.comment}}
+    
+    .row.btn-toolbar.text-center
+      button.btn.btn-default(ng-click="onBackToReviewItems()") &lt;&lt; Back to review items
+      button.btn.btn-primary(ng-click="onConfirmImport()") Perform Import

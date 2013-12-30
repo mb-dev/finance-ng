@@ -1,4 +1,5 @@
 @import "bootstrap/bootstrap.less";
+@import "bootstrap/typeahead.js-bootstrap.less";
 
 .form_area {
   margin-top: 10px;
@@ -56,6 +57,7 @@ form .select2-container {
   padding: 10px 15px;
 }
 
+
 .fixed-row {
   .make-row();
   .col-90 {
@@ -83,6 +85,18 @@ input[pickadate] {
 
 .form-label {
   padding-top: 7px;
+}
+
+form {
+  .inline-controls {
+    .form-control {
+      width: auto;
+      margin-right: 5px;
+    }
+    input[type=checkbox] {
+      display: inline-block;
+    }
+  }
 }
 
 .btns-parent .btn {

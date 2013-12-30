@@ -18,7 +18,7 @@ angular.module('app.controllers')
 
     $scope.onSubmit = ->
       onSuccess = -> $location.path('/accounts/')
-      saveTables = -> db.saveTables([Database.ACCOUNTS_TBL])
+      saveTables = -> db.saveTables([db.tables.accounts])
       updateFunc($scope.item).then(saveTables).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
   .controller 'AccountsShowController', ($scope, $routeParams, db) ->

@@ -5,7 +5,7 @@ class window.BudgetReportView
 
     @budgetItems = db.budgetItems().getItemsByYear('budget_year', @year, Collection.doNotConvertFunc).toArray()
     @plannedItems = db.plannedItems().getItemsByYear('event_date_start', @year).toArray()
-    @lineItems = db.lineItems().getItemsByYear('event_date', @year).toArray()
+    @lineItems = db.lineItems().getItemsByYear('date', @year).toArray()
 
     @totals = {}
 
@@ -14,7 +14,7 @@ class window.BudgetReportView
       if lineItem.grouped_label
         item = @groupedItems[lineItem.grouped_label] ?= {amount: 0, month: 12, label: lineItem.grouped_label}
         item['amount'] += lineItem.$signedAmount()
-        item['month'] = Lazy([item['month'], lineItem.$eventDate().month]).min
+        item['month'] = Lazy([item['month'], lineItem.$date().month]).min
     
     @groupedItems = Lazy(@groupedItems).values().sortBy((item) -> item['month']).toArray()
 
@@ -35,10 +35,10 @@ class window.BudgetReportView
     @incomeBox.setColumns([0..11], ['amount', 'future_income'])
     # add expenses/income
     Lazy(@lineItems).each (lineItem) =>
-      if db.user().config.incomeCategories.indexOf(lineItem.category_name) >= 0
-        @incomeBox.addToValue('income', lineItem.$eventDate().month(), 'amount', lineItem.$signedAmount())
-      else if categoryToBudget[lineItem.category_name]
-        @expenseBox.addToValue(categoryToBudget[lineItem.category_name].name, lineItem.$eventDate().month(), 'expense', lineItem.$signedAmount())      
+      if db.user().config.incomeCategories.indexOf(lineItem.categoryName) >= 0
+        @incomeBox.addToValue('income', lineItem.$date().month(), 'amount', lineItem.$signedAmount())
+      else if categoryToBudget[lineItem.categoryName]
+        @expenseBox.addToValue(categoryToBudget[lineItem.categoryName].name, lineItem.$date().month(), 'expense', lineItem.$signedAmount())      
 
     # add future expenses
     if @year == moment().year()

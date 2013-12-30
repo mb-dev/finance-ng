@@ -4,20 +4,43 @@
 
 class window.LineItemCollection extends Collection
   @EXPENSE = 1
-  @INCOME = 0
+  @INCOME = 2
 
+  @SOURCE_IMPORT = 'import'
+    
   getItemsByMonthYear: (month, year, sortBy) ->
     Lazy(@collection).filter((item) -> 
-      date = moment(item.event_date)
+      date = moment(item.date)
       date.month() == month && date.year() == year
     ).sortBy(sortBy)
 
-  getCategories: () ->
-    Lazy(@collection).map((item) -> item.category_name).uniq().sortBy(Lazy.identity).toArray()
+  reBalance: (modifiedItem) =>
+    return if !@collection || @collection.length == 0
+    
+    sortedCollection = Lazy(@collection).sortBy(@defaultSortFunction).toArray()
+    currentBalance = new BigNumber(0)
+
+    if !modifiedItem || (modifiedItem.id == sortedCollection[0].id)
+      startIndex = 0
+    else
+      startIndex = Lazy(sortedCollection).pluck('id').indexOf(modifiedItem.id)
+      currentBalance = new BigNumber(sortedCollection[startIndex-1].balance)
+    
+    [startIndex..(sortedCollection.length-1)].forEach (index) =>
+      currentBalance = currentBalance.plus(sortedCollection[index].$signedAmount())
+      sortedCollection[index].balance = currentBalance.toString()
+
+
 
 class BudgetItemCollection extends Collection
   getYearRange: ->
     Lazy(@collection).pluck('budget_year').uniq().sortBy(Lazy.identity).toArray()
+
+class ImportedLinesCollection extends Collection
+  findByContent: (content) ->
+    index = Lazy(@collection).pluck('content').indexOf(content)
+    return null if index < 0
+    @collection[index]
 
 class MemoriesCollection extends Collection
 
@@ -32,7 +55,7 @@ class MemoriesCollection extends Collection
 
   getItemsByMonthYear: (month, year, sortBy) ->
     results = Lazy(@collection).filter((item) -> 
-      date = moment(item.event_date)
+      date = moment(item.date)
       date.month() == month && date.year() == year
     )
     results = results.sortBy sortBy if sortBy
@@ -135,13 +158,19 @@ angular.module('app.services', ['ngStorage'])
       budgetItems: 'budgetItems',
       plannedItems: 'plannedItems'
       categories: 'categories'
+      payees: 'payees'
+      importedLines: 'importedLines'
+      processingRules: 'processingRules'
     }
     tables = {
       accounts: db.createCollection(tablesList.accounts, new Collection($q, 'name'))
-      lineItems: db.createCollection(tablesList.lineItems, new LineItemCollection($q, 'event_date'))
+      lineItems: db.createCollection(tablesList.lineItems, new LineItemCollection($q, 'date'))
       budgetItems: db.createCollection(tablesList.budgetItems, new BudgetItemCollection($q, 'budget_year'))
       plannedItems: db.createCollection(tablesList.plannedItems, new Collection($q))
       categories: db.createCollection(tablesList.categories, new SimpleCollection($q))
+      payees: db.createCollection(tablesList.payees, new SimpleCollection($q))
+      importedLines: db.createCollection(tablesList.importedLines, new ImportedLinesCollection($q))
+      processingRules: db.createCollection(tablesList.processingRules, new SimpleCollection($q))
     }
     
     tables.lineItems.setItemExtendFunc (item) ->
@@ -149,12 +178,33 @@ angular.module('app.services', ['ngStorage'])
         @type == LineItemCollection.EXPENSE
       item.$isIncome = ->
         @type == LineItemCollection.INCOME
-      item.$eventDate = ->
-        moment(@event_date)
+      item.$date = ->
+        moment(@date)
       item.$multiplier = ->
         if @type == LineItemCollection.EXPENSE then -1 else 1
       item.$signedAmount = ->
         parseFloat(@amount) * @$multiplier()
+      item.$addProcessingRule = ->
+        return if !@categoryName || !@payeeName
+        if @$originalPayeeName
+          tables.processingRules.set('name:' + @$originalPayeeName, {payeeName: @payeeName, categoryName: @categoryName})
+        else
+          tables.processingRules.set('amount:' + @amount, {payeeName: @payeeName, categoryName: @categoryName})
+          
+
+      item.$process = ->
+        processingRule = null
+        if @payeeName && tables.processingRules.has('name:' + @payeeName)
+          processingRule = tables.processingRules.get('name:' + @payeeName)
+        else if tables.processingRules.has('amount:' + @amount)
+          processingRule = tables.processingRules.get('amount:' + @amount)
+
+        if processingRule
+          @payeeName = processingRule.payeeName
+          @categoryName = processingRule.categoryName
+          true
+        else
+          false
 
     tables.plannedItems.setItemExtendFunc (item) ->
       item.$isIncome = ->
@@ -165,11 +215,10 @@ angular.module('app.services', ['ngStorage'])
         moment(@event_date_start)
       item.$eventDateEnd = ->
         moment(@event_date_end)
+
     
     accessFunc = {
       tables: tablesList
-      categories: ->
-        tables.categories
       lineItems: ->
         tables.lineItems
       accounts: ->
@@ -180,6 +229,14 @@ angular.module('app.services', ['ngStorage'])
         db.user()
       plannedItems: ->
         tables.plannedItems
+      categories: ->
+        tables.categories
+      payees: ->
+        tables.payees
+      importedLines: ->
+        tables.importedLines
+      processingRules: ->
+        tables.processingRules
       getTables: (tableList) =>
         defer = $q.defer()
         db.getTables(tableList).then((db) =>
@@ -230,6 +287,17 @@ angular.module('app.directives', ['app.services', 'app.filters'])
           moment(value).valueOf()          
     }
 
+  .directive 'floatToString', ($filter) ->
+    {  
+      require: 'ngModel'
+      link: (scope, element, attr, ngModelCtrl) ->
+        ngModelCtrl.$formatters.unshift (value) ->
+          parseFloat(value)
+        
+        ngModelCtrl.$parsers.push (value) ->
+          value.toString()
+    }
+
   .directive 'typeFormat', ($filter) ->
     typeFilter = $filter('typeString')
     {  
@@ -257,7 +325,15 @@ angular.module('app.directives', ['app.services', 'app.filters'])
           format: 'mm/dd/yyyy'
         })
     }
- 
+  .directive "fileread", () ->
+    scope: 
+      fileread: "="
+    link: (scope, element, attributes) ->
+      element.bind "change", (changeEvent) ->
+        scope.$apply () ->
+          scope.fileread = changeEvent.target.files[0]
+                
+
  angular.module('app.filters', [])
   .filter 'localDate', ($filter) ->
     angularDateFilter = $filter('date')
@@ -268,6 +344,15 @@ angular.module('app.directives', ['app.services', 'app.filters'])
     angularDateFilter = $filter('date')
     (theDate) ->
       angularDateFilter(theDate, 'MM/dd')
+
+  .filter 'mbCurrency', ($filter) ->
+    angularCurrencyFilter = $filter('currency')
+    (number) ->
+      result = angularCurrencyFilter(number)
+      if result[0] == '('
+        '-' + result[1..-2]
+      else
+        result
 
   .filter 'typeString', ($filter) ->
     (typeInt) ->
@@ -283,3 +368,4 @@ angular.module('app.directives', ['app.services', 'app.filters'])
   .filter 'joinBy', () ->
     (input, delimiter) ->
       (input || []).join(delimiter || ',')
+        
