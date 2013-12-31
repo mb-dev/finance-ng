@@ -278,7 +278,7 @@ class window.Database
       deferred.reject(response)
 
     onReadTablesFromFS = (fileContents) =>
-      if @db.user.lastModifiedDate > Lazy(fileContents).pluck('content').pluck('modifiedAt').max()  # if the web has more up to date version of data
+      if moment(@db.user.lastModifiedDate).valueOf() > Lazy(fileContents).pluck('content').pluck('modifiedAt').max()  # if the web has more up to date version of data
         @readTablesFromWeb(tableList).then(onReadTablesFromWeb, onFailedReadTablesFromWeb)
       else
         fileContents.forEach(loadDataSet)
