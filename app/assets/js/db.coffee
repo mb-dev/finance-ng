@@ -244,6 +244,7 @@ class window.Database
     @$http.get('/data/authenticate')
       .success (response, status, headers) =>
         @db.user.email = response.user.email
+        @db.user.lastModifiedDate = response.user.lastModifiedDate
         @$sessionStorage.user = {email: response.user.email, lastModifiedDate: response.user.lastModifiedDate}
         defer.resolve()
       .error (data, status, headers) ->
