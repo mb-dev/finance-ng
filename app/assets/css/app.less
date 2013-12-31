@@ -44,20 +44,6 @@ form .select2-container {
   width: 100%;
 }
 
-.list-group-item.header {
-  > * {
-    font-weight: bold;
-  }
-}
-.list-group-item {
-  padding: 10px 0;
-}
-
-.list-group-item.header {
-  padding: 10px 15px;
-}
-
-
 .fixed-row {
   .make-row();
   .col-90 {
@@ -164,7 +150,21 @@ form {
 // section specific styles
 
 .main_list {
-  
+  .list-group-item.header {
+    padding: 10px 0;
+    > * {
+      font-weight: bold;
+    }
+  }
+  .list-group-item {
+    padding: 10px 0;
+    &:nth-child(even) {
+      background-color: @table-bg-accent;
+    }
+    &:nth-child(odd) {
+      
+    }
+  }
 }
 
 .line_items_index {

@@ -26,11 +26,11 @@ describe 'ImportItemsController', ->
     spyOn(root.$location, 'path')
 
     # one item was already imported, we have one rule already
-    root.db.importedLines().insert({content: '{"source":"import","type":1,"amount":"1350","comment":"Check 1015","date":1341298800000}'})
+    root.db.importedLines().insert({content: '1,1350,,Check 1015,07/03/2012'})
     root.db.processingRules().set('amount:130', {payeeName: 'Home Owner', categoryName: 'Rent'})
     root.db.processingRules().set('name:TARGET T2767 OAKLA OAKLAND CAUS', {payeeName: 'Target', categoryName: 'Shopping'})
 
-    # step 1: load file
+    # step 1: load file\
     root.$scope.accountId = root.account.id
     root.$scope.onFileLoaded(content)
 
@@ -55,7 +55,7 @@ describe 'ImportItemsController', ->
     root.$scope.onConfirmImport()
     importedLines = root.db.importedLines().getAll().toArray()
     expect(importedLines.length).toEqual(5)
-    expect(importedLines[1].content).toEqual('{"source":"import","type":1,"amount":"52","payeeName":"BACI CAFE & WINE B HEALDSBURG CAUS","date":1341212400000}')
+    expect(importedLines[1].content).toEqual('1,52,BACI CAFE & WINE B HEALDSBURG CAUS,,07/02/2012')
     
     lineItems = root.db.lineItems().getAll().toArray()
     expect(lineItems[1].importId).toEqual(importedLines[2].id)

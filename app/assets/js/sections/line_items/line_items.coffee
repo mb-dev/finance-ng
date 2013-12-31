@@ -1,7 +1,11 @@
 angular.module('app.controllers')
   .controller 'LineItemsIndexController', ($scope, $routeParams, $location, db) ->
     applyDateChanges = ->
-      $scope.lineItems = db.lineItems().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).toArray()
+      if $routeParams.categories
+        $scope.lineItems = db.lineItems().getItemsByMonthYearAndCategories($scope.currentDate.month(), $scope.currentDate.year(), $routeParams.categories.split(',')).toArray().reverse()
+      else
+        $scope.lineItems = db.lineItems().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).toArray().reverse()
+        
 
     $scope.currentDate = moment()
     if $routeParams.month && $routeParams.year
@@ -28,6 +32,7 @@ angular.module('app.controllers')
       name: 'payees'
       local: db.payees().getAll().toArray()
     }
+    $scope.tags = ['Cash', 'Exclude from Reports']
     $scope.accounts = db.accounts().getAll().toArray()
 
     updateFunc = null
@@ -40,6 +45,7 @@ angular.module('app.controllers')
       $scope.type = 'edit'
       $scope.title = 'Edit line item'
       $scope.item = db.lineItems().findById($routeParams.itemId)
+      $scope.item.amount = parseFloat($scope.item.amount)
       updateFunc = db.lineItems().editById
 
     $scope.onChangePayee = ->
@@ -56,7 +62,9 @@ angular.module('app.controllers')
         $scope.item.originalDate = $scope.item.date
       updateFunc($scope.item)
       db.lineItems().reBalance($scope.item)
-      onSuccess = -> $location.path('/line_items/')
+      onSuccess = -> 
+        itemDate = moment($scope.item.date)
+        $location.path('/' + ($routeParams.returnto || "line_items/#{itemDate.year()}/#{itemDate.month()}"))
       db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees]).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
   .controller 'LineItemShowController', ($scope, $routeParams, db) ->

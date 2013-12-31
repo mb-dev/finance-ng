@@ -6,6 +6,9 @@ correctCase = (name) ->
   return name if !name
   name.split(' ').map(capitalizeFirstLetter).join(' ')
 
+toImportString = (item) ->
+  "#{item.type},#{item.amount},#{item.payeeName||''},#{item.comment || ''},#{moment(item.date).format('L')}"
+
 angular.module('app.controllers')
   .controller 'ImportItemsController', ($scope, $routeParams, $location, db, $injector) ->
     $scope.states = {SELECT_FILE: 'selectFile', REVIEW_ITEMS: 'reviewItems', RENAME_ITEMS: 'renameItems'}
@@ -41,7 +44,7 @@ angular.module('app.controllers')
       # mark items that were imported before with ignore flag
       $scope.items.forEach (item) ->
         db.lineItems().extendItem(item)
-        item.$originalJson = angular.toJson(item)
+        item.$originalJson = toImportString(item)
         item.accountId = account.id
         if(importedLines[item.$originalJson])
           item.$ignore = true

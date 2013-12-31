@@ -1,20 +1,16 @@
 angular.module('app.controllers')
   .controller 'BudgetsIndexController', ($scope, $routeParams, $location, db, budgetReportService) ->
-    report = null
-    applyDateChanges = ->
-        reportGenerator = budgetReportService.getReportForYear(db, $scope.currentDate.year())
-        $scope.report = reportGenerator.generateReport()
-    $scope.yearRanges = db.budgetItems().getYearRange()
-    
-    $scope.currentDate = moment('2012-01-01')
+    $scope.currentYear = moment().year()
     if $routeParams.year
-      $scope.currentDate.year(+$routeParams.year)
+      $scope.currentYear = parseInt($routeParams.year, 10)
     $scope.months = moment.monthsShort()
-    applyDateChanges()
+    reportGenerator = budgetReportService.getReportForYear(db, $scope.currentYear)
+    $scope.report = reportGenerator.generateReport()
 
-    $scope.selectYear = (year) ->
-      $scope.currentDate.year(year)
-      $location.path('/budgets/' + $scope.currentDate.year().toString())
+    $scope.nextYear = ->
+      $location.path('/budgets/' + ($scope.currentYear+1).toString())
+    $scope.prevYear = ->
+      $location.path('/budgets/' + ($scope.currentYear-1).toString())
 
   .controller 'BudgetItemsFormController', ($scope, $routeParams, $location, db, errorReporter) ->
     updateFunc = null
@@ -33,3 +29,9 @@ angular.module('app.controllers')
       onSuccess = -> $location.path('/budgets/' + $scope.item.budget_year.toString())
       saveTables = -> db.saveTables([Database.BUDGET_ITEMS_TBL])
       updateFunc($scope.item).then(saveTables).then(onSuccess, errorReporter.errorCallbackToScope($scope))
+
+angular.module('app.services')
+  .factory 'budgetReportService', () ->
+    getReportForYear: (db, year) ->
+      budgetReport = new BudgetReportView(db, year)
+      budgetReport

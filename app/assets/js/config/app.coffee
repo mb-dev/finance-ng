@@ -13,6 +13,7 @@ App = angular.module('app', [
   'ui.select2',
   'fileSystem',
   'siyfion.sfTypeahead'
+  'checklist-model'
 ])
 
 App.config ($routeProvider, $locationProvider) ->
@@ -59,7 +60,7 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/planned_items/:year?', {templateUrl: '/partials/planned_items/index.html'})
     .when('/planned_items/:year/:name/edit', {templateUrl: '/partials/planned_items/edit.html'})
 
-    .when('/reports/:year?/:month?', {templateUrl: '/partials/reports/index.html'})
+    .when('/reports/:year?/:month?', {templateUrl: '/partials/reports/index.html', controller: 'ReportsIndexController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories]) })
     .when('/reports/:year/categories/:item', {templateUrl: '/partials/reports/show.html'})
 
     .when('/misc', {templateUrl: '/partials/misc/index.html'})    

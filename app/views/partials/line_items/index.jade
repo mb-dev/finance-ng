@@ -10,18 +10,26 @@ ng-include(src="'/partials/common/finance_header.html'")
 
   .main_list.list-group
     .list-group-item.row.header
-      .date.col-xs-4 Date
-      .payee.col-xs-5 Payee Name
-      .amount.col-xs-3 Amount
+      .date.col-xs-2.col-md-1 &nbsp;
+      .date.col-xs-2.col-md-1 Date
+      .payee.col-xs-5.col-md-2 Payee Name
+      .balance.hidden-xs.col-md-3 Category Name
+      .amount.col-xs-3.col-md-2 Amount
+      .balance.hidden-xs.col-md-3 Balance
+      
     a.list-group-item.row(ng-href='/line_items/{{item.id}}', ng-repeat='item in lineItems')
-      .date.col-xs-4
+      .date.col-xs-2.col-md-1
         i.fa.fa-tags.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.tags[0]}}', ng-show='{{item.tags && item.tags.length > 0}}')/
         i.fa.fa-comment.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.comment}}', ng-show='{{item.comment.length > 0}}')/
-        i.fa.fa-plane.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.grouped_label}}', ng-show='{{item.grouped_label.length > 0}}')/
-        |&nbsp;
+        i.fa.fa-plane.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.grouped_label}}', ng-show='{{item.grouped_label.length > 0}}')
+        | &nbsp;
+      .date.col-xs-2.col-md-1
         {{item.date | amDateFormat:'DD' }}
-      .payee.col-xs-5 {{item.payeeName}}
-      .amount.col-xs-3 {{item.$signedAmount()}}
+      .payee.col-xs-5.col-md-2 {{item.payeeName}}
+      .payee.hidden-xs.col-md-3 {{item.categoryName}}
+      .amount.col-xs-3.col-md-2
+         currency-with-sign(amount='item.$signedAmount()')
+      .payee.hidden-xs.col-md-3 {{item.balance | currency}}
     
 
   .footer.well.row

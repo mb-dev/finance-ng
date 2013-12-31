@@ -1,4 +1,137 @@
 # JS Functions
+importDatabase = ($q, db) ->
+  dateToJsStorage = (dateString) -> 
+    moment(dateString).valueOf()
+
+  importFile = (fileName, itemConvert) ->
+    deferred = $q.defer();
+    $.getJSON fileName, (data) ->
+      data.forEach(itemConvert)
+      deferred.resolve(true)
+    deferred.promise
+
+    # 0 - Provident Checking
+    # 1 - Provident Visa
+    # 2 - Chase CC
+
+  accountsMap = {}
+  importedLinesMap = {}
+
+  importAccount = ->
+    importFile '/dumps/Account.json', (account) ->
+      if(account.name  == 'Provident - Checking')
+        accountsMap[account._id] = '1'
+      else if(account.name  == 'Provident - Credit Card')
+        accountsMap[account._id] = '2'
+      else if (account.name  == 'Chase - Credit Card')
+        accountsMap[account._id] = '3'
+    
+  amountOfImportLines = 0
+  importImportedLines = ->
+    console.log('import imported lines')
+    importFile '/dumps/ImportedLine.json', (item) ->
+      return if !accountsMap[item.account_id]
+      amountOfImportLines += 1
+      originalLine = JSON.parse(item.imported_line)
+      
+      originalLine.type = if originalLine.type == 0 then LineItemCollection.INCOME else LineItemCollection.EXPENSE
+      originalLine.amount = parseFloat(originalLine.amount).toString()
+      originalLine.date = moment(originalLine.event_date).format('L')
+      newLine = "#{originalLine.type},#{originalLine.amount},#{originalLine.payee_name||''},#{originalLine.comment || ''},#{originalLine.date}"
+
+      newItem = {content: newLine}
+      db.importedLines().insert(newItem)
+      importedLinesMap[item.line_item_id] = newItem.id 
+
+  amountOfLineItems = 0
+  importLineItem = ->
+    console.log(amountOfImportLines)
+    console.log('import line items')
+    importFile '/dumps/LineItem.json', (item) ->
+      newItem = {
+        type: if item.type == 0 then LineItemCollection.INCOME else LineItemCollection.EXPENSE,
+        date: dateToJsStorage(item.event_date)
+        payeeName: item.payee_name
+        accountId: accountsMap[item.account_id]
+        comment: item.comment
+        tags: item.tags
+        amount: parseFloat(item.amount).toString()
+        createdAt: dateToJsStorage(item.created_at || moment().toString()) 
+        updatedAt: dateToJsStorage(item.updated_at || moment().toString()) 
+      }
+      newItem.amount = (Math.round(parseFloat(item.amount) * 100) / 100).toString()
+      if item.category_name == 'Salary'
+        newItem.categoryName = 'Income:Salary'
+      else if item.category_name == 'Investments:Dividend'
+        newItem.categoryName = 'Income:Dividend'
+      else
+        newItem.categoryName = item.category_name
+      if item.original_event_date
+        newItem.originalDate = dateToJsStorage(item.original_event_date) 
+      else
+        newItem.originalDate = newItem.date
+      if item.grouped_label
+        newItem.groupedLabel = item.grouped_label
+      if importedLinesMap[item._id]
+        newItem.source = 'import'
+        newItem.importId = importedLinesMap[item._id]
+      amountOfLineItems+=1
+      db.lineItems().insert(newItem)
+      db.categories().findOrCreate(newItem.categoryName)
+      db.payees().findOrCreate(newItem.payeeName)
+
+  processingRulesMap = {}
+  processingRulesMapReverse = {}
+
+  importProcessingRule = ->
+    console.log(amountOfLineItems)
+    console.log('import processing rules')
+    importFile '/dumps/ProcessingRule.json', (item) ->
+      return if !item.expression || !item.replacement
+      replacingName = null
+      processingRule = null
+      if item.item_type == 'payee'
+        replacingName = item.expression
+        processingRule = {payeeName: item.replacement, categoryName: processingRulesMapReverse[item.replacement]}
+        processingRulesMap[item.replacement] = item.expression
+      else 
+        if processingRulesMap[item.expression]
+          replacingName = processingRulesMap[item.expression]
+          processingRule = {payeeName: item.expression, categoryName: item.replacement}
+        else
+          processingRulesMapReverse[item.expression] = item.replacement
+      if processingRule && processingRule.categoryName && processingRule.payeeName
+        db.processingRules().set('name:' + replacingName, processingRule)
+
+
+  importBudgetItem = ->
+    console.log('import budget items')
+    importFile '/dumps/BudgetItem.json', (item) ->
+      newItem = {
+        name: item.name, 
+        categories: item.categories
+        budgetYear: item.budget_year
+        limit: item.limit
+        estimatedMinMonthly: item.estimated_min_monthly_amount
+      }
+      db.budgetItems().insert(newItem)
+
+  emptyItems = ->
+    db.lineItems().collection = []
+    db.budgetItems().collection = []
+    db.importedLines().collection = []
+    db.categories().collection = {}
+    db.payees().collection = {}
+    db.processingRules().collection = {}
+
+  db.getTables(Object.keys(db.tables))
+    .then(emptyItems).then(importAccount).then(importImportedLines).then(importLineItem).then(importProcessingRule).then(importBudgetItem).then () ->
+      db.accounts().getAll().toArray().forEach (account) =>
+        firstItem = db.lineItems().getItemsByAccountId(account.id, (item) -> item.originalDate + '-' + item.id).first()
+        db.lineItems().reBalance(firstItem)
+      db.saveTables(Object.keys(db.tables))
+
+  true
 
 # Other
 
@@ -7,17 +140,40 @@ class window.LineItemCollection extends Collection
   @INCOME = 2
 
   @SOURCE_IMPORT = 'import'
+
+  @EXCLUDE_FROM_REPORT = 'Exclude from Reports'
+  @TRANSFER_TO_CASH = 'Transfer:Cash'
     
+  getYearRange: ->
+    Lazy(@collection).map((item) -> moment(item.date).year()).uniq().sortBy(Lazy.identity).toArray()
+
   getItemsByMonthYear: (month, year, sortBy) ->
+    if !sortBy && @sortColumn
+      sortBy = @defaultSortFunction
     Lazy(@collection).filter((item) -> 
       date = moment(item.date)
       date.month() == month && date.year() == year
     ).sortBy(sortBy)
 
+  getItemsByMonthYearAndCategories: (month, year, categories, sortBy) ->
+    if !sortBy && @sortColumn
+      sortBy = @defaultSortFunction
+    Lazy(@collection).filter((item) -> 
+      date = moment(item.date)
+      date.month() == month && date.year() == year && categories.indexOf(item.categoryName) >= 0
+    ).sortBy(sortBy)
+
+  getItemsByAccountId: (accountId, sortBy) ->
+    accountId = accountId.toString()
+    Lazy(@collection).filter((item) -> 
+      item.accountId.toString() == accountId
+    ).sortBy(sortBy)
+
   reBalance: (modifiedItem) =>
     return if !@collection || @collection.length == 0
+    return if !modifiedItem || !modifiedItem.accountId
     
-    sortedCollection = Lazy(@collection).sortBy(@defaultSortFunction).toArray()
+    sortedCollection = @getItemsByAccountId(modifiedItem.accountId, (item) -> item.originalDate + '-' + item.id).toArray()
     currentBalance = new BigNumber(0)
 
     if !modifiedItem || (modifiedItem.id == sortedCollection[0].id)
@@ -106,7 +262,7 @@ angular.module('app.services', ['ngStorage'])
     }
     db = new Database('memoryng', $http, $q, $sessionStorage, $localStorage, fileSystem)
     tables = {
-      memories: db.createCollection(tablesList.memories, new MemoriesCollection($q, 'date'))
+      memories: db.createCollection(tablesList.memories, new MemoriesCollection($q, ['date', 'id']))
       events: db.createCollection(tablesList.events, new EventsCollection($q, 'date'))
       people: db.createCollection(tablesList.people, new Collection($q)),
       categories: db.createCollection(tablesList.categories, new SimpleCollection($q))
@@ -164,7 +320,7 @@ angular.module('app.services', ['ngStorage'])
     }
     tables = {
       accounts: db.createCollection(tablesList.accounts, new Collection($q, 'name'))
-      lineItems: db.createCollection(tablesList.lineItems, new LineItemCollection($q, 'date'))
+      lineItems: db.createCollection(tablesList.lineItems, new LineItemCollection($q, ['date', 'id']))
       budgetItems: db.createCollection(tablesList.budgetItems, new BudgetItemCollection($q, 'budget_year'))
       plannedItems: db.createCollection(tablesList.plannedItems, new Collection($q))
       categories: db.createCollection(tablesList.categories, new SimpleCollection($q))
@@ -184,6 +340,8 @@ angular.module('app.services', ['ngStorage'])
         if @type == LineItemCollection.EXPENSE then -1 else 1
       item.$signedAmount = ->
         parseFloat(@amount) * @$multiplier()
+      item.$signedAmountAbs = ->
+        Math.abs(parseFloat(@amount) * @$multiplier())
       item.$addProcessingRule = ->
         return if !@categoryName || !@payeeName
         if @$originalPayeeName
@@ -219,6 +377,8 @@ angular.module('app.services', ['ngStorage'])
     
     accessFunc = {
       tables: tablesList
+      importDatabase: ->
+        importDatabase($q, accessFunc)
       lineItems: ->
         tables.lineItems
       accounts: ->
@@ -252,27 +412,27 @@ angular.module('app.services', ['ngStorage'])
       dumpAllCollections: (tableList) -> 
         db.dumpAllCollections(tableList)
     }
-  .factory 'budgetReportService', () ->
-    getReportForYear: (db, year) ->
-      budgetReport = new BudgetReportView(db, year)
-      budgetReport
+  
   .factory 'errorReporter', () ->
     errorCallbackToScope: ($scope) ->
       (reason) ->
         $scope.error = "failure for reason: " + reason
 
 angular.module('app.directives', ['app.services', 'app.filters'])
-  .directive 'currencyWithSign', ->
+  .directive 'currencyWithSign', ($filter) ->
     {
       restrict: 'E',
       link: (scope, elm, attrs) ->
+        currencyFilter = $filter('currency')
         scope.$watch attrs.amount, (value) ->
+          if typeof value != 'string'
+            value = value.toString()
           if (typeof value == 'undefined' || value == null)
             elm.html('')
           else if value[0] == '-'
-            elm.html('<span class="negative">' + value + '</span>')
+            elm.html('<span class="negative">' + currencyFilter(value) + '</span>')
           else
-            elm.html('<span class="positive">' + value + '</span>')
+            elm.html('<span class="positive">' + currencyFilter(value) + '</span>')
     }
   
   .directive 'dateFormat', ($filter) ->
@@ -292,6 +452,7 @@ angular.module('app.directives', ['app.services', 'app.filters'])
       require: 'ngModel'
       link: (scope, element, attr, ngModelCtrl) ->
         ngModelCtrl.$formatters.unshift (value) ->
+          return 0 if !value
           parseFloat(value)
         
         ngModelCtrl.$parsers.push (value) ->
@@ -320,10 +481,18 @@ angular.module('app.directives', ['app.services', 'app.filters'])
 
   .directive 'pickadate', () ->
     {
-      link: (scope, element, attrs, modelCtrl) ->
-        element.pickadate({
-          format: 'mm/dd/yyyy'
-        })
+      require: 'ngModel',
+      link: (scope, element, attrs, ngModel) ->
+        initialized = false
+        scope.$watch(() ->
+          ngModel.$modelValue;
+        , (newValue) ->
+          if newValue && !initialized
+            element.pickadate({
+              format: 'mm/dd/yyyy'
+            })
+            initialized = true
+        )
     }
   .directive "fileread", () ->
     scope: 
@@ -344,6 +513,10 @@ angular.module('app.directives', ['app.services', 'app.filters'])
     angularDateFilter = $filter('date')
     (theDate) ->
       angularDateFilter(theDate, 'MM/dd')
+
+  .filter 'percent', ->
+    (value) ->
+      value + '%'
 
   .filter 'mbCurrency', ($filter) ->
     angularCurrencyFilter = $filter('currency')

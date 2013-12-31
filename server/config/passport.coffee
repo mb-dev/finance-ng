@@ -33,5 +33,6 @@ module.exports = (passport, config) ->
             console.log 'saved user for session', user
             done(err, user)
       else
+        user.accessToken
         done(err, user)
   ))

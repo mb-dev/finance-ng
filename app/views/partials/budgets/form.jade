@@ -16,7 +16,7 @@ ng-include(src="'/partials/common/finance_header.html'")
       .form-group
         label.col-xs-4.col-sm-2.control-label Budget Year
         .col-xs-8.col-sm-10
-          input.form-control(type='text', placeholder='Budget Year', ng-model='item.budget_year', numbers-only)
+          input.form-control(type='text', placeholder='Budget Year', ng-model='item.budgetYear', numbers-only)
       .form-group
         label.col-xs-4.col-sm-2.control-label Limit
         .col-xs-8.col-sm-10
@@ -24,5 +24,5 @@ ng-include(src="'/partials/common/finance_header.html'")
       .form-group
         label.col-xs-4.col-sm-2.control-label Estimated Min Monthly
         .col-xs-8.col-sm-10
-          input.form-control(type='text', placeholder='Estimated Minimum Amount', ng-model='item.estimated_min_monthly_amount', numbers-only)
+          input.form-control(type='text', placeholder='Estimated Minimum Amount', ng-model='item.estimatedMinMonthly', numbers-only)
       button.btn.btn-default(ng-click="onSubmit()") Submit

@@ -3,7 +3,7 @@ ng-include(src="'/partials/common/finance_header.html'")
   .panel.panel-default.row
     .panel-heading
       .btns-parent.pull-right
-        a.btn.btn-default.btn-sm.edit(ng-href='/line_items/{{item.id}}/edit?returnto=evenline_itemsts/{{item.id}}') Edit  
+        a.btn.btn-default.btn-sm.edit(ng-href='/line_items/{{item.id}}/edit?returnto=line_items/{{item.id}}') Edit  
         a.btn.btn-default.btn-sm.delete(ng-href='/line_items/{{item.id}}/delete') Delete
       h4.panel-title {{item.date | localDate}} - {{item.type | typeString}}
     .panel-body    
@@ -14,6 +14,7 @@ ng-include(src="'/partials/common/finance_header.html'")
           div Account: {{account.name}}
           div Category: {{item.categoryName}}
           div Payee: {{item.payeeName}}
+          div originalDate: {{item.originalDate | localDate}}
           div(ng-show='item.comment.length > 0') Comment: {{item.comment}}
           div(ng-show='item.groupedLabel.length > 0') Highlight Group: {{item.groupedLabel}}
           div(ng-show='item.tags.length > 0') Tags: {{item.tags}}

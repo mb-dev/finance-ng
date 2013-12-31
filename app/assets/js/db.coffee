@@ -57,8 +57,11 @@ class window.Collection
     result = result.sortBy sortBy if sortBy
     result
 
-  defaultSortFunction: (item) ->
-    (item) -> (item) item[@sortColumn]
+  defaultSortFunction: (item) =>
+    if @sortColumn instanceof Array && @sortColumn.length == 2
+      item[@sortColumn[0]] + '-' + item[@sortColumn[1]]
+    else
+      item[@sortColumn]
 
   getItemsByYear: (column, year, convertFunc, sortBy) ->
     if !sortBy && @sortColumn
@@ -186,7 +189,7 @@ class window.Database
     @fileSystem = fileSystem
 
     @db = {
-      user: {config: {incomeCategories: ['Salary', 'Investments:Dividend', 'Income:Misc']}} 
+      user: {config: {incomeCategories: ['Income:Salary', 'Income:Dividend', 'Income:Misc']}} 
     }
 
   user: =>
@@ -216,55 +219,6 @@ class window.Database
         console.log('failed to write', tableName, 'to FS', err)
 
     @$q.all(promises)
-  
-
-  # importDatabase: ($q, $sessionStorage) ->
-  #   dateToJsStorage = (dateString) -> 
-  #     moment(dateString).valueOf()
-
-  #   cleanItem = (item) ->
-  #     item.id = item['_id']
-  #     item.created_at = moment(item.created_at).valueOf() if item.created_at
-  #     item.updated_at = moment(item.updated_at).valueOf() if item.updated_at
-
-  #     delete item['_id']
-  #     delete item['processing_rule_ids']
-  #     delete item['encrypted_password']
-
-  #   importFile = (fileName, collectionModel, itemConvert) ->
-  #     deferred = $q.defer();
-  #     $.getJSON fileName, (data) ->
-  #       Lazy(data).each (item) ->
-  #         cleanItem(item)
-  #         itemConvert(item) if itemConvert
-  #         collectionModel.insert(item)
-        
-  #       deferred.resolve(true)
-  #     deferred.promise
-
-  #   importDeferred = $q.defer()
-
-  #   @loadStateFromLocalStorage($sessionStorage)
-  #   if @db.lineItems.collection && @db.lineItems.collection.length > 1
-  #     importDeferred.resolve(this)
-  #   else
-  #     file1 = importFile '/dumps/Account.json', @accounts()
-  #     file2 = importFile '/dumps/LineItem.json', @lineItems(), (item) ->
-  #       item.event_date = dateToJsStorage(item.event_date)
-  #       if item.original_event_date
-  #         item.original_event_date = dateToJsStorage(item.original_event_date) 
-  #       else
-  #         item.original_event_date = item.event_date
-  #     file3 = importFile '/dumps/BudgetItem.json', @budgetItems()
-  #     file4 = importFile '/dumps/PlannedItem.json', @plannedItems(), (item) ->
-  #       item.event_date_start = dateToJsStorage(item.event_date)
-  #       item.event_date_end = dateToJsStorage(item.event_date)
-
-  #     $q.all([file1, file2, file3, file4]).then (values) => 
-  #       @saveStateToLocalStorage($sessionStorage)
-  #       importDeferred.resolve(this)
-    
-  #   importDeferred.promise
   
   collectionToStorage: (tableName) =>
     dbModel = @db[tableName]

@@ -16,7 +16,7 @@ module.exports = (app, config, passport) ->
   app.configure ->
     app.use(express.cookieParser(config.cookieSecret));
 
-    app.use(express.bodyParser());
+    app.use(express.bodyParser({limit: '50mb'}));
 
     sessionStore = new RedisStore(host: config.redis.host, port: config.redis.port, db: config.redis.db, ttl: (60*60*24*7))
     sessionStore.on 'disconnect', () ->

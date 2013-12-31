@@ -1,41 +1,44 @@
 ng-include(src="'/partials/common/finance_header.html'")
-.budgets_index.container
-  div.row
-    ul.year_selector.col-xs-12
-      li(ng-repeat='year in yearRanges')
-        a(ng-click='selectYear(year)', href='#') {{year}}
+.budgets_index.index_page.container
+  .month-nav.row.well.wells-sm
+    a.col-xs-3.prev_month(ng-click='prevYear()', href='#') &lt;&lt; Prev
+    span.col-xs-6.current_month {{currentYear}}
+    a.col-xs-3.next_month(ng-click='nextYear()', href='#') Next &gt;&gt;
     
-  table.table.table-striped.table-bordered.table-condensed.report_table
-    thead
-      tr
-        th.name Budget Name
-        th.date(ng-repeat='month in months')
-          span {{month}}
-        th.total Total
-        th.actions
-    tbody
-      tr.item-row
-        td Income
-        td(ng-repeat='column in report.incomeRow', class='{{column.type}}')
-          span {{column.amount}}
-        td
-          currency-with-sign(amount='report.incomeMeta.totalIncome')
-        td
-      tr.item-row(ng-repeat='expenseRow in report.expenseRows')
-        td 
-          span {{expenseRow.meta.name}} - 
-          span.limit {{expenseRow.meta.limit}}
-          br/
-          span.now Now: {{expenseRow.meta.now}}
-        td(ng-repeat='expenseColumn in expenseRow.columns', class='{{expenseColumn.type}}')
-          {{expenseColumn.amount}}
-        td
-          span Total: {{expenseRow.meta.total}}
-          br/ 
-          span Expenses: {{expenseRow.meta.expenses}}
-          br/
-          span Percent: {{expenseRow.meta.percent}}
-        td
-          a.btn.btn-primary.btn-small.edit_btn(href="/budgets/{{currentDate | amDateFormat: 'YYYY'}}/{{expenseRow.meta.budgetItemId}}/edit") Edit
+  .row
+    table.table.table-striped.table-bordered.table-condensed.report_table
+      thead
+        tr
+          th.name Budget Name
+          th.date(ng-repeat='month in months')
+            span {{month}}
+          th.total Total
+          th.actions
+      tbody
+        tr.item-row
+          td Income
+          td(ng-repeat='column in report.incomeRow', class='{{column.type}}')
+            a(href='/line_items/{{currentYear}}/{{$index+1}}?categories={{report.incomeCategories}}', target='_blank') {{column.amount}}
+          td
+            currency-with-sign(amount='report.incomeMeta.totalIncome')
+          td
+        tr.item-row(ng-repeat='expenseRow in report.expenseRows')
+          td 
+            span {{expenseRow.meta.name}} - 
+            span.limit ${{expenseRow.meta.limit}}
+            br/
+            span.now 
+              |Now: 
+              currency-with-sign(amount='expenseRow.meta.now')
+          td(ng-repeat='expenseColumn in expenseRow.columns', class='{{expenseColumn.type}}')
+            a(href='/line_items/{{currentYear}}/{{$index+1}}?categories={{expenseRow.meta.categories}}', target='_blank')
+              {{expenseColumn.amount | currency}}
+          td
+            span Total: {{expenseRow.meta.total | currency}}
+            br/ 
+            span Expenses: {{expenseRow.meta.expenses | currency}} ({{expenseRow.meta.percent}})
+          td
+            a.btn.btn-primary.btn-small.edit_btn(href="/budgets/{{currentDate | amDateFormat: 'YYYY'}}/{{expenseRow.meta.budgetItemId}}/edit") Edit
 
-  div Total Budgeted: {{report.totalBudgeted | currency}}
+  .well.row
+      |Total Budgeted: {{report.totalBudgeted | currency}}

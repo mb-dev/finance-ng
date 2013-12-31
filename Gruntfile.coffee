@@ -90,6 +90,7 @@ module.exports = (grunt) ->
             'build/js/vendor/angular-strap-typeahead.js'
             'build/js/vendor/angular-filesystem.js'
             'build/js/vendor/angular-typeahead.js'
+            'build/js/vendor/angular-checklist-model.js'
             'build/js/vendor/ngStorage.js'
             'build/js/vendor/pickadate.js'
             'build/js/vendor/pickadate.date.js'
