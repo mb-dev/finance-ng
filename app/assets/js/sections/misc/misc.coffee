@@ -42,7 +42,8 @@ angular.module('app.controllers')
       $scope.items = importer.import(fileContent)
 
       # mark items that were imported before with ignore flag
-      $scope.items.forEach (item) ->
+      $scope.items.forEach (item, index) ->
+        item.index = index.toString()
         db.lineItems().extendItem(item)
         item.$originalJson = toImportString(item)
         item.accountId = account.id
@@ -54,6 +55,8 @@ angular.module('app.controllers')
           if !item.$process()
             item.payeeName = correctCase(item.payeeName)
             item.$addRule = true
+          else
+            item.$addRule = false
 
       $scope.state = $scope.states.REVIEW_ITEMS
       $scope.$apply()

@@ -61,7 +61,7 @@ ng-include(src="'/partials/common/finance_header.html'")
         .payee.col-xs-5.col-md-3 Category Name
         .amount.col-xs-3.col-md-1 Amount
         .comment.hidden-xs.col-md-4 Comment
-      a.list-group-item.row(ng-repeat='item in items | notIgnored')
+      .list-group-item.row(ng-repeat='item in items | notIgnored')
         .date.col-xs-4.col-md-1
           {{item.date | amDateFormat:'MM/DD/YYYY' }}
         .payee.col-xs-5.col-md-3

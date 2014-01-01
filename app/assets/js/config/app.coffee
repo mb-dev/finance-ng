@@ -121,7 +121,8 @@ App.run ($rootScope, $location, $injector) ->
     $sessionStorage = $injector.get('$sessionStorage')
     if $sessionStorage.successMsg
       $rootScope.successMsg = $sessionStorage.successMsg
-      $sessionStorage.successMsg = null
+    $sessionStorage.successMsg = null
+    
 
   $rootScope.isActive = (urlPart) =>
     $location.path().indexOf(urlPart) > 0
