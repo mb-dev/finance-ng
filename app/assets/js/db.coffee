@@ -330,10 +330,11 @@ class window.Database
     deferred = @$q.defer();
 
     dataSets = @dumpAllCollections(tableList)[@appName]
+    lastModifiedDate = Lazy(dataSets).pluck('content').pluck('modifiedAt').max() - 10
     dataSets.forEach (dataSet) =>
       dataSet.content = sjcl.encrypt(@$localStorage.encryptionKey, angular.toJson(dataSet.content))
 
-    @$http.post('/data/datasets?' + $.param({appName: @appName}), dataSets)
+    @$http.post('/data/datasets?' + $.param({appName: @appName, lastModifiedDate: lastModifiedDate}), dataSets)
       .success (data, status, headers) =>
         console.log 'saving datasets:', tableList, 'to session'
         @writeTablesToFS(tableList).then ->

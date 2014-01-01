@@ -84,7 +84,7 @@ exports.postDataSets = (req, res) ->
       console.log('Write failed', err)
       res.json 400, {reason: "write_failed"}
     else
-      req.user.lastModifiedDate = Date.now()
+      req.user.lastModifiedDate = req.query.lastModifiedDate
       req.user.save (err) ->
         if(err) then res.json 400, {reason: "write_failed"}
         else res.json 200, {message: "write_ok"}
