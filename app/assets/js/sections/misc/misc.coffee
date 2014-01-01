@@ -88,6 +88,30 @@ angular.module('app.controllers')
       $scope.flashSuccess(imported.toString() + ' items were imported successfully!')
       $location.path('/line_items')
 
+  .controller 'MiscCategoriesController', ($scope, $routeParams, $location, db, $injector) ->
+    $scope.items = db.categories().getAll().toArray().sort()
+
+  .controller 'MiscPayeesController', ($scope, $routeParams, $location, db, $injector) ->
+    $scope.items = db.payees().getAll().toArray().sort()
+
+  .controller 'MiscProcessingRulesController', ($scope, $routeParams, $location, db, $injector) ->
+    processingRules = db.processingRules().getAll().toArray().sort()
+
+    $scope.processingRulesByName = []
+    $scope.processingRulesByAmount = []
+    processingRules.forEach (item) ->
+      details = db.processingRules().get(item)
+      if Lazy(item).startsWith('name:')
+        $scope.processingRulesByName.push({name: item.substring(5), payeeName: details.payeeName, categoryName: details.categoryName, key: item})
+      else
+        $scope.processingRulesByAmount.push({name: item.substring(6), payeeName: details.payeeName, categoryName: details.categoryName, key: item})
+
+    $scope.deleteItem = (key, collection, index) ->
+      db.processingRules().delete(key)
+      collection.splice(index, 1)
+      db.saveTables([db.tables.processingRules])
+      $scope.$apply();
+
 angular.module('app.filters')
   .filter 'notIgnored', ->
     (items, userAccessLevel) ->

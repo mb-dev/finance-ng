@@ -145,6 +145,9 @@ class window.SimpleCollection
   set: (key, value) =>
     @collection[key] = value
 
+  delete: (key) =>
+    delete @collection[key]
+
   findOrCreate: (items) =>
     return if !items
     items = [items] if !(items instanceof Array)

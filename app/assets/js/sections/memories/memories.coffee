@@ -63,16 +63,15 @@ angular.module('app.controllers')
       db.categories().findOrCreate($scope.item.categories)
 
       onSuccess = -> 
-        $location.path('/' + ($routeParams.returnto || 'memories') + '/')
+        $location.path($routeParams.returnto || '/memories/')
       saveTables = -> db.saveTables([db.tables.memories, db.tables.categories])
       saveTables().then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
   .controller 'MemoriesShowController', ($scope, $routeParams, db) ->
     $scope.item = db.memories().findById($routeParams.itemId)
     $scope.people = db.people().findByIds($scope.item.people)
-    if $scope.item.eventId
-      $scope.event = db.events().findById($scope.item.eventId)
-      console.log('event')
+    if $scope.item.events
+      $scope.events = db.events().findByIds($scope.item.events)
     if $scope.item.parentMemoryId
       $scope.parentMemory = db.memories().findById($scope.item.parentMemoryId)
     $scope.childMemories = db.memories().getItemsByParentMemoryId($scope.item.id).toArray()

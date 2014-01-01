@@ -8,28 +8,35 @@ ng-include(src="'/partials/common/finance_header.html'")
     span.col-xs-6.current_month {{currentDate | amDateFormat:'MMMM, YYYY'}}
     a.col-xs-3.next_month(ng-click='nextMonth()', href='#') Next &gt;&gt;
 
-  .main_list.list-group
-    .list-group-item.row.header
-      .date.col-xs-2.col-md-1 &nbsp;
-      .date.col-xs-2.col-md-1 Date
-      .payee.col-xs-5.col-md-2 Payee Name
-      .balance.hidden-xs.col-md-3 Category Name
-      .amount.col-xs-3.col-md-2 Amount
-      .balance.hidden-xs.col-md-3 Balance
+  .main_list.list-group.split_links
+    .list-group-item.row.header.compact
+      .col-xs-12.col-md-10
+        .date.col-xs-2.col-md-1 &nbsp;
+        .date.col-xs-2.col-md-1 Date
+        .payee.col-xs-5.col-md-4 Payee Name
+        .balance.hidden-xs.col-md-3 Category Name
+        .amount.col-xs-3.col-md-1 Amount
+        .balance.hidden-xs.col-md-2 Balance
+      .hidden-xs.col-md-2 Actions
       
-    a.list-group-item.row(ng-href='/line_items/{{item.id}}', ng-repeat='item in lineItems')
-      .date.col-xs-2.col-md-1
-        i.fa.fa-tags.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.tags[0]}}', ng-show='{{item.tags && item.tags.length > 0}}')/
-        i.fa.fa-comment.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.comment}}', ng-show='{{item.comment.length > 0}}')/
-        i.fa.fa-plane.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.grouped_label}}', ng-show='{{item.grouped_label.length > 0}}')
-        | &nbsp;
-      .date.col-xs-2.col-md-1
-        {{item.date | amDateFormat:'DD' }}
-      .payee.col-xs-5.col-md-2 {{item.payeeName}}
-      .payee.hidden-xs.col-md-3 {{item.categoryName}}
-      .amount.col-xs-3.col-md-2
-         currency-with-sign(amount='item.$signedAmount()')
-      .payee.hidden-xs.col-md-3 {{item.balance | currency}}
+    .list-group-item.row(ng-repeat='item in lineItems', ng-click='onClickItem(item)')
+      a.col-xs-12.col-md-10(ng-href='/line_items/{{item.id}}')
+        .date.col-xs-2.col-md-1
+          i.fa.fa-tags.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.tags[0]}}', ng-show='{{item.tags && item.tags.length > 0}}')/
+          i.fa.fa-comment.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.comment}}', ng-show='{{item.comment.length > 0}}')/
+          i.fa.fa-plane.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.grouped_label}}', ng-show='{{item.grouped_label.length > 0}}')
+          | &nbsp;
+        .date.col-xs-2.col-md-1
+          {{item.date | amDateFormat:'DD' }}
+        .payee.col-xs-5.col-md-4 {{item.payeeName}}
+        .payee.hidden-xs.col-md-3 {{item.categoryName}}
+        .amount.col-xs-3.col-md-1
+           currency-with-sign(amount='item.$signedAmount()')
+        .payee.hidden-xs.col-md-2 {{item.balance | currency}}
+      .actions.hidden-xs.col-md-2
+        a.btn.btn-default.btn-sm.edit(ng-href='/line_items/{{item.id}}/edit?returnto={{currentLocation}}') Edit 
+        &nbsp; 
+        a.btn.btn-default.btn-sm.delete(ng-href='/line_items/{{item.id}}/delete') Delete
     
 
   .footer.well.row

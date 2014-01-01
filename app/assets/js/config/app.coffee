@@ -4,6 +4,7 @@
 App = angular.module('app', [
   'ngCookies'
   'ngResource'
+  'ngSanitize'
   'app.controllers'
   'app.directives'
   'app.filters'
@@ -65,6 +66,9 @@ App.config ($routeProvider, $locationProvider) ->
 
     .when('/misc', {templateUrl: '/partials/misc/index.html'})    
     .when('/misc/import', {templateUrl: '/partials/misc/import.html', controller: 'ImportItemsController', resolve: resolveFDb((fdb) ->[fdb.tables.accounts, fdb.tables.categories, fdb.tables.payees, fdb.tables.lineItems, fdb.tables.importedLines, fdb.tables.processingRules]) })    
+    .when('/misc/categories', {templateUrl: '/partials/misc/categories.html', controller: 'MiscCategoriesController', resolve: resolveFDb((fdb) ->[fdb.tables.categories]) })    
+    .when('/misc/payees', {templateUrl: '/partials/misc/payees.html', controller: 'MiscPayeesController', resolve: resolveFDb((fdb) ->[fdb.tables.payees]) })    
+    .when('/misc/processingRules', {templateUrl: '/partials/misc/processingRules.html', controller: 'MiscProcessingRulesController', resolve: resolveFDb((fdb) ->[fdb.tables.processingRules]) })    
 
     .when('/login_success', redirectTo: '/welcome/')
     .when('/login', {templateUrl: '/partials/user/login.html', controller: 'UserLoginController'})
@@ -113,6 +117,7 @@ App.run ($rootScope, $location, $injector) ->
       $location.path '/key'
   
   $rootScope.$on '$routeChangeStart', ->
+    $rootScope.currentLocation = $location.path()
     $sessionStorage = $injector.get('$sessionStorage')
     if $sessionStorage.successMsg
       $rootScope.successMsg = $sessionStorage.successMsg

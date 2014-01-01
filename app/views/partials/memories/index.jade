@@ -9,9 +9,9 @@ ng-include(src="'/partials/common/memory_header.html'")
     a.col-xs-3.next_month(ng-click='nextMonth()', href='#') Next &gt;&gt;
 
   .main_list.list-group   
-    .list-group-item.row.header
-      .date.col-xs-3 Date
-      .payee.col-xs-9 Summary
+    .list-group-item.fixed-row.header.compact
+      .date.col-90 Date
+      .payee.rest-90 Summary
     a.list-group-item.fixed-row(ng-href='/memories/{{item.id}}', ng-repeat='item in items')
       .icons.col-90
         i.fa.fa-sun-o.fa-fw.fa-sr

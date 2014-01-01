@@ -4,9 +4,9 @@ ng-include(src="'/partials/common/memory_header.html'")
     a.btn.btn-primary.col-xs-12.add_transaction(ng-href='/people/new') Add Person
 
   .main_list.list-group   
-    .list-group-item.row.header
-      .icons.col-xs-2 &nbsp;
-      .date.col-xs-10 Name
+    .list-group-item.fixed-row.header.compact
+      .icons.col-90 &nbsp;
+      .date.rest-90 Name
     a.list-group-item.fixed-row(ng-href='/people/{{item.id}}', ng-repeat='item in items')
       .icons.col-90 
         i.fa.fa-user

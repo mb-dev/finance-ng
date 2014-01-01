@@ -501,7 +501,26 @@ angular.module('app.directives', ['app.services', 'app.filters'])
       element.bind "change", (changeEvent) ->
         scope.$apply () ->
           scope.fileread = changeEvent.target.files[0]
-                
+        
+  .directive 'ngConfirmClick', ->
+    link: (scope, element, attr) ->
+        msg = attr.ngConfirmClick || "Are you sure?";
+        clickAction = attr.confirmedClick
+        element.bind 'click', (event) ->
+          if window.confirm(msg)
+            scope.$eval(clickAction)
+
+  .directive 'autoresize', ($window) ->
+    restrict: 'A',
+    link: (scope, element, attrs) ->
+      offset = if !$window.opera then (element[0].offsetHeight - element[0].clientHeight) else (element[0].offsetHeight + parseInt($window.getComputedStyle(element[0], null).getPropertyValue('border-top-width'))) ;
+
+      resize  = (el)  ->
+        el.style.height = 'auto';
+        el.style.height = (el.scrollHeight  + offset ) + 'px';    
+   
+      element.bind('input', -> resize(element[0]));
+      element.bind('keyup', -> resize(element[0]));
 
  angular.module('app.filters', [])
   .filter 'localDate', ($filter) ->
@@ -541,4 +560,8 @@ angular.module('app.directives', ['app.services', 'app.filters'])
   .filter 'joinBy', () ->
     (input, delimiter) ->
       (input || []).join(delimiter || ',')
+
+  .filter 'newline', ($sce) ->
+    (string) ->
+      $sce.trustAsHtml(string.replace(/\n/g, '<br/>'));
         

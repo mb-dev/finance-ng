@@ -1,7 +1,7 @@
 ng-include(src="'/partials/common/memory_header.html'")
 .journal_index.container
-  .main_list.list-group   
-    div(ng-repeat='date in dates') 
+  .main_list.list-group.compact-list.row
+    div(ng-repeat='date in dates').col-xs-12
       .list-group-item.row.header
         b {{date}}
       a.list-group-item.fixed-row(ng-repeat='itemMeta in items[date]', ng-href="/{{itemMeta.type}}/{{item.id}}", ng-class="itemMeta.type", ng-init="item = itemMeta.data") 

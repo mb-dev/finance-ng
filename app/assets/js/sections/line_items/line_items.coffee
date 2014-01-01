@@ -20,7 +20,7 @@ angular.module('app.controllers')
       $scope.currentDate.add('months', -1)
       applyDateChanges()
       $location.path('/line_items/' + $scope.currentDate.year().toString() + '/' + ($scope.currentDate.month()+1).toString())
-
+      
     return
 
   .controller 'LineItemsFormController', ($scope, $routeParams, $location, db, errorReporter) ->
@@ -54,7 +54,6 @@ angular.module('app.controllers')
       # return if !$scope.item.payeeName
       # processingRule = fdb.processingRules().get('name:' + $scope.item.payeeName)
 
-
     $scope.onSubmit = ->
       db.categories().findOrCreate($scope.item.categoryName)
       db.payees().findOrCreate($scope.item.payeeName)
@@ -64,7 +63,7 @@ angular.module('app.controllers')
       db.lineItems().reBalance($scope.item)
       onSuccess = -> 
         itemDate = moment($scope.item.date)
-        $location.path('/' + ($routeParams.returnto || "line_items/#{itemDate.year()}/#{itemDate.month()}"))
+        $location.path($routeParams.returnto || "/line_items/#{itemDate.year()}/#{itemDate.month()}")
       db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees]).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
   .controller 'LineItemShowController', ($scope, $routeParams, db) ->

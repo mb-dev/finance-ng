@@ -3,7 +3,7 @@ ng-include(src="'/partials/common/memory_header.html'")
   .panel.panel-default.row
     .panel-heading
       .btns-parent.pull-right
-        a.btn.btn-default.btn-sm.edit(ng-href='/memories/{{item.id}}/edit?returnto=memories/{{item.id}}') Edit  
+        a.btn.btn-default.btn-sm.edit(ng-href='/memories/{{item.id}}/edit?returnto={{currentLocation}}') Edit  
         a.btn.btn-default.btn-sm.delete(ng-href='/memories/{{item.id}}/delete') Delete
       h4.panel-title Memory Details
     .panel-body.as-prop-columns.col-xs-12
@@ -12,7 +12,7 @@ ng-include(src="'/partials/common/memory_header.html'")
         .right-pane
           a(ng-href='/memories/{{parentMemory.id}}')
             {{parentMemory.title}}
-      .row(ng-if="!!event")
+      .row(ng-if="!!events")
         .left-pane Events
         .right-pane 
           a(ng-repeat='event in events', ng-href='/events/{{event.id}}')
@@ -32,9 +32,9 @@ ng-include(src="'/partials/common/memory_header.html'")
           a(ng-repeat='person in people', ng-href='/people/{{person.id}}')
             {{person.name}}{{$last ? '' : ', '}}
       .row
-        .col-xs-12(colspan='2') {{item.content}}
+        .col-xs-12(colspan='2', ng-bind-html="item.content | newline")
 
-  a.btn.btn-primary.pull-right(ng-href='/memories/new?parentMemoryId={{item.id}}') Add
+  a.btn.btn-primary.pull-right(ng-href='/memories/new?parentMemoryId={{item.id}}&returnto={{currentLocation}}') Add
   h3 Child memories
   .list-group
     a.list-group-item.fixed-row(ng-repeat='item in childMemories', ng-href="/memories/{{item.id}}")

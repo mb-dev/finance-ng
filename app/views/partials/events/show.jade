@@ -3,7 +3,7 @@ ng-include(src="'/partials/common/memory_header.html'")
   .panel.panel-default.row
     .panel-heading
       .btns-parent.pull-right
-        a.btn.btn-default.btn-sm.edit(ng-href='/events/{{item.id}}/edit?returnto=events/{{item.id}}') Edit  
+        a.btn.btn-default.btn-sm.edit(ng-href='/events/{{item.id}}/edit?returnto={{currentLocation}}') Edit  
         a.btn.btn-default.btn-sm.delete(ng-href='/events/{{item.id}}/delete') Delete
       h4.panel-title
         |Event Details
@@ -25,7 +25,7 @@ ng-include(src="'/partials/common/memory_header.html'")
       .row
         td.col-xs-12(colspan='2') {{item.content}}
   
-  a.btn.btn-primary.pull-right(ng-href='/memories/new?eventId={{item.id}}&returnto=events/{{item.id}}') Add
+  a.btn.btn-primary.pull-right(ng-href='/memories/new?eventId={{item.id}}&returnto={{currentLocation}}') Add
   h3 Associated memories
   .list-group
     a.list-group-item.fixed-row(ng-repeat='item in associatedMemories', ng-href="/memories/{{item.id}}")
