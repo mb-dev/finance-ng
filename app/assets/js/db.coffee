@@ -336,7 +336,7 @@ class window.Database
 
     @$http.post('/data/datasets?' + $.param({appName: @appName, lastModifiedDate: lastModifiedDate}), dataSets)
       .success (data, status, headers) =>
-        console.log 'saving datasets:', tableList, 'to session'
+        console.log 'saving datasets:', tableList, 'to file system'
         @writeTablesToFS(tableList).then ->
           deferred.resolve(data)
         , (error) ->
@@ -380,6 +380,7 @@ class window.Box
     @rows[0]['values'].length
   
   rowColumnValues: (row) =>
+    return [] if !@rowByHash[row]
     Lazy(@rowByHash[row]['columns']).pairs().map((item) -> {column: item[0], values: item[1].values }).toArray()
 
   rowTotals: (row) =>

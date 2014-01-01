@@ -4,7 +4,7 @@ ng-include(src="'/partials/common/memory_header.html'")
     .panel-heading
       .btns-parent.pull-right
         a.btn.btn-default.btn-sm.edit(ng-href='/memories/{{item.id}}/edit?returnto={{currentLocation}}') Edit  
-        a.btn.btn-default.btn-sm.delete(ng-href='/memories/{{item.id}}/delete') Delete
+        a.btn.btn-default.btn-sm.delete(ng-confirm-click='Are you sure you want to delete {{item.title}}?', confirmed-click='deleteItem()') Delete
       h4.panel-title Memory Details
     .panel-body.as-prop-columns.col-xs-12
       .row(ng-if="!!parentMemory")

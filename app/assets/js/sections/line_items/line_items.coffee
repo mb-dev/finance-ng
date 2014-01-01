@@ -1,12 +1,12 @@
 angular.module('app.controllers')
   .controller 'LineItemsIndexController', ($scope, $routeParams, $location, db) ->
     applyDateChanges = ->
-      if $routeParams.categories
-        $scope.lineItems = db.lineItems().getItemsByMonthYearAndCategories($scope.currentDate.month(), $scope.currentDate.year(), $routeParams.categories.split(',')).toArray().reverse()
-      else
-        $scope.lineItems = db.lineItems().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).toArray().reverse()
+      filter = {}
+      filter.date = {month: $scope.currentDate.month(), year: $scope.currentDate.year()}
+      filter.categories = $routeParams.categories.split(',') if $routeParams.categories
+      filter.accountId = $routeParams.accountId if $routeParams.accountId
+      $scope.lineItems = db.lineItems().getByDynamicFilter(filter).toArray().reverse()
         
-
     $scope.currentDate = moment()
     if $routeParams.month && $routeParams.year
       $scope.currentDate.year(+$routeParams.year).month(+$routeParams.month - 1)
@@ -20,7 +20,7 @@ angular.module('app.controllers')
       $scope.currentDate.add('months', -1)
       applyDateChanges()
       $location.path('/line_items/' + $scope.currentDate.year().toString() + '/' + ($scope.currentDate.month()+1).toString())
-      
+
     return
 
   .controller 'LineItemsFormController', ($scope, $routeParams, $location, db, errorReporter) ->

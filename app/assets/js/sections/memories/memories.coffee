@@ -67,7 +67,7 @@ angular.module('app.controllers')
       saveTables = -> db.saveTables([db.tables.memories, db.tables.categories])
       saveTables().then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
-  .controller 'MemoriesShowController', ($scope, $routeParams, db) ->
+  .controller 'MemoriesShowController', ($scope, $routeParams, db, $location) ->
     $scope.item = db.memories().findById($routeParams.itemId)
     $scope.people = db.people().findByIds($scope.item.people)
     if $scope.item.events
@@ -75,3 +75,19 @@ angular.module('app.controllers')
     if $scope.item.parentMemoryId
       $scope.parentMemory = db.memories().findById($scope.item.parentMemoryId)
     $scope.childMemories = db.memories().getItemsByParentMemoryId($scope.item.id).toArray()
+
+    $scope.deleteItem = ->
+
+      # delete child memory
+      $scope.childMemories.forEach (childMemory) ->
+        db.memories().deleteById(childMemory.id)
+
+      # delete memory
+      db.memories().deleteById($scope.item.id)
+
+      db.saveTables([db.tables.memories]).then ->
+        if $scope.item.events
+          $location.path('/events/' + $scope.item.events[0])
+        else
+          date = moment($scope.item.events[0])
+          $location.path('/memories/' + date.year().toString() + '/' + date.month().toString())

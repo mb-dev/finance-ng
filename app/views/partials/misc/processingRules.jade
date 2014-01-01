@@ -3,7 +3,7 @@ ng-include(src="'/partials/common/finance_header.html'")
   a(href='/misc/') &lt;&lt; Back
   h2 By name
   .main_list.list-group.compact-list
-    .list-group-item.row(ng-repeat='item in processingRulesByName')
+    .list-group-item(ng-repeat='item in processingRulesByName')
       .col-xs-2.col-md-1
         a.btn.btn-default.btn-xs.edit(ng-confirm-click='Are you sure you want to delete {{item.name}}?', confirmed-click='deleteItem(item.key, processingRulesByName, $index)') Delete 
       .col-xs-10.col-md-11
@@ -16,7 +16,7 @@ ng-include(src="'/partials/common/finance_header.html'")
 
   h2 By amount
   .main_list.list-group.compact-list
-    .list-group-item.row(ng-repeat='item in processingRulesByAmount')
+    .list-group-item(ng-repeat='item in processingRulesByAmount')
       .col-xs-2.col-md-1
         a.btn.btn-default.btn-xs.edit(ng-confirm-click='Are you sure you want to delete {{item.name}}?', confirmed-click='deleteItem(item.key, processingRulesByAmount, $index)') Delete 
       .col-xs-10.col-md-11

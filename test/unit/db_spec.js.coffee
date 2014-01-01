@@ -23,7 +23,6 @@ describe 'Database', ->
     root.tableName = 'people'
     root.authenticateURL = '/data/authenticate'
     root.getURL = '/data/datasets?' + $.param({appName: root.appName, tableList: [root.tableName]})
-    root.postURL = '/data/datasets?' + $.param({appName: root.appName})
     root.authenticateOkResponseDataStale = {user: {email: 'a@a.com', lastModifiedDate: root.timeNow}}
     root.authenticateOkResponseDataOk = {user: {email: 'a@a.com', lastModifiedDate: 1}}
     root.getResponse = {tablesResponse: []}
@@ -88,10 +87,13 @@ describe 'Database', ->
       expect(testCollection.getAll().toArray()).toEqual([{id: 1, name: 'Moshe'}])
   describe 'saveTables', ->
     it 'should save to the server', ->
-      root.$httpBackend.expectPOST(root.postURL)
       db = new Database(root.appName, root.$http, root.$q, root.$sessionStorage, root.$localStorage, root.fileSystem)
       testCollection = db.createCollection(root.tableName, new Collection(root.$q, 'name'))
       testCollection.insert(root.item)
+
+      root.postURL = '/data/datasets?' + $.param({appName: root.appName, lastModifiedDate: testCollection.modifiedAt - 10})
+      root.$httpBackend.expectPOST(root.postURL)
+
       db.saveTables([root.tableName])
       root.$httpBackend.flush()
       expect(JSON.parse(root.fileSystemContent[root.fileSystemFileName]).data[0].name).toEqual('Moshe')

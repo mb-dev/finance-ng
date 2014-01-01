@@ -1,0 +1,14 @@
+ng-include(src="'/partials/common/memory_header.html'")
+.events_index.container
+  a(href='/events/{{item.id}}') &lt;&lt; Back
+  a.btn.btn-primary.pull-right(ng-click='saveChanges()') Save Changes
+  h3 Associate Memory
+  .main_list.list-group.compact-list
+    .list-group-item(ng-repeat='memory in memories')
+      .col-xs-4.col-md-1
+        a.btn.btn-default.btn-xs.edit(ng-click='associateMemory(memory.id, memory)', ng-hide='memory.$associated') Associate 
+        a.btn.btn-default.btn-xs.edit(ng-click='unAssociateMemory(memory.id, memory)', ng-show='memory.$associated') Unassociate 
+      a.col-xs-6.col-md-11(ng-href='/memories/{{memory.id}}')
+        {{memory.date | localDate}}
+        &nbsp; &dash; &nbsp;
+        {{memory.title}}         

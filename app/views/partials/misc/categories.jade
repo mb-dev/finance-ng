@@ -3,7 +3,7 @@ ng-include(src="'/partials/common/finance_header.html'")
   a(href='/misc/') &lt;&lt; Back
   br/
   br/
-  .main_list.list-group
-    a.list-group-item.row(ng-href='/accounts/{{item.id}}', ng-repeat='item in items')
+  .main_list.list-group.compact-list
+    a.list-group-item(ng-href='/accounts/{{item.id}}', ng-repeat='item in items')
       .col-xs-12
         {{item}}

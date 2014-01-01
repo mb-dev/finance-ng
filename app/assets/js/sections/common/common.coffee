@@ -143,9 +143,26 @@ class window.LineItemCollection extends Collection
 
   @EXCLUDE_FROM_REPORT = 'Exclude from Reports'
   @TRANSFER_TO_CASH = 'Transfer:Cash'
+
+  @TAG_CASH = 'Cash'
     
   getYearRange: ->
     Lazy(@collection).map((item) -> moment(item.date).year()).uniq().sortBy(Lazy.identity).toArray()
+
+  getByDynamicFilter: (filter, sortBy) ->
+    if !sortBy && @sortColumn
+      sortBy = @defaultSortFunction
+
+    Lazy(@collection).filter((item) -> 
+      if filter.date
+        date = moment(item.date)
+        return false if !(date.month() == filter.date.month && date.year() == filter.date.year)
+      if filter.categories
+        return false if filter.categories.indexOf(item.categoryName) < 0
+      if filter.accountId
+        return false if item.accountId != filter.accountId
+      true
+    ).sortBy(sortBy)
 
   getItemsByMonthYear: (month, year, sortBy) ->
     if !sortBy && @sortColumn
@@ -183,7 +200,8 @@ class window.LineItemCollection extends Collection
       currentBalance = new BigNumber(sortedCollection[startIndex-1].balance)
     
     [startIndex..(sortedCollection.length-1)].forEach (index) =>
-      currentBalance = currentBalance.plus(sortedCollection[index].$signedAmount())
+      if !(sortedCollection[index].tags && sortedCollection[index].tags.indexOf(LineItemCollection.TAG_CASH) >= 0) # don't increase balance for cash
+        currentBalance = currentBalance.plus(sortedCollection[index].$signedAmount())
       sortedCollection[index].balance = currentBalance.toString()
 
 
@@ -237,6 +255,11 @@ class MemoriesCollection extends Collection
     results = results.sortBy sortBy if sortBy
     results   
 
+  getMemoriesMentionedAtEventId: (eventId, sortBy) ->
+    results = Lazy(@collection).filter((item) -> item.mentionedIn && item.mentionedIn.indexOf(eventId) >= 0 )
+    results = results.sortBy sortBy if sortBy
+    results    
+
 class EventsCollection extends Collection
   getItemsByMonthYear: (month, year, sortBy) ->
     if !sortBy && @sortColumn
@@ -276,6 +299,9 @@ angular.module('app.services', ['ngStorage'])
       item.$memories = ->
         getAll: ->
           tables.memories.getItemsByEventId(item.id)
+      item.$mentioned = ->
+        getAll: ->
+          tables.memories.getMemoriesMentionedAtEventId(item.id)
 
     accessFunc = {
       tables: tablesList
@@ -563,5 +589,6 @@ angular.module('app.directives', ['app.services', 'app.filters'])
 
   .filter 'newline', ($sce) ->
     (string) ->
+      return '' if !string
       $sce.trustAsHtml(string.replace(/\n/g, '<br/>'));
         

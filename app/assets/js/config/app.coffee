@@ -92,6 +92,7 @@ App.config ($routeProvider, $locationProvider) ->
 
     .when('/events/new', {templateUrl: '/partials/events/form.html', controller: 'EventsFormController', resolve: resolveMDb(memoryNgAllDb) })
     .when('/events/:itemId/edit', {templateUrl: '/partials/events/form.html', controller: 'EventsFormController', resolve: resolveMDb(memoryNgAllDb) })
+    .when('/events/:itemId/addMention', {templateUrl: '/partials/events/addMention.html', controller: 'EventsAddMentionController', resolve: resolveMDb(memoryNgAllDb) })
     .when('/events/:year/:month', {templateUrl: '/partials/events/index.html', controller: 'EventsIndexController', reloadOnSearch: false, resolve: resolveMDb(memoryNgAllDb) })
     .when('/events/:itemId', {templateUrl: '/partials/events/show.html', controller: 'EventsShowController', resolve: resolveMDb(memoryNgAllDb) })
     .when('/events/', {templateUrl: '/partials/events/index.html', controller: 'EventsIndexController', reloadOnSearch: false, resolve: resolveMDb(memoryNgAllDb) })
@@ -122,7 +123,7 @@ App.run ($rootScope, $location, $injector) ->
     if $sessionStorage.successMsg
       $rootScope.successMsg = $sessionStorage.successMsg
     $sessionStorage.successMsg = null
-    
+
 
   $rootScope.isActive = (urlPart) =>
     $location.path().indexOf(urlPart) > 0

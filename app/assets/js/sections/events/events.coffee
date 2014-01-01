@@ -55,8 +55,36 @@ angular.module('app.controllers')
     $scope.item = db.events().findById($routeParams.itemId)
     $scope.participants = $scope.item.$participants().getAll()
     $scope.associatedMemories = $scope.item.$memories().getAll().toArray()
-
+    $scope.mentionedMemories = $scope.item.$mentioned().getAll().toArray()
     $scope.deleteItem = () ->
       db.events().deleteById($scope.item.id)
       db.saveTables([db.tables.events])
       $location.path('/events/')
+
+  .controller 'EventsAddMentionController', ($scope, $routeParams, $location, db) ->
+    $scope.item = db.events().findById($routeParams.itemId)
+    $scope.memories = db.memories().getAll().toArray()
+    $scope.changedMemories = {}
+
+    $scope.memories.forEach (memory) ->
+      if memory.mentionedIn && memory.mentionedIn.indexOf($scope.item.id) >= 0
+        memory.$associated = true
+      else
+        memory.$associated = false
+
+    $scope.associateMemory = (memoryId, memory) ->
+      memory.mentionedIn = [] if !memory.mentionedIn
+      memory.mentionedIn.push($scope.item.id)
+      db.memories().editById(memory)
+      memory.$associated = true
+      console.log(memory.mentionedIn)
+
+    $scope.unAssociateMemory = (memoryId, memory) ->
+      memory.mentionedIn.splice(memory.mentionedIn.indexOf($scope.item.id), 1)
+      db.memories().editById(memory)
+      memory.$associated = false      
+      console.log(memory.mentionedIn)
+
+    $scope.saveChanges = ->
+      db.saveTables([db.tables.memories]).then ->
+        $location.path("/events/#{$scope.item.id}")

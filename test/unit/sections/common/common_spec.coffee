@@ -47,7 +47,9 @@ describe 'line items', ->
     #   expect(root.db.lineItems().findById(root.item2Id).balance).toEqual('-50')
 
     it 'should allow rebalance of one item', ->
-      root.db.lineItems().reBalance()
+      root.db.lineItems().insert { type: 1, accountId: 1, date: moment('2012-11-01').valueOf(), amount: 30, category: 'Groceries', payee: 'Leumi', tags: ['Cash'] }
+      root.item3Id = root.db.lineItems().lastInsertedId
+
       item = root.db.lineItems().findById(root.item1Id)
       item.amount = '30'
       root.db.lineItems().editById(item)
@@ -60,3 +62,4 @@ describe 'line items', ->
       root.db.lineItems().reBalance(item)
       expect(root.db.lineItems().findById(root.item1Id).balance).toEqual('-30')
       expect(root.db.lineItems().findById(root.item2Id).balance).toEqual('-90')
+      expect(root.db.lineItems().findById(root.item3Id).balance).toEqual('-90')

@@ -30,3 +30,9 @@ ng-include(src="'/partials/common/memory_header.html'")
   .list-group
     a.list-group-item.fixed-row(ng-repeat='item in associatedMemories', ng-href="/memories/{{item.id}}")
       span(ng-include="'/partials/memories/itemSmall.html'")      
+
+  a.btn.btn-primary.pull-right(ng-href='/events/{{item.id}}/addMention') Add
+  h3 Mentioned memories
+  .list-group
+    a.list-group-item.fixed-row(ng-repeat='item in mentionedMemories', ng-href="/memories/{{item.id}}")
+      span(ng-include="'/partials/memories/itemSmall.html'")      

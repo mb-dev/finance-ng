@@ -10,7 +10,7 @@ describe 'budget report view', ->
     root.fdb = fdb
   ))
   beforeEach ->
-    root.budgetItem = {name: 'Groceries', budget_year: 2012, categories: ['Groceries'] }
+    root.budgetItem = {name: 'Groceries', budgetYear: 2012, categories: ['Groceries'] }
 
     db = root.fdb
     db.lineItems().insert {type: 1, date: moment('2012-01-01').valueOf(), amount: '20.0', categoryName: 'Groceries'}
