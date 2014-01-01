@@ -34,7 +34,7 @@ exports.authenticate = (req, res) ->
     res.json 403, { reason: 'not_logged_in' }
     return
 
-  res.json 200, {user: {email: req.user.email, lastModifiedDate: req.user.lastModifiedDate }}
+  res.json 200, {user: {email: req.user.email, lastModifiedByApp: req.user.lastModifiedByApp }}
 
 exports.getDataSets = (req, res) ->
   if !req.isAuthenticated()
@@ -84,7 +84,8 @@ exports.postDataSets = (req, res) ->
       console.log('Write failed', err)
       res.json 400, {reason: "write_failed"}
     else
-      req.user.lastModifiedDate = req.query.lastModifiedDate
+      req.user.lastModifiedByApp[req.query.appName] = req.query.lastModifiedDate
+      req.user.markModified('lastModifiedByApp')
       req.user.save (err) ->
         if(err) then res.json 400, {reason: "write_failed"}
         else res.json 200, {message: "write_ok"}

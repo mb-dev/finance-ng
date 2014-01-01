@@ -247,8 +247,8 @@ class window.Database
     @$http.get('/data/authenticate')
       .success (response, status, headers) =>
         @db.user.email = response.user.email
-        @db.user.lastModifiedDate = response.user.lastModifiedDate
-        @$sessionStorage.user = {email: response.user.email, lastModifiedDate: response.user.lastModifiedDate}
+        @db.user.lastModifiedByApp = response.user.lastModifiedByApp
+        @$sessionStorage.user = {email: response.user.email, lastModifiedByApp: response.user.lastModifiedByApp}
         defer.resolve()
       .error (data, status, headers) ->
         console.log(data)
@@ -281,7 +281,7 @@ class window.Database
       deferred.reject(response)
 
     onReadTablesFromFS = (fileContents) =>
-      if moment(@db.user.lastModifiedDate).valueOf() > Lazy(fileContents).pluck('content').pluck('modifiedAt').max()  # if the web has more up to date version of data
+      if !@db.user.lastModifiedByApp[@appName] || (moment(@db.user.lastModifiedByApp[@appName]).valueOf() > Lazy(fileContents).pluck('content').pluck('modifiedAt').max())  # if the web has more up to date version of data
         @readTablesFromWeb(tableList).then(onReadTablesFromWeb, onFailedReadTablesFromWeb)
       else
         fileContents.forEach(loadDataSet)

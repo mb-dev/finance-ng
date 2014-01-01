@@ -23,8 +23,8 @@ describe 'Database', ->
     root.tableName = 'people'
     root.authenticateURL = '/data/authenticate'
     root.getURL = '/data/datasets?' + $.param({appName: root.appName, tableList: [root.tableName]})
-    root.authenticateOkResponseDataStale = {user: {email: 'a@a.com', lastModifiedDate: root.timeNow}}
-    root.authenticateOkResponseDataOk = {user: {email: 'a@a.com', lastModifiedDate: 1}}
+    root.authenticateOkResponseDataStale = {user: {email: 'a@a.com', lastModifiedByApp: {finance: root.timeNow}}}
+    root.authenticateOkResponseDataOk = {user: {email: 'a@a.com', lastModifiedByApp: {finance: 1} }}
     root.getResponse = {tablesResponse: []}
     root.postResponse = {success: true}
     root.item = {name: 'Moshe'}
