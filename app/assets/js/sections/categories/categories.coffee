@@ -20,7 +20,6 @@ angular.module('app.controllers')
       else
         categoryData[item] = Lazy(categoryData[item]).sortBy((item) -> item.itemDate).reverse().toArray()
 
-    console.log(categoryData)
     $scope.categories = categories.toArray().sort()
     $scope.categoryData = categoryData
 

@@ -443,7 +443,7 @@ angular.module('app.services', ['ngStorage'])
         defer.promise
 
       saveTables: (tableList) ->
-        db.saveTables(tableList)
+        db.saveTables(tableList, 2)
       load2: (tableList, all) ->
         db.load2(tableList, all)
       save2: (tableList, all) ->
