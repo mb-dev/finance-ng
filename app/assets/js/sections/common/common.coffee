@@ -320,9 +320,9 @@ angular.module('app.services', ['ngStorage'])
         tables.categories
       user: ->
         db.user()
-      getTables: (tableList) =>
+      getTables: (tableList, version) =>
         defer = $q.defer()
-        db.getTables(tableList, 2).then((db) =>
+        db.getTables(tableList, version || 2).then((db) =>
           $rootScope.user = accessFunc.user()
           defer.resolve(accessFunc)
         , (err) =>
