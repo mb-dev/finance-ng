@@ -135,8 +135,7 @@ exports.postDataSet2 = (req, res) ->
         return
 
       if(op.action == 'update')
-        console.log(entry)
-        entry.jsonData = entry.item
+        entry.jsonData = op.item
       else if(op.action == 'insert')
         entry = new Model()
         entry._id = op.id
