@@ -20,4 +20,6 @@ module.exports = (app, passport) ->
   app.get '/data/authenticate', dataSection.authenticate
   app.post '/data/datasets', dataSection.postDataSets
 
+  app.get '/data2/:appName/:tableName', dataSection.getDataSet2
+  app.post '/data2/:appName/:tableName', dataSection.postDataSet2
   app.all '/*', homeSection.index

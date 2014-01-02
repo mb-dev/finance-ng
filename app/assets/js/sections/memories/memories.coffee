@@ -1,7 +1,7 @@
 angular.module('app.controllers')
   .controller 'MemoriesIndexController', ($scope, $routeParams, $location, db) ->
     applyDateChanges = ->
-      $scope.items = db.memories().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).toArray()
+      $scope.items = db.memories().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).toArray().reverse()
 
     $scope.currentDate = moment()
     if $routeParams.month && $routeParams.year

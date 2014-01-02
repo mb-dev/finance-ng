@@ -236,34 +236,38 @@ class MemoriesCollection extends Collection
     results
 
   getItemsByEventId: (eventId, sortBy) ->
+    sortBy = @defaultSortFunction if !sortBy && @sortColumn
     results = Lazy(@collection).filter((item) -> item.events && item.events.indexOf(eventId) >= 0 )
     results = results.sortBy sortBy if sortBy
     results
 
   getItemsByParentMemoryId: (parentMemoryId, sortBy) ->
+    sortBy = @defaultSortFunction if !sortBy && @sortColumn
     results = Lazy(@collection).filter((item) -> item.parentMemoryId == parentMemoryId)
     results = results.sortBy sortBy if sortBy
     results
 
   getMemoriesByPersonId: (personId, sortBy) ->
+    sortBy = @defaultSortFunction if !sortBy && @sortColumn
     results = Lazy(@collection).filter((item) -> item.people && item.people.indexOf(personId) >= 0 )
     results = results.sortBy sortBy if sortBy
     results
 
   getAllParentMemories: (sortBy) ->
+    sortBy = @defaultSortFunction if !sortBy && @sortColumn
     results = Lazy(@collection).filter((item) -> !item.parentMemoryId && (!item.events || item.events.length == 0) )
     results = results.sortBy sortBy if sortBy
     results   
 
   getMemoriesMentionedAtEventId: (eventId, sortBy) ->
+    sortBy = @defaultSortFunction if !sortBy && @sortColumn
     results = Lazy(@collection).filter((item) -> item.mentionedIn && item.mentionedIn.indexOf(eventId) >= 0 )
     results = results.sortBy sortBy if sortBy
     results    
 
 class EventsCollection extends Collection
   getItemsByMonthYear: (month, year, sortBy) ->
-    if !sortBy && @sortColumn
-      sortBy = @defaultSortFunction
+    sortBy = @defaultSortFunction if !sortBy && @sortColumn
 
     Lazy(@collection).filter((item) -> 
       date = moment(item.date)
@@ -271,6 +275,7 @@ class EventsCollection extends Collection
     ).sortBy(sortBy)
 
   getEventsByParticipantId: (participantId, sortBy) ->
+    sortBy = @defaultSortFunction if !sortBy && @sortColumn
     results = Lazy(@collection).filter((item) -> item.participantIds && item.participantIds.indexOf(participantId) >= 0 )
     results = results.sortBy sortBy if sortBy
     results 
@@ -287,7 +292,7 @@ angular.module('app.services', ['ngStorage'])
     tables = {
       memories: db.createCollection(tablesList.memories, new MemoriesCollection($q, ['date', 'id']))
       events: db.createCollection(tablesList.events, new EventsCollection($q, 'date'))
-      people: db.createCollection(tablesList.people, new Collection($q)),
+      people: db.createCollection(tablesList.people, new Collection($q,'name')),
       categories: db.createCollection(tablesList.categories, new SimpleCollection($q))
     }
 
@@ -317,7 +322,7 @@ angular.module('app.services', ['ngStorage'])
         db.user()
       getTables: (tableList) =>
         defer = $q.defer()
-        db.getTables(tableList).then((db) =>
+        db.getTables(tableList, 2).then((db) =>
           $rootScope.user = accessFunc.user()
           defer.resolve(accessFunc)
         , (err) =>
@@ -326,7 +331,11 @@ angular.module('app.services', ['ngStorage'])
         defer.promise
 
       saveTables: (tableList) ->
-        db.saveTables(tableList)
+        db.saveTables(tableList, 2)
+      load2: (tableList, all) ->
+        db.load2(tableList, all)
+      save2: (tableList, all) ->
+        db.save2(tableList, all)
       dumpAllCollections: (tableList) -> 
         db.dumpAllCollections(tableList)
     }
@@ -425,7 +434,7 @@ angular.module('app.services', ['ngStorage'])
         tables.processingRules
       getTables: (tableList) =>
         defer = $q.defer()
-        db.getTables(tableList).then((db) =>
+        db.getTables(tableList, 2).then((db) =>
           $rootScope.user = accessFunc.user()
           defer.resolve(accessFunc)
         , (err) =>
@@ -435,6 +444,10 @@ angular.module('app.services', ['ngStorage'])
 
       saveTables: (tableList) ->
         db.saveTables(tableList)
+      load2: (tableList, all) ->
+        db.load2(tableList, all)
+      save2: (tableList, all) ->
+        db.save2(tableList, all)
       dumpAllCollections: (tableList) -> 
         db.dumpAllCollections(tableList)
     }

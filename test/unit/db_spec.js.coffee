@@ -97,6 +97,10 @@ describe 'Database', ->
       db.saveTables([root.tableName])
       root.$httpBackend.flush()
       expect(JSON.parse(root.fileSystemContent[root.fileSystemFileName]).data[0].name).toEqual('Moshe')
+
+describe 'SimpleCollection', ->
+  
+
 describe 'Box', ->
   it 'should allow setting values', ->
     item = {name: 'Groceries'}

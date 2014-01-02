@@ -18,4 +18,4 @@ UserSchema.path('email').validate((email) ->
   email.length
 , 'Email cannot be blank')
 
-mongoose.model('User', UserSchema)
+exports.User = mongoose.model('User', UserSchema)
