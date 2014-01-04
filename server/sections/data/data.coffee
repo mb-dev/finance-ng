@@ -98,7 +98,7 @@ exports.postDataSet = (req, res) ->
       
 
   performPost = ->
-    async.map req.body, performOperation, (err, results) ->
+    async.mapSeries req.body, performOperation, (err, results) ->
       if err
         console.log('Write failed', err)
         res.json 400, {reason: "write_failed", details: 'performing operations failed', err: err}
