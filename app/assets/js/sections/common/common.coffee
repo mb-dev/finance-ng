@@ -149,11 +149,8 @@ class window.LineItemCollection extends Collection
   getYearRange: ->
     Lazy(@collection).map((item) -> moment(item.date).year()).uniq().sortBy(Lazy.identity).toArray()
 
-  getByDynamicFilter: (filter, sortBy) ->
-    if !sortBy && @sortColumn
-      sortBy = @defaultSortFunction
-
-    Lazy(@collection).filter((item) -> 
+  getByDynamicFilter: (filter, sortColumns) ->
+    results = Lazy(@collection).filter((item) -> 
       if filter.date
         date = moment(item.date)
         return false if !(date.month() == filter.date.month && date.year() == filter.date.year)
@@ -162,35 +159,34 @@ class window.LineItemCollection extends Collection
       if filter.accountId
         return false if item.accountId != filter.accountId
       true
-    ).sortBy(sortBy)
+    )
+    @sortLazy(results, sortColumns)
 
-  getItemsByMonthYear: (month, year, sortBy) ->
-    if !sortBy && @sortColumn
-      sortBy = @defaultSortFunction
-    Lazy(@collection).filter((item) -> 
+  getItemsByMonthYear: (month, year, sortColumns) ->
+    results = Lazy(@collection).filter((item) -> 
       date = moment(item.date)
       date.month() == month && date.year() == year
-    ).sortBy(sortBy)
+    )
+    @sortLazy(results, sortColumns)
 
-  getItemsByMonthYearAndCategories: (month, year, categories, sortBy) ->
-    if !sortBy && @sortColumn
-      sortBy = @defaultSortFunction
-    Lazy(@collection).filter((item) -> 
+  getItemsByMonthYearAndCategories: (month, year, categories, sortColumns) ->
+    results = Lazy(@collection).filter((item) -> 
       date = moment(item.date)
       date.month() == month && date.year() == year && categories.indexOf(item.categoryName) >= 0
-    ).sortBy(sortBy)
+    )
+    @sortLazy(results, sortColumns)
 
-  getItemsByAccountId: (accountId, sortBy) ->
-    accountId = accountId
-    Lazy(@collection).filter((item) -> 
+  getItemsByAccountId: (accountId, sortColumns) ->
+    results = Lazy(@collection).filter((item) -> 
       item.accountId == accountId
-    ).sortBy(sortBy)
+    )
+    @sortLazy(results, sortColumns)
 
   reBalance: (modifiedItem) =>
     return if !@collection || @collection.length == 0
     return if !modifiedItem || !modifiedItem.accountId
     
-    sortedCollection = @getItemsByAccountId(modifiedItem.accountId, (item) -> item.originalDate + '-' + item.id).toArray()
+    sortedCollection = @getItemsByAccountId(modifiedItem.accountId, ['originalDate', 'id']).toArray()
     currentBalance = new BigNumber(0)
 
     if !modifiedItem || (modifiedItem.id == sortedCollection[0].id)
@@ -204,7 +200,14 @@ class window.LineItemCollection extends Collection
         currentBalance = currentBalance.plus(sortedCollection[index].$signedAmount())
       sortedCollection[index].balance = currentBalance.toString()
 
-
+  cloneLineItem: (originalItem) =>
+    newItem = {}
+    angular.copy(originalItem, newItem)
+    delete newItem['id']
+    delete newItem['createdAt']
+    delete newItem['updatedAt']
+    delete newItem['balance']
+    newItem
 
 class BudgetItemCollection extends Collection
   getYearRange: ->
@@ -220,58 +223,44 @@ class MemoriesCollection extends Collection
 
   migrateIfNeeded: ->
 
-  getItemsByMonthYear: (month, year, sortBy) ->
+  getItemsByMonthYear: (month, year, sortColumns) ->
     results = Lazy(@collection).filter((item) -> 
       date = moment(item.date)
       date.month() == month && date.year() == year
     )
-    results = results.sortBy sortBy if sortBy
-    results
+    @sortLazy(results, sortColumns)
 
-  getItemsByEventId: (eventId, sortBy) ->
-    sortBy = @defaultSortFunction if !sortBy && @sortColumn
+  getItemsByEventId: (eventId, sortColumns) ->
     results = Lazy(@collection).filter((item) -> item.events && item.events.indexOf(eventId) >= 0 )
-    results = results.sortBy sortBy if sortBy
-    results
+    @sortLazy(results, sortColumns)
 
-  getItemsByParentMemoryId: (parentMemoryId, sortBy) ->
-    sortBy = @defaultSortFunction if !sortBy && @sortColumn
+  getItemsByParentMemoryId: (parentMemoryId, sortColumns) ->
     results = Lazy(@collection).filter((item) -> item.parentMemoryId == parentMemoryId)
-    results = results.sortBy sortBy if sortBy
-    results
+    @sortLazy(results, sortColumns)
 
-  getMemoriesByPersonId: (personId, sortBy) ->
-    sortBy = @defaultSortFunction if !sortBy && @sortColumn
+  getMemoriesByPersonId: (personId, sortColumns) ->
     results = Lazy(@collection).filter((item) -> item.people && item.people.indexOf(personId) >= 0 )
-    results = results.sortBy sortBy if sortBy
-    results
+    @sortLazy(results, sortColumns)
 
-  getAllParentMemories: (sortBy) ->
-    sortBy = @defaultSortFunction if !sortBy && @sortColumn
+  getAllParentMemories: (sortColumns) ->
     results = Lazy(@collection).filter((item) -> !item.parentMemoryId && (!item.events || item.events.length == 0) )
-    results = results.sortBy sortBy if sortBy
-    results   
+    @sortLazy(results, sortColumns)
 
-  getMemoriesMentionedAtEventId: (eventId, sortBy) ->
-    sortBy = @defaultSortFunction if !sortBy && @sortColumn
+  getMemoriesMentionedAtEventId: (eventId, sortColumns) ->
     results = Lazy(@collection).filter((item) -> item.mentionedIn && item.mentionedIn.indexOf(eventId) >= 0 )
-    results = results.sortBy sortBy if sortBy
-    results    
+    @sortLazy(results, sortColumns)
 
 class EventsCollection extends Collection
-  getItemsByMonthYear: (month, year, sortBy) ->
-    sortBy = @defaultSortFunction if !sortBy && @sortColumn
-
-    Lazy(@collection).filter((item) -> 
+  getItemsByMonthYear: (month, year, sortColumns) ->
+    results = Lazy(@collection).filter((item) -> 
       date = moment(item.date)
       date.month() == month && date.year() == year
-    ).sortBy(sortBy)
+    )
+    @sortLazy(results, sortColumns)
 
-  getEventsByParticipantId: (participantId, sortBy) ->
-    sortBy = @defaultSortFunction if !sortBy && @sortColumn
+  getEventsByParticipantId: (participantId, sortColumns) ->
     results = Lazy(@collection).filter((item) -> item.participantIds && item.participantIds.indexOf(participantId) >= 0 )
-    results = results.sortBy sortBy if sortBy
-    results 
+    @sortLazy(results, sortColumns)
 
 angular.module('app.services', ['ngStorage'])
   .factory 'mdb', ($http, $q, $sessionStorage, $localStorage, $rootScope, fileSystem) ->

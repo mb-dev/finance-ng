@@ -66,6 +66,32 @@ angular.module('app.controllers')
         $location.path($routeParams.returnto || "/line_items/#{itemDate.year()}/#{itemDate.month()}")
       db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees]).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
+  .controller 'LineItemsSplitController', ($scope, $routeParams, $location, db, errorReporter) ->
+    $scope.allCategories = {
+      name: 'categories'
+      local: db.categories().getAll().toArray()
+    }
+
+    $scope.item = db.lineItems().findById($routeParams.itemId)
+    $scope.newItem = db.lineItems().cloneLineItem($scope.item)
+    $scope.amount = new BigNumber($scope.item.amount)
+    $scope.newAmount = 0
+    $scope.amountLeft = $scope.item.amount
+
+    $scope.onChangeSplitAmount = ->
+      if $scope.newAmount
+        $scope.amountLeft = parseFloat($scope.amount.minus($scope.newAmount).toFixed(2))
+
+    $scope.onSubmit = ->
+      $scope.item.amount = parseFloat($scope.amountLeft.toFixed(2)).toString()
+      $scope.newItem.amount = parseFloat($scope.newAmount.toFixed(2)).toString()
+      db.categories().findOrCreate($scope.newItem.categoryName)
+      db.lineItems().editById($scope.item)
+      db.lineItems().insert($scope.newItem)
+      db.lineItems().reBalance($scope.item)
+      db.saveTables([db.tables.lineItems, db.tables.categories]).then ->
+        $location.path($routeParams.returnto || "/line_items/#{itemDate.year()}/#{itemDate.month()}")
+
   .controller 'LineItemShowController', ($scope, $routeParams, db) ->
     $scope.item = db.lineItems().findById($routeParams.itemId)
     $scope.account = db.accounts().findById($scope.item.accountId)

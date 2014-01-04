@@ -1,0 +1,25 @@
+ng-include(src="'/partials/common/finance_header.html'")
+.line_item_form.container
+  .error {{error}}
+  .panel.panel-default
+    .panel-heading
+      h4.panel-title {{title}}
+    form.panel-body.form-horizontal(role='form')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Cateogry
+        .col-xs-8.col-sm-10.form-label {{item.categoryName}}
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Amount
+        .col-xs-8.col-sm-10.form-label {{amount | bnToFixed | currency}}
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Split Amount
+        .col-xs-8.col-sm-10
+          input.form-control(type='number', placeholder='Amount', ng-model='newAmount', ng-change="onChangeSplitAmount()")
+      .form-group
+        label.col-xs-4.col-sm-2.control-label For Category
+        .col-xs-8.col-sm-10
+          input.sfTypeahead.form-control(type='text', ng-model='newItem.categoryName', datasets="allCategories", ng-trim='false')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Amount Left
+        .col-xs-8.col-sm-10.form-label {{amountLeft | currency}}
+      button.btn.btn-default(ng-click="onSubmit()") Submit

@@ -36,6 +36,8 @@ ng-include(src="'/partials/common/finance_header.html'")
       .actions.hidden-xs.col-md-2
         a.btn.btn-default.btn-sm.edit(ng-href='/line_items/{{item.id}}/edit?returnto={{currentLocation}}') Edit 
         &nbsp; 
+        a.btn.btn-default.btn-sm.split(ng-href='/line_items/{{item.id}}/split?returnto={{currentLocation}}') Split 
+        &nbsp; 
         a.btn.btn-default.btn-sm.delete(ng-href='/line_items/{{item.id}}/delete') Delete
     
 

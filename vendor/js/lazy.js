@@ -4606,11 +4606,22 @@
       return compare(fn(x), fn(y));
     }
 
-    if (x === y) {
+    if (x instanceof Array && y instanceof Array && x.length == 2 && y.length == 2) {
+      if (x[0] != y[0]) {
+        return x[0] > y[0] ? 1 : -1;
+      }
+      if (x[1] < y[1]) return -1;
+      if (x[1] > y[1]) return 1;
       return 0;
-    }
 
-    return x > y ? 1 : -1;
+    } else {
+
+      if (x === y) {
+        return 0;
+      }
+
+      return x > y ? 1 : -1;
+    }
   }
 
   /**

@@ -3,7 +3,8 @@ ng-include(src="'/partials/common/finance_header.html'")
   .panel.panel-default.row
     .panel-heading
       .btns-parent.pull-right
-        a.btn.btn-default.btn-sm.edit(ng-href='/line_items/{{item.id}}/edit?returnto=line_items/{{item.id}}') Edit  
+        a.btn.btn-default.btn-sm.edit(ng-href='/line_items/{{item.id}}/split?returnto={{currentLocation}}}}') Split
+        a.btn.btn-default.btn-sm.edit(ng-href='/line_items/{{item.id}}/edit?returnto={{currentLocation}}') Edit  
         a.btn.btn-default.btn-sm.delete(ng-href='/line_items/{{item.id}}/delete') Delete
       h4.panel-title {{item.date | localDate}} - {{item.type | typeString}}
     .panel-body    

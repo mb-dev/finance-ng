@@ -6,6 +6,21 @@ angular.element('.list-group').injector().get('mdb').events().collection.forEach
 angular.element('.list-group').injector().get('mdb').events().collection.forEach(function(item, index) { item.participants && item.participants.forEach(function(item, index) {item.participants[index] = parseInt(item.participants[index], 10) }) })
 angular.element('.list-group').injector().get('mdb').events().collection.forEach(function(item, index) { item.associatedMemories && item.associatedMemories.forEach(function(item, index) {item.associatedMemories[index] = parseInt(item.associatedMemories[index], 10) }) })
 --
+events:
+angular.element('.list-group').injector().get('mdb').events().collection.forEach(function(item, index) { 
+  if(item.participants) { 
+   item.participants.forEach(function(association, index) {
+     item.participants[index] = parseInt(item.participants[index], 10); 
+   }) 
+  }
+  if(item.associatedMemories) {
+    item.associatedMemories.forEach(function(association, index) {
+     item.associatedMemories[index] = parseInt(item.associatedMemories[index], 10); 
+   })  
+  }
+}) 
+angular.element('.list-group').injector().get('mdb').saveTables(['events'], true)
+---
 memories:
 angular.element('.list-group').injector().get('mdb').memories().collection.forEach(function(item, index) { 
  if(item.events) { 
@@ -17,6 +32,9 @@ angular.element('.list-group').injector().get('mdb').memories().collection.forEa
    item.people.forEach(function(association, index) {
      item.people[index] = parseInt(item.people[index], 10); 
    }) 
+ }
+ if(item.parentMemoryId) {
+    item.parentMemoryId = parseInt(parentMemoryId, 10);
  }
 }) 
 angular.element('.list-group').injector().get('mdb').saveTables(['memories'], true)
@@ -78,35 +96,29 @@ class window.Collection
     result = angular.copy(result) if result
     result
 
-  getAll: (sortBy) ->
-    if !sortBy && @sortColumn
-      sortBy = @defaultSortFunction
-
+  getAll: (sortColumns) ->
     result = Lazy(angular.copy(@collection))
-    result = result.sortBy sortBy if sortBy
+    result = @sortLazy(result, sortColumns)
     result
 
-  defaultSortFunction: (item) =>
-    if @sortColumn instanceof Array && @sortColumn.length == 2
-      item[@sortColumn[0]] + '-' + item[@sortColumn[1]]
+  sortLazy: (items, columns) =>
+    if !columns && @sortColumn
+      columns = @sortColumn
+
+    if columns
+      if columns instanceof Array && columns.length == 2
+        items.sortBy((item) -> [item[columns[0]], item[columns[1]]])
+      else
+        items.sortBy((item) -> item[columns])
     else
-      item[@sortColumn]
+      items
 
-  getItemsByYear: (column, year, convertFunc, sortBy) ->
-    if !sortBy && @sortColumn
-      sortBy = @defaultSortFunction
-    if !convertFunc
-      convertFunc = (value) -> moment(value).year()
-
-    step1 = Lazy(@collection).filter((item) -> 
-      value = item[column]
-      value = convertFunc(value) if convertFunc
-      value == year
-    )
+  getItemsByYear: (column, year, sortColumns) ->
+    results = Lazy(@collection).filter((item) -> item[column] == year )
     if sortBy
-      step1.sortBy sortBy
+      @sortLazy(results, sortColumns)
     else
-      step1
+      results
 
   insert: (details) =>
     deferred = @$q.defer()

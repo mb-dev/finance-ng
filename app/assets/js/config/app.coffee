@@ -51,7 +51,8 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/accounts/:itemId', {templateUrl: '/partials/accounts/show.html', controller: 'AccountsShowController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
 
     .when('/line_items/new', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories, fdb.tables.payees, fdb.tables.accounts]) })
-    .when('/line_items/:itemId/edit', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories, fdb.tables.payees, fdb.tables.accounts, fdb.tables.processingRules]) })
+    .when('/line_items/:itemId/edit', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories, fdb.tables.payees, fdb.tables.accounts]) })
+    .when('/line_items/:itemId/split', {templateUrl: '/partials/line_items/split.html', controller: 'LineItemsSplitController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories, fdb.tables.accounts]) })
     .when('/line_items/:itemId', {templateUrl: '/partials/line_items/show.html', controller: 'LineItemShowController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.accounts]) })
     .when('/line_items/:year/:month', {templateUrl: '/partials/line_items/index.html', controller: 'LineItemsIndexController', reloadOnSearch: false, resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.accounts]) })
     .when('/line_items/', {templateUrl: '/partials/line_items/index.html', controller: 'LineItemsIndexController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems]) })
