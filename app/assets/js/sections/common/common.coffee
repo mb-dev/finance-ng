@@ -181,7 +181,7 @@ class window.LineItemCollection extends Collection
     ).sortBy(sortBy)
 
   getItemsByAccountId: (accountId, sortBy) ->
-    accountId = accountId.toString()
+    accountId = accountId
     Lazy(@collection).filter((item) -> 
       item.accountId == accountId
     ).sortBy(sortBy)
