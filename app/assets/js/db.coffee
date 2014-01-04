@@ -13,8 +13,6 @@ angular.element('.list-group').injector().get('mdb').memories().collection.forEa
      item.events[index] = parseInt(item.events[index], 10); 
    }) 
  }
-}) 
-angular.element('.list-group').injector().get('mdb').memories().collection.forEach(function(item, index) { 
  if(item.people) { 
    item.people.forEach(function(association, index) {
      item.people[index] = parseInt(item.people[index], 10); 
