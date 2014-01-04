@@ -535,7 +535,8 @@ class window.Database
       else
         actions = dbModel.actionsLog
         actions.forEach (action) =>
-          action.item = sjcl.encrypt(@$localStorage.encryptionKey, angular.toJson(action.item))
+          if action.item
+            action.item = sjcl.encrypt(@$localStorage.encryptionKey, angular.toJson(action.item))
 
       promise = @$http.post("/data/#{@appName}/#{tableName}?all=#{!!forceServerCleanAndSaveAll}", actions).then (response) =>
         dbModel.updatedAt = response.data.updatedAt
