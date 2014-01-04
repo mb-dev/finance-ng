@@ -459,7 +459,7 @@ class window.Database
         deferred.reject({data: {reason: 'missing_key'}, status: 403})
       else
         copyUserDataFromSession()
-        if loadedDataFromFS
+        if options.initialState == 'authenticate'
           @readTablesFromWeb(tableList).then(onReadTablesFromWeb, onFailedReadTablesFromWeb)
         else
           @readTablesFromFS(tableList).then(onReadTablesFromFS, onFailedReadTablesFromFS)
