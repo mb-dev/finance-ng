@@ -393,7 +393,7 @@ class window.Database
 
     @$http.get('/data/authenticate')
       .success (response, status, headers) =>
-        @$sessionStorage.user = {email: response.user.email, lastModifiedDate: response.user.lastModifiedDate}
+        @$localStorage.user = {email: response.user.email, lastModifiedDate: response.user.lastModifiedDate}
         defer.resolve()
       .error (data, status, headers) ->
         defer.reject({data: data, status: status, headers: headers})
@@ -448,17 +448,21 @@ class window.Database
 
   performGet: (tableList, options) ->
     deferred = @$q.defer();
+    loadedDataFromFS = false
 
     copyUserDataFromSession = =>
-      @db.user.email = @$sessionStorage.user.email
-      @db.user.lastModifiedDate = @$sessionStorage.user.lastModifiedDate
+      @db.user.email = @$localStorage.user.email
+      @db.user.lastModifiedDate = @$localStorage.user.lastModifiedDate
 
     onAuthenticated = =>
       if !@$localStorage.encryptionKey
         deferred.reject({data: {reason: 'missing_key'}, status: 403})
       else
         copyUserDataFromSession()
-        @readTablesFromWeb(tableList).then(onReadTablesFromWeb, onFailedReadTablesFromWeb)
+        if loadedDataFromFS
+          @readTablesFromWeb(tableList).then(onReadTablesFromWeb, onFailedReadTablesFromWeb)
+        else
+          @readTablesFromFS(tableList).then(onReadTablesFromFS, onFailedReadTablesFromFS)
 
     onFailedAuthenticate = (response) =>
       deferred.reject(response)
@@ -473,6 +477,7 @@ class window.Database
       deferred.reject(response)
 
     onReadTablesFromFS = (fileContents) =>
+      loadedDataFromFS = true
       fileContents.forEach(loadDataSet)
       console.log 'read data sets ', tableList, ' from file system - resolving'
       deferred.resolve(this)
@@ -512,9 +517,9 @@ class window.Database
 
   getTables: (tableList, forceRefreshAll = false) ->
     # actual getTables code start shere
-    if @$sessionStorage.user && forceRefreshAll
+    if @$localStorage.user && forceRefreshAll
       @performGet(tableList, {initialState: 'readFromWeb', forceRefreshAll: true})
-    else if @$sessionStorage.user && !forceRefreshAll
+    else if @$localStorage.user && !forceRefreshAll
       @performGet(tableList, {initialState: 'readFromFS', forceRefreshAll: false})  
     else
       @performGet(tableList, {initialState: 'authenticate', forceRefreshAll: false})  
@@ -538,7 +543,7 @@ class window.Database
       promise = @$http.post("/data/#{@appName}/#{tableName}?all=#{!!forceServerCleanAndSaveAll}", actions).then (response) =>
         dbModel.updatedAt = response.data.updatedAt
         @db.user.lastModifiedDate["#{@appName}-#{tableName}"] = dbModel.updatedAt
-        @$sessionStorage.user.lastModifiedDate["#{@appName}-#{tableName}"] = dbModel.updatedAt
+        @$localStorage.user.lastModifiedDate["#{@appName}-#{tableName}"] = dbModel.updatedAt
         dbModel.actionsLog = []
 
       promises.push(promise)
