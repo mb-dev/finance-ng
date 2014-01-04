@@ -4,7 +4,7 @@ angular.module('app.controllers')
       filter = {}
       filter.date = {month: $scope.currentDate.month(), year: $scope.currentDate.year()}
       filter.categories = $routeParams.categories.split(',') if $routeParams.categories
-      filter.accountId = $routeParams.accountId if $routeParams.accountId
+      filter.accountId = parseInt($routeParams.accountId, 10) if $routeParams.accountId
       $scope.lineItems = db.lineItems().getByDynamicFilter(filter).toArray().reverse()
         
     $scope.currentDate = moment()
