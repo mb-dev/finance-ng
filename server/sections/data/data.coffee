@@ -96,13 +96,13 @@ exports.postDataSet = (req, res) ->
     async.map req.body, performOperation, (err, results) ->
       if err
         console.log('Write failed', err)
-        res.json 400, {reason: "write_failed"}
+        res.json 400, {reason: "write_failed", details: 'performing operations failed', err: err}
       else
         mostUpdatedAt = Lazy(results).max()
         req.user.lastModifiedDate["#{req.params.appName}-#{req.params.tableName}"] = mostUpdatedAt
         req.user.markModified("lastModifiedDate.#{req.params.appName}-#{req.params.tableName}")
         req.user.save (err) ->
-          if(err) then res.json 400, {reason: "write_failed"}
+          if(err) then res.json 400, {reason: "write_failed", details: 'saving user failed', err: err}
           else res.json 200, {message: "write_ok", updatedAt: mostUpdatedAt}
 
   if !req.body
@@ -111,6 +111,7 @@ exports.postDataSet = (req, res) ->
 
   if req.body.length == 0
     res.json 200, {message: "write_ok", updatedAt: req.user.lastModifiedDate["#{req.params.appName}-#{req.params.tableName}"]}
+    return
 
   if req.query.all == 'true'
     Model.remove {}, (err) ->
