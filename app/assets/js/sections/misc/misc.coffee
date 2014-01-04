@@ -85,7 +85,7 @@ angular.module('app.controllers')
           item.$addProcessingRule()
         imported += 1
 
-      firstModifiedItem = Lazy($scope.items).filter((item) -> !item.$ignore).sortBy((item) -> item.date).first()
+      firstModifiedItem = Lazy($scope.items).filter((item) -> !item.$ignore).sortBy((item) -> [item.date, item.id]).first()
       db.lineItems().reBalance(firstModifiedItem)
       db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees, db.tables.importedLines, db.tables.processingRules])
       $scope.flashSuccess(imported.toString() + ' items were imported successfully!')
@@ -158,7 +158,7 @@ angular.module('app.importers', [])
         description = row[3]
         amount = row[4]
 
-        amountAsFloat = parseFloat(amount.match(/[0-9.\-]+/g).join(''))
+        amountAsFloat = parseFloat(amount.toString().match(/[0-9.\-]+/g).join(''))
 
         lineItem = {}
         lineItem.source = LineItemCollection.SOURCE_IMPORT

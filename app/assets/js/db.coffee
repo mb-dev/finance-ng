@@ -81,7 +81,7 @@ class window.Collection
   getAvailableId: =>
     currentTime = moment().unix()
     if @lastIssuedId >= currentTime
-      @lastIssuedId = lastIssuedId + 1
+      @lastIssuedId = @lastIssuedId + 1
     else
       @lastIssuedId = currentTime
 

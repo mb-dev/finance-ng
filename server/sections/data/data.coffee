@@ -75,8 +75,13 @@ exports.postDataSet = (req, res) ->
         return
 
       if op.action == 'insert' && entry != null
-        console.log 'attempt to insert item that already exists', op
+        console.log 'attempt to insert item that already exists', req.params.tableName, op
         callback('attempt to insert item that already exists')
+        return
+
+      if op.action == 'update' && !entry
+        console.log 'attempt to update item that does not exist', req.params.tableName, op
+        callback('attempt to update item that does not exist')
         return
 
       if(op.action == 'update')
