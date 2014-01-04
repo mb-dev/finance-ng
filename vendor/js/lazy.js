@@ -4607,7 +4607,7 @@
     }
 
     if (x instanceof Array && y instanceof Array && x.length == 2 && y.length == 2) {
-      if (x[0] != y[0]) {
+      if (x[0] !== y[0]) {
         return x[0] > y[0] ? 1 : -1;
       }
       if (x[1] < y[1]) return -1;
