@@ -115,10 +115,7 @@ class window.Collection
 
   getItemsByYear: (column, year, sortColumns) ->
     results = Lazy(@collection).filter((item) -> item[column] == year )
-    if sortBy
-      @sortLazy(results, sortColumns)
-    else
-      results
+    @sortLazy(results, sortColumns)
 
   insert: (details) =>
     deferred = @$q.defer()
