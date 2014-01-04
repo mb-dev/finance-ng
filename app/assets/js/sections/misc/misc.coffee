@@ -87,9 +87,9 @@ angular.module('app.controllers')
 
       firstModifiedItem = Lazy($scope.items).filter((item) -> !item.$ignore).sortBy((item) -> [item.date, item.id]).first()
       db.lineItems().reBalance(firstModifiedItem)
-      db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees, db.tables.importedLines, db.tables.processingRules])
-      $scope.flashSuccess(imported.toString() + ' items were imported successfully!')
-      $location.path('/line_items')
+      db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees, db.tables.importedLines, db.tables.processingRules]).then ->
+        $scope.flashSuccess(imported.toString() + ' items were imported successfully!')
+        $location.path('/line_items')
 
   .controller 'MiscCategoriesController', ($scope, $routeParams, $location, db, $injector) ->
     $scope.items = db.categories().getAll().toArray().sort()
