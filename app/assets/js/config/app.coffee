@@ -18,16 +18,26 @@ App = angular.module('app', [
 ])
 
 App.config ($routeProvider, $locationProvider) ->
+  authAndCheckData = (tableList, db) ->
+    setTimeout ->
+      $injector = angular.element('ng-view').injector()
+      db.authAndCheckData(tableList(db)).then (ok) ->
+        a = 1
+      , (failure) ->
+        $injector.get('$rootScope').broadcast('auth_fail', failure)
+    , 5000
+    db
+
   resolveFDb = (tableList) ->
     {
       db: (fdb) -> 
-        fdb.getTables(tableList(fdb))
+        fdb.getTables(tableList(fdb)).then -> authAndCheckData(tableList, fdb)
     }
 
   resolveMDb = (tableList) ->
     {
       db: (mdb) -> 
-        mdb.getTables(tableList(mdb))
+        mdb.getTables(tableList(mdb)).then -> authAndCheckData(tableList, mdb)
     }
 
   memoryNgAllDb = (mdb) -> [mdb.tables.memories, mdb.tables.events, mdb.tables.people, mdb.tables.categories]
@@ -109,7 +119,7 @@ App.config ($routeProvider, $locationProvider) ->
   # Without server side support html5 must be disabled.
   $locationProvider.html5Mode(true)
 
-App.run ($rootScope, $location, $injector) ->
+App.run ($rootScope, $location, $injector, $timeout) ->
   $rootScope.$on "$routeChangeError", (event, current, previous, rejection) ->
     if rejection.status == 403 && rejection.data.reason == 'not_logged_in'
       $location.path '/login'
@@ -135,6 +145,6 @@ App.run ($rootScope, $location, $injector) ->
   $rootScope.$on '$viewContentLoaded', ->
     $sessionStorage = $injector.get('$sessionStorage')
     $sessionStorage.successMsg = null
-    $sessionStorage.errorMsg = null    
+    $sessionStorage.errorMsg = null  
 
 angular.module('app.controllers', ['app.services', 'app.importers'])

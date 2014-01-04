@@ -9,7 +9,7 @@ UserSchema = new Schema({
   provider: { type: String, default: '' }
   authToken: { type: String, default: '' }
   googleId: {type: String, default: ''}
-  lastModifiedByApp: {type: Schema.Types.Mixed, default: {}}
+  lastModifiedDate: {type: Schema.Types.Mixed, default: {}}
 })
 
 UserSchema.path('email').validate((email) ->

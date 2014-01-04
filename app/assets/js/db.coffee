@@ -1,20 +1,48 @@
-# weird functions to fix issues:
-# convertId = function(id) { return parseInt(id[0], 10) + id.length - 1 }
-# angular.element('.list-group').injector().get('mdb').events().collection.forEach(function(item, index) { if(item.participantIds && item.participantIds[0]) { console.log(item.participantIds[0], convertId(item.participantIds[0])); } })
-
+###
+weird functions to fix issues:
+convertId = function(id) { return parseInt(id[0], 10) + id.length - 1 }
+events:
+angular.element('.list-group').injector().get('mdb').events().collection.forEach(function(item, index) { if(item.participantIds && item.participantIds[0]) { console.log(item.participantIds[0], convertId(item.participantIds[0])); } })
+angular.element('.list-group').injector().get('mdb').events().collection.forEach(function(item, index) { item.participants && item.participants.forEach(function(item, index) {item.participants[index] = parseInt(item.participants[index], 10) }) })
+angular.element('.list-group').injector().get('mdb').events().collection.forEach(function(item, index) { item.associatedMemories && item.associatedMemories.forEach(function(item, index) {item.associatedMemories[index] = parseInt(item.associatedMemories[index], 10) }) })
+--
+memories:
+angular.element('.list-group').injector().get('mdb').memories().collection.forEach(function(item, index) { 
+ if(item.events) { 
+   item.events.forEach(function(association, index) {
+     item.events[index] = parseInt(item.events[index], 10); 
+   }) 
+ }
+}) 
+angular.element('.list-group').injector().get('mdb').memories().collection.forEach(function(item, index) { 
+ if(item.people) { 
+   item.people.forEach(function(association, index) {
+     item.people[index] = parseInt(item.people[index], 10); 
+   }) 
+ }
+}) 
+angular.element('.list-group').injector().get('mdb').saveTables(['memories'], true)
+--
+line items:
+angular.element('.list-group').injector().get('fdb').lineItems().collection.forEach(function(item, index) { 
+   item.accountId = parseInt(item.accountId, 10);
+   item.importId = parseInt(item.importId, 10);
+})
+angular.element('.list-group').injector().get('fdb').saveTables(['lineItems'], true) 
+--
+processing rules:
+angular.element('ng-view').injector().get('fdb').processingRules().collection.forEach(function(item, index) { 
+   item.id = index + 1;
+   angular.element('ng-view').injector().get('fdb').processingRules().actualCollection[item.key].id = index + 1;
+})
+###
 class window.Collection
   VERSION = '1.0'
 
-  constructor: ($q, sortColumn, extendFunc) ->
+  constructor: ($q, sortColumn) ->
     @$q = $q
-    @collection = []
     @sortColumn = sortColumn
-    @lastInsertedId = null
-    @modifiedAt = 0
-    @actionsLog = []
-    @idIndex = {}
-    if extendFunc
-      extendFunc(this)
+    @reset()
 
   @doNotConvertFunc = (item) -> item
 
@@ -34,20 +62,21 @@ class window.Collection
     @collection.forEach (item) =>
       @itemExtendFunc(item)
 
-  getAvailableId: ->
-    return 1 if @collection.length == 0
-    lastId = @collection[@collection.length - 1].id
-    parseInt(lastId, 10) + 1
+  getAvailableId: =>
+    currentTime = moment().unix()
+    if @lastIssuedId >= currentTime
+      @lastIssuedId = lastIssuedId + 1
+    else
+      @lastIssuedId = currentTime
 
   findById: (id) ->
-    result = Lazy(@collection).find (item) -> item.id.toString() == id.toString()
+    result = @collection[@idIndex[id]]
     result = angular.copy(result) if result
     result
 
   findByIds: (ids) ->
     return [] if !ids
-    ids = ids.map (id) -> id.toString()
-    result = Lazy(@collection).filter((item) -> ids.indexOf(item.id.toString()) >= 0).toArray()
+    result = Lazy(ids).map((id) => @collection[@idIndex[id]]).toArray()
     result = angular.copy(result) if result
     result
 
@@ -83,11 +112,12 @@ class window.Collection
 
   insert: (details) =>
     deferred = @$q.defer()
+    @correctId(details)
     if !details.id
       id = @getAvailableId()
-      details.id = id.toString()
+      details.id = id
       details.createdAt = moment().valueOf()
-      details.modifiedAt = moment().valueOf()
+      details.updatedAt = moment().valueOf()
       @lastInsertedId = details.id
     else if @findById(details.id)
       deferred.reject("ID already exists")
@@ -107,9 +137,12 @@ class window.Collection
 
   editById: (details) =>
     deferred = @$q.defer()
-    item = Lazy(@collection).find (item) -> item.id.toString() == details.id.toString()
+    @correctId(details)
+    index = @idIndex[details.id]
+    throw 'not found' if index == undefined
+    item = @collection[index]
     angular.copy(details, item)
-    item.modifiedAt = moment().valueOf()
+    item.updatedAt = moment().valueOf()
     @onModified()
 
     # add to log
@@ -118,11 +151,11 @@ class window.Collection
     deferred.resolve()
     deferred.promise
 
-  deleteById: (itemId) =>
-    itemIndex = Lazy(@collection).pluck('id').indexOf(itemId.toString())
-    if itemIndex >= 0
-      @collection.splice(itemIndex, 1)
-      delete @idIndex[itemId]
+  deleteById: (itemId, loadingProcess) =>
+    throw 'not found' if @idIndex[itemId] == undefined
+    @collection.splice(@idIndex[itemId], 1)
+    delete @idIndex[itemId]
+    if !loadingProcess
       @actionsLog.push({action: 'delete', id: itemId})
       @onModified()
 
@@ -131,10 +164,20 @@ class window.Collection
 
   reset: =>
     @collection = []
+    @lastInsertedId = null
+    @updatedAt = 0
+    @actionsLog = []
+    @idIndex = {}
+    @lastIssuedId = 0
+
+  correctId: (item) =>
+    if item.id && typeof item.id != 'number'
+      item.id = parseInt(item.id, 10)
 
   onModified: =>
-    @modifiedAt = Date.now()
+    @updatedAt = Date.now()
 
+  # sync actions
   $buildIndex: =>
     indexItem = (result, item, index) -> 
       result[item.id] = index
@@ -142,33 +185,41 @@ class window.Collection
     @idIndex = Lazy(@collection).reduce(indexItem, {})
 
   $updateOrSet: (item, updatedAt) =>
+    @correctId(item)
     if !@idIndex[item.id]
       @collection.push(item)
       @idIndex[item.id] = @collection.length - 1
     else
       @collection[@idIndex[item.id]] = item
     @extendItem(item)
-    if updatedAt > @modifiedAt
-      @modifiedAt = updatedAt
+    item.updatedAt = updatedAt
+    if updatedAt > @updatedAt
+      @updatedAt = updatedAt
+
+  $deleteItem: (itemId, updatedAt) =>
+    @deleteById(itemId, true)
+    if updatedAt > @updatedAt
+      @updatedAt = updatedAt
 
   afterLoadCollection: =>
+    @collection.forEach (item) =>
+      @correctId(item)
     @$buildIndex()
+    @migrateIfNeeded()
 
 
 class window.SimpleCollection
   VERSION = '1.0'
 
   constructor:  ($q) ->
-    @collection = []
-    @actualCollection = {}
-    @idIndex = []
-    @actionsLog = []
-    @modifiedAt = 0
+    @reset()
 
-  getAvailableId: ->
-    return 1 if @collection.length == 0
-    lastId = @collection[@collection.length - 1].id
-    parseInt(lastId, 10) + 1
+  getAvailableId: =>
+    currentTime = moment().unix()
+    if @lastIssuedId >= currentTime
+      @lastIssuedId = @lastIssuedId + 1
+    else
+      @lastIssuedId = currentTime
 
   version: -> VERSION
 
@@ -183,6 +234,7 @@ class window.SimpleCollection
     !!@actualCollection[key]
 
   get: (key) =>
+    return undefined if !@actualCollection[key]
     angular.copy(@actualCollection[key].value)
 
   set: (key, value, isLoadingProcess, loadedId) =>
@@ -197,19 +249,22 @@ class window.SimpleCollection
         newId = @getAvailableId()
       @actualCollection[key] = {id: newId, value: value}
       entry = {id: newId, key: key, value: value}
-      @idIndex[newId] = @collection.length - 1
       @collection.push(entry)
       @actionsLog.push({action: 'insert', id: newId, item:  entry})  if !isLoadingProcess
+      @idIndex[newId] = @collection.length - 1
     @onModified() if !isLoadingProcess
 
-  delete: (key) =>
+  delete: (key, isLoadingProcess) =>
     item = @actualCollection[key]
+    throw 'not found' if !item
     index = @idIndex[item.id]
+    throw 'not found' if index == undefined
     delete @idIndex[item.id]
     @collection.splice(index, 1)
     delete @actualCollection[key]
-    actionsLog.push({action: 'delete', id: item.id})
-    @onModified()
+    if !isLoadingProcess
+      @actionsLog.push({action: 'delete', id: item.id})
+      @onModified()
 
   findOrCreate: (items) =>
     return if !items
@@ -218,7 +273,20 @@ class window.SimpleCollection
       @set(item, true)  
 
   onModified: =>
-    @modifiedAt = Date.now()
+    @updatedAt = Date.now()
+
+  correctId: (item) =>
+    if item.id && typeof item.id != 'number'
+      item.id = parseInt(item.id, 10)
+
+  # sync actions
+  reset: =>
+    @idIndex = []
+    @collection = []
+    @actualCollection = {}
+    @actionsLog = []
+    @updatedAt = 0
+    @lastIssuedId = 0
 
   $buildIndex: =>
     indexItem = (result, item, index) -> 
@@ -227,12 +295,20 @@ class window.SimpleCollection
     @idIndex = Lazy(@collection).reduce(indexItem, {})
 
   $updateOrSet: (item, updatedAt) =>
+    @correctId(item)
     @set(item.key, item.value, true, item.id)
-    if updatedAt > @modifiedAt
-      @modifiedAt = updatedAt  
+    if updatedAt > @updatedAt
+      @updatedAt = updatedAt 
+
+  $deleteItem: (itemId, updatedAt) =>
+    @delete(itemId, true)
+    if updatedAt > @updatedAt
+      @updatedAt = updatedAt
 
   afterLoadCollection: =>
     if @collection instanceof Array
+      @collection.forEach (item) =>
+        @correctId(item)
       @$buildIndex()
       @collection.forEach (item) =>
         @actualCollection[item.key] = {id: item.id, value: item.value}
@@ -289,7 +365,7 @@ class window.Database
     {
       version: dbModel.version()
       data: dbModel.collection
-      modifiedAt: dbModel.modifiedAt
+      updatedAt: dbModel.updatedAt
     }
 
   dumpAllCollections: (tableList) =>
@@ -307,67 +383,92 @@ class window.Database
 
     @$http.get('/data/authenticate')
       .success (response, status, headers) =>
-        @db.user.email = response.user.email
-        @db.user.lastModifiedByApp = response.user.lastModifiedByApp
-        @$sessionStorage.user = {email: response.user.email, lastModifiedByApp: response.user.lastModifiedByApp}
+        @$sessionStorage.user = {email: response.user.email, lastModifiedDate: response.user.lastModifiedDate}
         defer.resolve()
       .error (data, status, headers) ->
-        console.log(data)
         defer.reject({data: data, status: status, headers: headers})
 
     defer.promise
 
-  readTablesFromWeb: (tableList) =>
-    defer = @$q.defer()
-    
-    @$http.get('/data/datasets?' + $.param({appName: @appName, tableList: tableList}))
-      .success (response, status, headers) =>
-        defer.resolve(response.tablesResponse)
-      .error (data, status, headers) ->
-        console.log(data)
-        defer.reject({data: data, status: status, headers: headers})
+  readTablesFromWeb: (tableList, forceLoadAll) =>
+    # which tables require reading?
+    staleTableList = []
+    if forceLoadAll
+      staleTableList = tableList
+    else
+      tableList.forEach (tableName) =>
+        dbModel = @db[tableName]
+        lastModifiedServerTime = @db.user.lastModifiedDate["#{@appName}-#{tableName}"]
+        if lastModifiedServerTime && lastModifiedServerTime > dbModel.updatedAt
+          staleTableList.push(tableName)
 
-    defer.promise
-      
-  getTables: (tableList, version) ->
+    # load them
     deferred = @$q.defer();
+
+    promises = []
+    staleTableList.forEach (tableName) =>
+      dbModel = @db[tableName]
+      if forceLoadAll
+        dbModel.reset()
+        getDataFrom = 0
+      else
+        getDataFrom = dbModel.updatedAt
+
+      promise = @$http.get("/data/#{@appName}/#{tableName}?" + $.param({updatedAt: getDataFrom})).then (response) =>
+        dbModel.actionsLog = []
+        response.data.actions.forEach (op) =>
+          if op.action == 'update'
+            try
+              dbModel.$updateOrSet(JSON.parse(sjcl.decrypt(@$localStorage.encryptionKey, op.item)), op.updatedAt)
+            catch
+              console.log 'failed to decrypt', tableName, op
+              throw 'failed to decrypt'
+          else if op.action == 'delete'
+            dbModel.$deleteItem(op.id, op.updatedAt)
+
+      promises.push(promise)
     
+    @$q.all(promises).then (actions) =>
+      deferred.resolve(staleTableList)
+    , (fail) =>
+      console.log 'fail', fail
+      deferred.reject({data: fail.data, status: fail.status, headers: fail.headers})
+
+    deferred.promise
+
+  performGet: (tableList, options) ->
+    deferred = @$q.defer();
+
+    copyUserDataFromSession = =>
+      @db.user.email = @$sessionStorage.user.email
+      @db.user.lastModifiedDate = @$sessionStorage.user.lastModifiedDate
+
     onAuthenticated = =>
       if !@$localStorage.encryptionKey
-        defer.reject({data: {reason: 'missing_key'}, status: 403})
+        deferred.reject({data: {reason: 'missing_key'}, status: 403})
       else
-        @readTablesFromFS(tableList).then(onReadTablesFromFS, onFailedReadTablesFromFS)
+        copyUserDataFromSession()
+        @readTablesFromWeb(tableList).then(onReadTablesFromWeb, onFailedReadTablesFromWeb)
 
     onFailedAuthenticate = (response) =>
       deferred.reject(response)
 
-    onReadTablesFromFS = (fileContents) =>
-      if !@db.user.lastModifiedByApp[@appName] || (moment(@db.user.lastModifiedByApp[@appName]).valueOf() > Lazy(fileContents).pluck('content').pluck('modifiedAt').max())  # if the web has more up to date version of data
-        if version && version == 2
-          @load2(tableList).then(onReadTablesFromWebV2, onFailedReadTablesFromWeb)
-        else
-          @readTablesFromWeb(tableList).then(onReadTablesFromWeb, onFailedReadTablesFromWeb)
-      else
-        fileContents.forEach(loadDataSet)
-        console.log 'all data sets ', tableList, ' found in file system - resolving'
-        deferred.resolve(this)
-
-    onFailedReadTablesFromFS = () =>
-      @readTablesFromWeb(tableList).then(onReadTablesFromWeb, onFailedReadTablesFromWeb)
-
-    onReadTablesFromWeb = (fileContents) =>
-      fileContents.forEach(loadDataSet)
-      @writeTablesToFS(tableList)
-      console.log 'all data sets ', tableList, ' were retrieved from the web - resolving'
-      deferred.resolve(this)
-
-    onReadTablesFromWebV2 = (fileContents) =>
-      @writeTablesToFS(tableList)
-      console.log 'all data sets ', tableList, ' were retrieved from the web v2 - resolving'
+    onReadTablesFromWeb = (staleTables) =>
+      @writeTablesToFS(staleTables)
+      if staleTables.length > 0
+        console.log 'stale data sets ', staleTables, ' were updated from the web - resolving'
       deferred.resolve(this)
 
     onFailedReadTablesFromWeb = (response) =>
       deferred.reject(response)
+
+    onReadTablesFromFS = (fileContents) =>
+      fileContents.forEach(loadDataSet)
+      console.log 'read data sets ', tableList, ' from file system - resolving'
+      deferred.resolve(this)
+
+    onFailedReadTablesFromFS = () =>
+      @readTablesFromWeb(tableList).then(onReadTablesFromWeb, onFailedReadTablesFromWeb)
 
     loadDataSet = (dataSet) =>
       dbModel = @db[dataSet.name]
@@ -375,96 +476,48 @@ class window.Database
         console.log('failed to load ' + dataSet.name)
         return
       
-      if typeof(dataSet.content) == 'string'
-        try
-          dataSet.content = JSON.parse(sjcl.decrypt(@$localStorage.encryptionKey, dataSet.content))
-        catch err
-          console.log('failed to decrypt ' + dataSet.name)
-          return
-
       if !dataSet.content.version
         console.log('failed to load ' + dataSet.name + ' - version missing')
         return
-    
-      dbModel.modifiedAt = dataSet.content.modifiedAt
+      
+      dbModel.updatedAt = dataSet.content.updatedAt
       dbModel.collection = dataSet.content.data
       dbModel.afterLoadCollection()
-      dbModel.migrateIfNeeded()
       dbModel.reExtendItems()
-      
+
+    if options.initialState == 'authenticate'
+      # actual getTables code start shere
+      @authenticate().then(onAuthenticated, onFailedAuthenticate)
+    else if options.initialState == 'readFromWeb'
+      copyUserDataFromSession()
+      @readTablesFromWeb(tableList, options.forceRefreshAll).then(onReadTablesFromWeb, onFailedReadTablesFromWeb)
+    else if options.initialState == 'readFromFS'
+      copyUserDataFromSession()
+      @readTablesFromFS(tableList).then(onReadTablesFromFS, onFailedReadTablesFromFS)
+  
+    deferred.promise
+
+  authAndCheckData: (tableList) ->
+    @performGet(tableList, {initialState: 'authenticate', forceRefreshAll: false})
+
+  getTables: (tableList, forceRefreshAll = false) ->
     # actual getTables code start shere
-    @authenticate().then(onAuthenticated, onFailedAuthenticate)
-    deferred.promise
-
-  saveTables: (tableList, version) =>
-    deferred = @$q.defer();
-
-    dataSets = @dumpAllCollections(tableList)[@appName]
-    lastModifiedDate = Lazy(dataSets).pluck('content').pluck('modifiedAt').max() - 10
-    dataSets.forEach (dataSet) =>
-      dataSet.content = sjcl.encrypt(@$localStorage.encryptionKey, angular.toJson(dataSet.content))
-
-    if version && version == 2
-      @save2(tableList).then =>
-        @writeTablesToFS(tableList).then ->
-          deferred.resolve(true)
-        , (error) ->
-          console.log('failed to write files to file system', error)
-          deferred.reject('failed to write to file system')
+    if @$sessionStorage.user && forceRefreshAll
+      @performGet(tableList, {initialState: 'readFromWeb', forceRefreshAll: true})
+    else if @$sessionStorage.user && !forceRefreshAll
+      @performGet(tableList, {initialState: 'readFromFS', forceRefreshAll: false})  
     else
-      @$http.post('/data/datasets?' + $.param({appName: @appName, lastModifiedDate: lastModifiedDate}), dataSets)
-        .success (data, status, headers) =>
-          console.log 'saving datasets:', tableList, 'to file system'
-          @writeTablesToFS(tableList).then ->
-            deferred.resolve(data)
-          , (error) ->
-            console.log('failed to write files to file system', error)
-            deferred.reject('failed to write to file system')
-        .error (data, status, headers) ->
-          deferred.reject({data: data, status: status, headers: headers})
+      @performGet(tableList, {initialState: 'authenticate', forceRefreshAll: false})  
 
-    deferred.promise
-
-  load2: (tableList, all) =>
+  saveTables: (tableList, forceServerCleanAndSaveAll = false) =>
     deferred = @$q.defer();
-
-    promises = []
-    tableList.forEach (tableName) =>
-      dbModel = @db[tableName]
-      if all
-        dbModel.collection = []
-        getDataFrom = 0
-      else
-        getDataFrom = dbModel.modifiedAt
-
-      promise = @$http.get("/data2/#{@appName}/#{tableName}?" + $.param({updatedAt: getDataFrom})).then (response) =>
-        dbModel.actionsLog = []
-        response.data.actions.forEach (op) =>
-          if op.action == 'update'
-            dbModel.$updateOrSet(JSON.parse(sjcl.decrypt(@$localStorage.encryptionKey, op.item)))
-          else if op.action == 'delete'
-            a = 1
-            # delete item
-
-      promises.push(promise)
     
-    @$q.all(promises).then (actions) =>
-      deferred.resolve(true)
-    , (fail) =>
-      console.log 'fail', fail
-      deferred.reject({data: fail.data, status: fail.status, headers: fail.headers})
-
-    deferred.promise
-
-  save2: (tableList, all) =>
-    deferred = @$q.defer();
-
     promises = []
     tableList.forEach (tableName) =>
       dbModel = @db[tableName]
 
       actions = []
-      if all
+      if forceServerCleanAndSaveAll
         dbModel.collection.forEach (item) =>
           actions.push({action: 'insert', id: item.id, item: sjcl.encrypt(@$localStorage.encryptionKey, angular.toJson(item))})
       else
@@ -472,13 +525,20 @@ class window.Database
         actions.forEach (action) =>
           action.item = sjcl.encrypt(@$localStorage.encryptionKey, angular.toJson(action.item))
 
-      promise = @$http.post("/data2/#{@appName}/#{tableName}?all=#{!!all}", actions).then () =>
+      promise = @$http.post("/data/#{@appName}/#{tableName}?all=#{!!forceServerCleanAndSaveAll}", actions).then (response) =>
+        dbModel.updatedAt = response.data.updatedAt
+        @db.user.lastModifiedDate["#{@appName}-#{tableName}"] = dbModel.updatedAt
+        @$sessionStorage.user.lastModifiedDate["#{@appName}-#{tableName}"] = dbModel.updatedAt
         dbModel.actionsLog = []
 
       promises.push(promise)
     
     @$q.all(promises).then (actions) =>
-      deferred.resolve(true)
+      @writeTablesToFS(tableList).then ->
+        deferred.resolve(true)
+      , (error) ->
+        console.log('failed to write files to file system', error)
+        deferred.reject('failed to write to file system')
     , (fail) =>
       console.log 'fail', fail
       deferred.reject({data: fail.data, status: fail.status, headers: fail.headers})

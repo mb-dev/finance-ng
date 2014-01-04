@@ -16,10 +16,7 @@ module.exports = (app, passport) ->
 
   app.get '/auth/check_login', userSection.isLoggedIn
 
-  app.get '/data/datasets', dataSection.getDataSets
   app.get '/data/authenticate', dataSection.authenticate
-  app.post '/data/datasets', dataSection.postDataSets
-
-  app.get '/data2/:appName/:tableName', dataSection.getDataSet2
-  app.post '/data2/:appName/:tableName', dataSection.postDataSet2
+  app.get '/data/:appName/:tableName', dataSection.getDataSet
+  app.post '/data/:appName/:tableName', dataSection.postDataSet
   app.all '/*', homeSection.index

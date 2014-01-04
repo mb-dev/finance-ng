@@ -183,7 +183,7 @@ class window.LineItemCollection extends Collection
   getItemsByAccountId: (accountId, sortBy) ->
     accountId = accountId.toString()
     Lazy(@collection).filter((item) -> 
-      item.accountId.toString() == accountId
+      item.accountId == accountId
     ).sortBy(sortBy)
 
   reBalance: (modifiedItem) =>
@@ -219,13 +219,6 @@ class ImportedLinesCollection extends Collection
 class MemoriesCollection extends Collection
 
   migrateIfNeeded: ->
-    Lazy(@collection).each (item) ->
-      if item.event_date
-        item.date = item.event_date
-        delete item.event_date
-      if item.eventId
-        item.events = [item.eventId]
-        delete item.eventId
 
   getItemsByMonthYear: (month, year, sortBy) ->
     results = Lazy(@collection).filter((item) -> 
@@ -320,9 +313,11 @@ angular.module('app.services', ['ngStorage'])
         tables.categories
       user: ->
         db.user()
-      getTables: (tableList, version) =>
+      authAndCheckData: (tableList) =>
+        db.authAndCheckData(tableList)
+      getTables: (tableList, forceRefreshAll) =>
         defer = $q.defer()
-        db.getTables(tableList, version || 2).then((db) =>
+        db.getTables(tableList, forceRefreshAll).then((db) =>
           $rootScope.user = accessFunc.user()
           defer.resolve(accessFunc)
         , (err) =>
@@ -330,12 +325,8 @@ angular.module('app.services', ['ngStorage'])
         )
         defer.promise
 
-      saveTables: (tableList) ->
-        db.saveTables(tableList, 2)
-      load2: (tableList, all) ->
-        db.load2(tableList, all)
-      save2: (tableList, all) ->
-        db.save2(tableList, all)
+      saveTables: (tableList, forceServerCleanAndSaveAll) ->
+        db.saveTables(tableList, forceServerCleanAndSaveAll)
       dumpAllCollections: (tableList) -> 
         db.dumpAllCollections(tableList)
     }
@@ -384,7 +375,6 @@ angular.module('app.services', ['ngStorage'])
         else
           tables.processingRules.set('amount:' + @amount, {payeeName: @payeeName, categoryName: @categoryName})
           
-
       item.$process = ->
         processingRule = null
         if @payeeName && tables.processingRules.has('name:' + @payeeName)
@@ -432,22 +422,19 @@ angular.module('app.services', ['ngStorage'])
         tables.importedLines
       processingRules: ->
         tables.processingRules
-      getTables: (tableList, version) =>
+      authAndCheckData: (tableList) =>
+        db.authAndCheckData(tableList)
+      getTables: (tableList, forceRefreshAll = false) =>
         defer = $q.defer()
-        db.getTables(tableList, version || 2).then((db) =>
+        db.getTables(tableList, forceRefreshAll).then((db) =>
           $rootScope.user = accessFunc.user()
           defer.resolve(accessFunc)
         , (err) =>
           defer.reject(err)
         )
         defer.promise
-
-      saveTables: (tableList) ->
-        db.saveTables(tableList, 2)
-      load2: (tableList, all) ->
-        db.load2(tableList, all)
-      save2: (tableList, all) ->
-        db.save2(tableList, all)
+      saveTables: (tableList, forceServerCleanAndSaveAll = false) ->
+        db.saveTables(tableList, forceServerCleanAndSaveAll)
       dumpAllCollections: (tableList) -> 
         db.dumpAllCollections(tableList)
     }

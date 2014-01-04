@@ -1,7 +1,7 @@
 // Karma configuration
 
 module.exports = function(karma) {
-  karma.configure({
+  karma.set({
 
     // base path, that will be used to resolve files and exclude
     basePath: '../',
@@ -25,7 +25,6 @@ module.exports = function(karma) {
       {pattern: 'test/fixtures/*.csv', watched: true, served: true, included: false}
     ],
 
-
     // list of files to exclude
     exclude: [
     ],
@@ -38,6 +37,8 @@ module.exports = function(karma) {
 
     // web server port
     port: 9876,
+
+    reportSlowerThan: 1000,
 
 
     // cli runner port
@@ -77,6 +78,7 @@ module.exports = function(karma) {
       'karma-jasmine',
       'karma-coffee-preprocessor',
       'karma-chrome-launcher',
+      'karma-phantomjs-launcher',
       'karma-osx-reporter',
       'jasmine-jquery'
     ],

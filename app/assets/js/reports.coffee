@@ -208,7 +208,6 @@ class window.BudgetReportView
         else
           expenseRow.columns.push {type: 'other', amount: '0.0'}
       
-      console.log(expenseRow.meta.name, amountAvailable, amountUsed.toFixed(2))
       expenseRow.meta.now = BigNumber(amountAvailable).minus(amountUsed).toFixed(2)
 
       expenseRowsForBudgetItem.push expenseRow

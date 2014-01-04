@@ -37,64 +37,9 @@ exports.authenticate = (req, res) ->
     res.json 403, { reason: 'not_logged_in' }
     return
 
-  res.json 200, {user: {email: req.user.email, lastModifiedByApp: req.user.lastModifiedByApp }}
+  res.json 200, {user: {email: req.user.email, lastModifiedDate: req.user.lastModifiedDate }}
 
-exports.getDataSets = (req, res) ->
-  if !req.isAuthenticated()
-    res.json 403, { reason: 'not_logged_in' }
-    return
-
-  tableList = req.query.tableList || []
-  
-  readFile = (tableName, callback) -> 
-    if(!validLocation(req.query.appName, req.user.id, tableName))
-      callback({ reason: 'invalid_location' })
-      return
-
-    fs.readFile fileLocation(req.query.appName, req.user.id, tableName, true), 'utf8', (err, data) ->
-      if(err && err.errno == 34)
-        console.log 'return empty content for file', tableName
-        callback(null, {name: tableName, content: null})
-      else if(err)
-        console.log 'error reading file: ' + err
-        callback(err)
-      else
-        callback(null, {name: tableName, content: data})
-
-  async.map tableList, readFile, (err, dataSets) ->
-    if err
-      res.json 400, {reason: "read_failed"}
-    else
-      res.json 200, {tablesResponse: dataSets}
-
-exports.postDataSets = (req, res) ->
-  saveFile = (dataSet, callback) -> fs.writeFile fileLocation(req.query.appName, req.user.id, dataSet.name, true), dataSet.content, callback
-
-  if !req.isAuthenticated()
-    res.json 403, { reason: 'not_logged_in' }
-    return
-
-  if !req.body
-    res.json 400, { reason: 'data_sets_missing' }
-    return
-
-  if !req.query.appName
-    res.json 400, { reason: 'app_name_missing' }
-    return
-  
-  async.each req.body, saveFile, (err) ->
-    if err
-      console.log('Write failed', err)
-      res.json 400, {reason: "write_failed"}
-    else
-      req.user.lastModifiedByApp[req.query.appName] = req.query.lastModifiedDate
-      req.user.markModified('lastModifiedByApp')
-      req.user.save (err) ->
-        if(err) then res.json 400, {reason: "write_failed"}
-        else res.json 200, {message: "write_ok"}
-
-
-exports.getDataSet2 = (req, res) ->
+exports.getDataSet = (req, res) ->
   if !req.isAuthenticated()
     res.json 403, { reason: 'not_logged_in' }
     return
@@ -105,7 +50,6 @@ exports.getDataSet2 = (req, res) ->
   actions = []
 
   loadFrom = new Date(parseInt(req.query.updatedAt, 10))
-  console.log loadFrom
 
   Model.find {updatedAt: {$gt: loadFrom}}, (err, items) ->
     items.forEach (item) ->
@@ -116,15 +60,15 @@ exports.getDataSet2 = (req, res) ->
     res.json 200, {actions: actions}
   
 
-exports.postDataSet2 = (req, res) ->
+exports.postDataSet = (req, res) ->
   if !req.isAuthenticated()
     res.json 403, { reason: 'not_logged_in' }
     return
+
   modelName = "data_#{req.user.id}_#{req.params.appName}_#{req.params.tableName}"
   Model = mongoose.model(modelName, dataSetModels.DataSetSchema)  
 
   performOperation = (op, callback) ->
-    console.log(op.id)
     Model.findById op.id, (err, entry) =>
       if err && op.action != 'insert'
         callback(err)
@@ -143,25 +87,30 @@ exports.postDataSet2 = (req, res) ->
         entry.deleted = false
       else if(op.action == 'delete')
         entry.deleted = true
-      entry.save(callback) 
+      entry.save (err) =>
+        callback(err, entry.updatedAt.getTime()) 
+      
 
   performPost = ->
-    async.each req.body, performOperation, (err) ->
+    async.map req.body, performOperation, (err, results) ->
       if err
         console.log('Write failed', err)
         res.json 400, {reason: "write_failed"}
       else
-        # req.user.lastModifiedByApp[req.query.appName] = req.query.lastModifiedDate
-        # req.user.markModified('lastModifiedByApp')
+        mostUpdatedAt = Lazy(results).max()
+        req.user.lastModifiedDate["#{req.params.appName}-#{req.params.tableName}"] = mostUpdatedAt
+        req.user.markModified("lastModifiedDate.#{req.params.appName}-#{req.params.tableName}")
         req.user.save (err) ->
           if(err) then res.json 400, {reason: "write_failed"}
-          else res.json 200, {message: "write_ok"}
+          else res.json 200, {message: "write_ok", updatedAt: mostUpdatedAt}
 
   if !req.body
-    res.json 400, { reason: 'data_sets_missing' }
+    res.json 400, { reason: 'no_operations' }
     return
 
-  console.log(req.query.all)
+  if req.body.length == 0
+    res.json 200, {message: "write_ok", updatedAt: req.user.lastModifiedDate["#{req.params.appName}-#{req.params.tableName}"]}
+
   if req.query.all == 'true'
     Model.remove {}, (err) ->
       performPost()

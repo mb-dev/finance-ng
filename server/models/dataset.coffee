@@ -2,7 +2,7 @@ mongoose = require('mongoose')
 Schema = mongoose.Schema
 
 DataSetSchema = new Schema({
-  _id: { type: String, required: true }
+  _id: { type: Number, required: true }
   jsonData: { type: String, default: '' }
   deleted: { type: Boolean, default: false }
   createdAt: { type: Date }

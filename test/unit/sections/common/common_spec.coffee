@@ -25,13 +25,27 @@ describe 'line items', ->
       root.db.lineItems().insert { type: 1, accountId: 1, date: moment('2012-11-01').valueOf(), amount: 30, category: 'Groceries', payee: 'Leumi' }
       root.item2Id = root.db.lineItems().lastInsertedId
 
+    it 'should update actions log', ->
+      expect(root.db.lineItems().actionsLog.length).toEqual(2)
+
+    it 'should update the index', ->
+      expect(root.db.lineItems().idIndex[root.item1Id]).toEqual(0)
+      expect(root.db.lineItems().idIndex[root.item2Id]).toEqual(1)
+
     it 'should find item', ->
       expect(root.db.lineItems().findById(root.item1Id).category).toEqual('Groceries')
+
+    it 'should find multiple items', ->
+      results = root.db.lineItems().findByIds([root.item1Id, root.item1Id])
+      expect(results.length).toEqual(2)      
 
     it 'should delete an item', ->
       expect(root.db.lineItems().length()).toEqual(2)
       root.db.lineItems().deleteById(root.item1Id)
       expect(root.db.lineItems().length()).toEqual(1)
+
+      expect(root.db.lineItems().idIndex).toEqual({2: 1})
+      expect(root.db.lineItems().actionsLog[2]).toEqual({action: 'delete', id: '1'})
 
     it 'should return items by month', ->
       expect(root.db.lineItems().getItemsByMonthYear(10, 2012).toArray().length).toEqual(1)
@@ -40,11 +54,6 @@ describe 'line items', ->
       lineItem = root.db.lineItems().findById(root.item1Id)
       expect(lineItem.$isExpense()).toEqual(true)
       expect(lineItem.$signedAmount()).toEqual(-20)
-
-    # it 'should allow rebalance of all existing collection', ->
-    #   root.db.lineItems().reBalance()
-    #   expect(root.db.lineItems().findById(root.item1Id).balance).toEqual('-20')
-    #   expect(root.db.lineItems().findById(root.item2Id).balance).toEqual('-50')
 
     it 'should allow rebalance of one item', ->
       root.db.lineItems().insert { type: 1, accountId: 1, date: moment('2012-11-01').valueOf(), amount: 30, category: 'Groceries', payee: 'Leumi', tags: ['Cash'] }
