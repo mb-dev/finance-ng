@@ -34,8 +34,8 @@ angular.module('app.controllers')
 
     $scope.onFileLoaded = (fileContent) ->
       account = db.accounts().findById($scope.accountId)
-      importedLines = db.importedLines().getAll().pluck('content').reduce (result, item) -> 
-        result[item] = true 
+      importedLines = db.importedLines().getAll().pluck('content').reduce (result, item, index) -> 
+        result[item] = index
         result
       , {}
       importer = $injector.get('Import' + account.importFormat)
@@ -111,9 +111,28 @@ angular.module('app.controllers')
 
     $scope.deleteItem = (key, collection, index) ->
       db.processingRules().delete(key)
-      collection.splice(index, 1)
-      db.saveTables([db.tables.processingRules])
-      $scope.$apply();
+      db.saveTables([db.tables.processingRules]).then ->
+        collection.splice(index, 1)
+        $scope.$apply();
+
+  .controller 'MiscImportedLinesController', ($scope, $routeParams, $location, db, $injector) ->
+    $scope.importedLines = db.importedLines().getAll().filter((item, index) ->
+      if $routeParams.year && $routeParams.month
+        try
+          parts = item.content.split(',')      
+          dateParts = parts.pop().split('/')
+          dateParts[0] == $routeParams.month && dateParts[2] == $routeParams.year
+        catch
+          debugger
+      else
+        true
+    ).toArray()
+
+    $scope.deleteItem = (item, index) ->
+      db.importedLines().deleteById(item.id)
+      db.saveTables([db.tables.importedLines]).then ->
+        $scope.importedLines.splice(index, 1)
+        $scope.$apply();
 
 angular.module('app.filters')
   .filter 'notIgnored', ->

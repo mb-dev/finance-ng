@@ -80,6 +80,8 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/misc/categories', {templateUrl: '/partials/misc/categories.html', controller: 'MiscCategoriesController', resolve: resolveFDb((fdb) ->[fdb.tables.categories]) })    
     .when('/misc/payees', {templateUrl: '/partials/misc/payees.html', controller: 'MiscPayeesController', resolve: resolveFDb((fdb) ->[fdb.tables.payees]) })    
     .when('/misc/processingRules', {templateUrl: '/partials/misc/processingRules.html', controller: 'MiscProcessingRulesController', resolve: resolveFDb((fdb) ->[fdb.tables.processingRules]) })    
+    .when('/misc/importedLines/:year/:month', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: resolveFDb((fdb) ->[fdb.tables.importedLines]) })    
+    .when('/misc/importedLines/', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: resolveFDb((fdb) ->[fdb.tables.importedLines]) })    
 
     .when('/login_success', redirectTo: '/welcome/')
     .when('/login', {templateUrl: '/partials/user/login.html', controller: 'UserLoginController'})

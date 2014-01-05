@@ -1,0 +1,10 @@
+ng-include(src="'/partials/common/finance_header.html'")
+.payees_index.container
+  a(href='/misc/') &lt;&lt; Back
+  h2 Imported Lines
+  .main_list.list-group.compact-list
+    .list-group-item(ng-repeat='item in importedLines')
+      .col-xs-2.col-md-1
+        a.btn.btn-default.btn-xs.edit(ng-confirm-click='Are you sure you want to delete {{item.content}}?', confirmed-click='deleteItem(item, $index)') Delete 
+      .col-xs-10.col-md-11
+        {{item.content}} 
