@@ -39,7 +39,8 @@ angular.module('app.controllers')
     if Lazy($location.$$url).endsWith('new')
       $scope.type = 'new'
       $scope.title = 'New line item'
-      $scope.item = {date: moment().valueOf(), tags: [], accountId: $scope.accounts[0].id}
+      # TODO: Allow defining any account as default
+      $scope.item = {type: 1, date: moment().valueOf(), tags: ['Cash'], accountId: $scope.accounts[1].id}
       updateFunc = db.lineItems().insert
     else
       $scope.type = 'edit'
