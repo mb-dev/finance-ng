@@ -113,7 +113,6 @@ angular.module('app.controllers')
       db.processingRules().delete(key)
       db.saveTables([db.tables.processingRules]).then ->
         collection.splice(index, 1)
-        $scope.$apply();
 
   .controller 'MiscImportedLinesController', ($scope, $routeParams, $location, db, $injector) ->
     $scope.importedLines = db.importedLines().getAll().filter((item, index) ->
