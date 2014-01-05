@@ -16,18 +16,18 @@ angular.module('app.controllers')
     updateFunc = null
     if Lazy($location.$$url).endsWith('new')
       $scope.title = 'New budget item'
-      $scope.item = {budget_year: moment().year()}
+      $scope.item = {budgetYear: moment().year()}
       updateFunc = db.budgetItems().insert
     else
       $scope.title = 'Edit account'
       $scope.item = db.budgetItems().findById($routeParams.itemId)
       updateFunc = db.budgetItems().editById
 
-    $scope.categories = db.lineItems().getCategories()
+    $scope.categories = db.categories().getAll().toArray().sort()
 
     $scope.onSubmit = ->
-      onSuccess = -> $location.path('/budgets/' + $scope.item.budget_year.toString())
-      saveTables = -> db.saveTables([Database.BUDGET_ITEMS_TBL])
+      onSuccess = -> $location.path('/budgets/' + $scope.item.budgetYear.toString())
+      saveTables = -> db.saveTables([db.tables.budgetItems])
       updateFunc($scope.item).then(saveTables).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
 angular.module('app.services')
