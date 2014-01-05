@@ -132,7 +132,6 @@ angular.module('app.controllers')
       db.importedLines().deleteById(item.id)
       db.saveTables([db.tables.importedLines]).then ->
         $scope.importedLines.splice(index, 1)
-        $scope.$apply();
 
 angular.module('app.filters')
   .filter 'notIgnored', ->
