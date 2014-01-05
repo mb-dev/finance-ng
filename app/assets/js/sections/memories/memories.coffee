@@ -47,7 +47,7 @@ angular.module('app.controllers')
     if $routeParams.eventId
       $scope.event = db.events().findById($routeParams.eventId)
       $scope.item.events ||= []
-      $scope.item.events.push($routeParams.eventId) if $scope.item.events.indexOf($routeParams.eventId) < 0
+      $scope.item.events.push($scope.event.id) if $scope.item.events.indexOf($scope.event.id) < 0
       $scope.item.date = $scope.event.date if $scope.type == 'new'
 
     if $routeParams.category
@@ -56,7 +56,7 @@ angular.module('app.controllers')
 
     if $routeParams.parentMemoryId
       $scope.parentMemory = db.memories().findById($routeParams.parentMemoryId)
-      $scope.item.parentMemoryId = $routeParams.parentMemoryId
+      $scope.item.parentMemoryId = $scope.parentMemory.id
 
     $scope.onSubmit = ->
       updateFunc($scope.item)
