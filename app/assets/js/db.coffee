@@ -115,7 +115,7 @@ class window.Collection
 
   getItemsByYear: (column, year, sortColumns) ->
     results = Lazy(@collection).filter (item) -> 
-      if typeof item[column] == 'number'
+      if item[column] < 10000
         item[column] == year
       else
         moment(item[column]).year() == year 

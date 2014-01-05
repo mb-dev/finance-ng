@@ -97,7 +97,7 @@ class window.LineItemsReportView
 class window.BudgetReportView
   constructor: (db, year) ->
     @db = db
-    @year = year
+    @year = parseInt(year, 10)
 
     @budgetItems = db.budgetItems().getItemsByYear('budgetYear', @year).toArray()
     @plannedItems = db.plannedItems().getItemsByYear('eventDateStart', @year).toArray()
