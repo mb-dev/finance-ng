@@ -1,6 +1,7 @@
 angular.module('app.controllers')
   .controller 'PeopleIndexController', ($scope, $routeParams, $location, db) ->
-    $scope.items = db.people().getAll().toArray()
+    $scope.items = db.people().getAll().groupBy((item) -> item.categories[0]).toObject()
+    $scope.categories = Object.keys($scope.items).sort()
 
     return
 
