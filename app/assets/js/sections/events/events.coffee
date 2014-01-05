@@ -77,13 +77,11 @@ angular.module('app.controllers')
       memory.mentionedIn.push($scope.item.id)
       db.memories().editById(memory)
       memory.$associated = true
-      console.log(memory.mentionedIn)
 
     $scope.unAssociateMemory = (memoryId, memory) ->
       memory.mentionedIn.splice(memory.mentionedIn.indexOf($scope.item.id), 1)
       db.memories().editById(memory)
       memory.$associated = false      
-      console.log(memory.mentionedIn)
 
     $scope.saveChanges = ->
       db.saveTables([db.tables.memories]).then ->
