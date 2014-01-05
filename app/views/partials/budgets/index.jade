@@ -38,7 +38,7 @@ ng-include(src="'/partials/common/finance_header.html'")
             br/ 
             span Expenses: {{expenseRow.meta.expenses | currency}} ({{expenseRow.meta.percent}})
           td
-            a.btn.btn-primary.btn-small.edit_btn(href="/budgets/{{currentDate | amDateFormat: 'YYYY'}}/{{expenseRow.meta.budgetItemId}}/edit") Edit
+            a.btn.btn-primary.btn-small.edit_btn(href="/budgets/{{currentYear | amDateFormat: 'YYYY'}}/{{expenseRow.meta.budgetItemId}}/edit") Edit
 
   .well.row
       |Total Budgeted: {{report.totalBudgeted | currency}}

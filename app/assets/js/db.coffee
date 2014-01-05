@@ -114,6 +114,7 @@ class window.Collection
       items
 
   getItemsByYear: (column, year, sortColumns) ->
+    # TODO: improve the < 10000
     results = Lazy(@collection).filter (item) -> 
       if item[column] < 10000
         item[column] == year
