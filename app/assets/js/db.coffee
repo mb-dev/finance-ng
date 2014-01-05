@@ -114,7 +114,12 @@ class window.Collection
       items
 
   getItemsByYear: (column, year, sortColumns) ->
-    results = Lazy(@collection).filter((item) -> moment(item[column]).year() == year )
+    results = Lazy(@collection).filter (item) -> 
+      if typeof item[column] == 'number'
+        item[column] == year
+      else
+        moment(item[column]).year() == year 
+      
     @sortLazy(results, sortColumns)
 
   insert: (details) =>

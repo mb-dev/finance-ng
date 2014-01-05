@@ -99,7 +99,7 @@ class window.BudgetReportView
     @db = db
     @year = year
 
-    @budgetItems = db.budgetItems().getItemsByYear('budgetYear', @year, Collection.doNotConvertFunc).toArray()
+    @budgetItems = db.budgetItems().getItemsByYear('budgetYear', @year).toArray()
     @plannedItems = db.plannedItems().getItemsByYear('eventDateStart', @year).toArray()
     @lineItems = db.lineItems().getItemsByYear('date', @year).toArray()
 
