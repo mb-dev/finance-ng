@@ -37,7 +37,7 @@ angular.module('app.controllers')
       $scope.title = 'New memory'
       $scope.item = {date: moment().valueOf()}
       updateFunc = db.memories().insert
-      $scope.item.people = [$routeParams.personId] if $routeParams.personId
+      $scope.item.people = [parseInt($routeParams.personId, 10)] if $routeParams.personId
     else
       $scope.type = 'edit'
       $scope.title = 'Edit memory'
@@ -119,7 +119,7 @@ angular.module('app.controllers')
       unassociate = (memory) -> memory.mentionedTo.splice(memory.mentionedTo.indexOf($scope.person.id), 1)
       onSuccess = -> $location.url("/people/#{$scope.person.id}")
 
-    memoriesGrouped = db.memories().getAll().groupBy (memory) -> if associateCheck(memory) then 'associated' else 'unassociated'
+    memoriesGrouped = db.memories().getAll().reverse().groupBy (memory) -> if associateCheck(memory) then 'associated' else 'unassociated'
 
     $scope.availableMemories = memoriesGrouped.get('unassociated')
     $scope.associatedMemories = memoriesGrouped.get('associated') || []
