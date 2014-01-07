@@ -250,6 +250,10 @@ class MemoriesCollection extends Collection
     results = Lazy(@collection).filter((item) -> item.mentionedIn && item.mentionedIn.indexOf(eventId) >= 0 )
     @sortLazy(results, sortColumns)
 
+  getMemoriesMentionedToPersonId: (personId, sortColumns) ->
+    results = Lazy(@collection).filter((item) -> item.mentionedTo && item.mentionedTo.indexOf(personId) >= 0 )
+    @sortLazy(results, sortColumns)
+
 class EventsCollection extends Collection
   getItemsByMonthYear: (month, year, sortColumns) ->
     results = Lazy(@collection).filter((item) -> 
@@ -289,6 +293,11 @@ angular.module('app.services', ['ngStorage'])
       item.$mentioned = ->
         getAll: ->
           tables.memories.getMemoriesMentionedAtEventId(item.id)
+
+    tables.people.setItemExtendFunc (item) ->
+      item.$mentioned = ->
+        getAll: ->
+          tables.memories.getMemoriesMentionedToPersonId(item.id)
 
     accessFunc = {
       tables: tablesList

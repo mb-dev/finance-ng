@@ -91,3 +91,50 @@ angular.module('app.controllers')
         else
           date = moment($scope.item.events[0])
           $location.path('/memories/' + date.year().toString() + '/' + date.month().toString())
+
+  .controller 'MemoriesAddMentionController', ($scope, $routeParams, $location, db) ->
+    associateCheck = null
+    associate = null
+    unassociate = null
+    onSuccess = null
+
+    $scope.availableMemories = []
+    $scope.associatedMemories = []
+    $scope.changedMemories = {}
+
+    if $routeParams.eventId
+      $scope.event = db.events().findById($routeParams.eventId)
+      associateCheck = (memory) -> memory.mentionedIn && memory.mentionedIn.indexOf($scope.event.id) >= 0
+      associate = (memory) -> 
+        memory.mentionedIn ||= []
+        memory.mentionedIn.push($scope.event.id)
+      unassociate = (memory) -> memory.mentionedIn.splice(memory.mentionedIn.indexOf($scope.event.id), 1)
+      onSuccess = -> $location.uri("/events/#{$scope.event.id}")
+    else if $routeParams.personId
+      $scope.person = db.people().findById($routeParams.personId)
+      associateCheck = (memory) -> memory.mentionedTo && memory.mentionedTo.indexOf($scope.person.id) >= 0
+      associate = (memory) -> 
+        memory.mentionedTo ||= [] 
+        memory.mentionedTo.push($scope.person.id)
+      unassociate = (memory) -> memory.mentionedTo.splice(memory.mentionedTo.indexOf($scope.person.id), 1)
+      onSuccess = -> $location.url("/people/#{$scope.person.id}")
+
+    memoriesGrouped = db.memories().getAll().groupBy (memory) -> if associateCheck(memory) then 'associated' else 'unassociated'
+
+    $scope.availableMemories = memoriesGrouped.get('unassociated')
+    $scope.associatedMemories = memoriesGrouped.get('associated') || []
+
+    $scope.associateMemory = (memoryId, memory, index) ->
+      associate(memory)
+      db.memories().editById(memory)
+      $scope.availableMemories.splice(index, 1)
+      $scope.associatedMemories.unshift(memory)
+
+    $scope.unAssociateMemory = (memoryId, memory, index) ->
+      unassociate(memory)
+      db.memories().editById(memory)
+      $scope.associatedMemories.splice(index, 1)
+      $scope.availableMemories.unshift(memory)
+
+    $scope.saveChanges = ->
+      db.saveTables([db.tables.memories]).then(onSuccess)

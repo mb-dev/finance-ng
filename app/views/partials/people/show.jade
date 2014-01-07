@@ -17,10 +17,16 @@ ng-include(src="'/partials/common/memory_header.html'")
         td.col-xs-12(colspan='2') {{item.comments}}
 
   a.btn.btn-primary.pull-right(ng-href='/memories/new?personId={{item.id}}&returnto={{currentLocation}}') Add
-  h3 Memories:
+  h3 Associated Memories:
   .list-group
     a.list-group-item.fixed-row.row(ng-repeat='item in memories', ng-href="/memories/{{item.id}}")
       span(ng-include="'/partials/memories/itemSmall.html'")
+
+  a.btn.btn-primary.pull-right(ng-href='/memories/addMention?personId={{item.id}}') Add
+  h3 Mentioned memories
+  .list-group
+    a.list-group-item.fixed-row(ng-repeat='item in mentionedMemories', ng-href="/memories/{{item.id}}")
+      span(ng-include="'/partials/memories/itemSmall.html'")      
 
   a.btn.btn-primary.pull-right(ng-href='/events/new?personId={{item.id}}&returnto={{currentLocation}}') Add
   h3 Events:

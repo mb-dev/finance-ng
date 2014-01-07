@@ -98,6 +98,7 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/categories/', {templateUrl: '/partials/categories/index.html', controller: 'CategoriesIndexController', resolve: resolveMDb(memoryNgAllDb) })
 
     .when('/memories/new', {templateUrl: '/partials/memories/form.html', controller: 'MemoriesFormController', resolve: resolveMDb(memoryNgAllDb) })
+    .when('/memories/addMention', {templateUrl: '/partials/memories/addMention.html', controller: 'MemoriesAddMentionController', resolve: resolveMDb(memoryNgAllDb) })
     .when('/memories/:itemId/edit', {templateUrl: '/partials/memories/form.html', controller: 'MemoriesFormController', resolve: resolveMDb(memoryNgAllDb) })
     .when('/memories/:year/:month', {templateUrl: '/partials/memories/index.html', controller: 'MemoriesIndexController', reloadOnSearch: false, resolve: resolveMDb(memoryNgAllDb) })
     .when('/memories/:itemId', {templateUrl: '/partials/memories/show.html', controller: 'MemoriesShowController', resolve: resolveMDb(memoryNgAllDb) })
@@ -105,7 +106,6 @@ App.config ($routeProvider, $locationProvider) ->
 
     .when('/events/new', {templateUrl: '/partials/events/form.html', controller: 'EventsFormController', resolve: resolveMDb(memoryNgAllDb) })
     .when('/events/:itemId/edit', {templateUrl: '/partials/events/form.html', controller: 'EventsFormController', resolve: resolveMDb(memoryNgAllDb) })
-    .when('/events/:itemId/addMention', {templateUrl: '/partials/events/addMention.html', controller: 'EventsAddMentionController', resolve: resolveMDb(memoryNgAllDb) })
     .when('/events/:year/:month', {templateUrl: '/partials/events/index.html', controller: 'EventsIndexController', reloadOnSearch: false, resolve: resolveMDb(memoryNgAllDb) })
     .when('/events/:itemId', {templateUrl: '/partials/events/show.html', controller: 'EventsShowController', resolve: resolveMDb(memoryNgAllDb) })
     .when('/events/', {templateUrl: '/partials/events/index.html', controller: 'EventsIndexController', reloadOnSearch: false, resolve: resolveMDb(memoryNgAllDb) })

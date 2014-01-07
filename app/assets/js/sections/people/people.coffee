@@ -37,3 +37,4 @@ angular.module('app.controllers')
 
     $scope.events = db.events().getEventsByParticipantId($scope.item.id).toArray()
     $scope.memories = db.memories().getMemoriesByPersonId($scope.item.id).toArray()
+    $scope.mentionedMemories = $scope.item.$mentioned().getAll().toArray()
