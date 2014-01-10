@@ -15,12 +15,13 @@ angular.module('app.controllers')
       $window.location.href = '/auth/' + provider;
 
   .controller 'UserKeyController', ($scope, $window, $localStorage, $location, fileSystem, $q) ->
+    setupFSState = setupFilesystem($q, fileSystem)
     $scope.key = ''
 
     $scope.onSubmit = ->
       $localStorage.encryptionKey = $scope.key
 
-      setupFilesystem($q, fileSystem).then ->
+      setupFSState.then ->
         $location.path('/line_items')
       , () ->
         $scope.error = 'Failed to set file system'

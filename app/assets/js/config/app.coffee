@@ -24,7 +24,7 @@ App.config ($routeProvider, $locationProvider) ->
       db.authAndCheckData(tableList(db)).then (ok) ->
         a = 1
       , (failure) ->
-        $injector.get('$rootScope').broadcast('auth_fail', failure)
+        $injector.get('$rootScope').$broadcast('auth_fail', failure)
     , 5000
     db
 
@@ -93,6 +93,7 @@ App.config ($routeProvider, $locationProvider) ->
     # download backup
 
     # memories
+    .when('/journal/:year/:month', {templateUrl: '/partials/journal/index.html', controller: 'JournalIndexController', resolve: resolveMDb(memoryNgAllDb) })
     .when('/journal/', {templateUrl: '/partials/journal/index.html', controller: 'JournalIndexController', resolve: resolveMDb(memoryNgAllDb) })
 
     .when('/categories/', {templateUrl: '/partials/categories/index.html', controller: 'CategoriesIndexController', resolve: resolveMDb(memoryNgAllDb) })
@@ -135,8 +136,14 @@ App.run ($rootScope, $location, $injector, $timeout) ->
     $sessionStorage = $injector.get('$sessionStorage')
     if $sessionStorage.successMsg
       $rootScope.successMsg = $sessionStorage.successMsg
+    if $sessionStorage.noticeMsg
+      $rootScope.noticeMsg = $sessionStorage.noticeMsg
     $sessionStorage.successMsg = null
+    $sessionStorage.noticeMsg = null
 
+  $rootScope.$on 'auth_fail', ->
+    $rootScope.flashNotice('You were logged out on the server, please login again')
+    $location.path '/login'
 
   $rootScope.isActive = (urlPart) =>
     $location.path().indexOf(urlPart) > 0
@@ -144,6 +151,10 @@ App.run ($rootScope, $location, $injector, $timeout) ->
   $rootScope.flashSuccess = (msg) ->
     $sessionStorage = $injector.get('$sessionStorage')
     $sessionStorage.successMsg = msg
+
+  $rootScope.flashNotice = (msg) ->
+    $sessionStorage = $injector.get('$sessionStorage')
+    $sessionStorage.noticeMsg = msg
 
   $rootScope.$on '$viewContentLoaded', ->
     $sessionStorage = $injector.get('$sessionStorage')

@@ -1,20 +1,15 @@
 angular.module('app.controllers')
   .controller 'MemoriesIndexController', ($scope, $routeParams, $location, db) ->
-    applyDateChanges = ->
-      $scope.items = db.memories().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).toArray().reverse()
-
     $scope.currentDate = moment()
     if $routeParams.month && $routeParams.year
       $scope.currentDate.year(+$routeParams.year).month(+$routeParams.month - 1)
 
-    applyDateChanges()
+    $scope.items = db.memories().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).toArray().reverse()
     $scope.nextMonth = ->
       $scope.currentDate.add('months', 1)
-      applyDateChanges()
       $location.path('/memories/' + $scope.currentDate.year().toString() + '/' + ($scope.currentDate.month()+1).toString())
     $scope.prevMonth = ->
       $scope.currentDate.add('months', -1)
-      applyDateChanges()
       $location.path('/memories/' + $scope.currentDate.year().toString() + '/' + ($scope.currentDate.month()+1).toString())
 
     return
@@ -38,6 +33,7 @@ angular.module('app.controllers')
       $scope.item = {date: moment().valueOf()}
       updateFunc = db.memories().insert
       $scope.item.people = [parseInt($routeParams.personId, 10)] if $routeParams.personId
+      $scope.item.date = parseInt($routeParams.date, 10) if $routeParams.date
     else
       $scope.type = 'edit'
       $scope.title = 'Edit memory'
@@ -63,7 +59,8 @@ angular.module('app.controllers')
       db.categories().findOrCreate($scope.item.categories)
 
       onSuccess = -> 
-        $location.path($routeParams.returnto || '/memories/')
+        memoryDate = moment($scope.item.date)
+        $location.path($routeParams.returnto || '/memories/' + memoryDate.format('YYYY/MM'))
       saveTables = -> db.saveTables([db.tables.memories, db.tables.categories])
       saveTables().then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
@@ -109,7 +106,7 @@ angular.module('app.controllers')
         memory.mentionedIn ||= []
         memory.mentionedIn.push($scope.event.id)
       unassociate = (memory) -> memory.mentionedIn.splice(memory.mentionedIn.indexOf($scope.event.id), 1)
-      onSuccess = -> $location.uri("/events/#{$scope.event.id}")
+      onSuccess = -> $location.url("/events/#{$scope.event.id}")
     else if $routeParams.personId
       $scope.person = db.people().findById($routeParams.personId)
       associateCheck = (memory) -> memory.mentionedTo && memory.mentionedTo.indexOf($scope.person.id) >= 0
@@ -121,7 +118,7 @@ angular.module('app.controllers')
 
     memoriesGrouped = db.memories().getAll().reverse().groupBy (memory) -> if associateCheck(memory) then 'associated' else 'unassociated'
 
-    $scope.availableMemories = memoriesGrouped.get('unassociated')
+    $scope.availableMemories = memoriesGrouped.get('unassociated') || []
     $scope.associatedMemories = memoriesGrouped.get('associated') || []
 
     $scope.associateMemory = (memoryId, memory, index) ->

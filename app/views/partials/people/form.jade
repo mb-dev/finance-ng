@@ -16,5 +16,5 @@ ng-include(src="'/partials/common/memory_header.html'")
       .form-group
         label.col-xs-4.col-sm-2.control-label Comments
         .col-xs-8.col-sm-10
-          textarea.form-control(type='text', ng-model='item.comments')
+          textarea.form-control(autoresize, type='text', ng-model='item.comments')
       button.btn.btn-default(ng-click="onSubmit()") Submit

@@ -1,7 +1,7 @@
 ng-include(src="'/partials/common/memory_header.html'")
 .memories_index.container.index_page
   .new.row
-    a.btn.btn-primary.col-xs-12.add_transaction(ng-href='/memories/new') Add Memory
+    a.btn.btn-primary.col-xs-12.add_transaction(ng-href='/memories/new?date={{currentDate.valueOf()}}') Add Memory
 
   .month-nav.row.well.wells-sm
     a.col-xs-3.prev_month(ng-click='prevMonth()', href='#') &lt;&lt; Prev
@@ -16,4 +16,6 @@ ng-include(src="'/partials/common/memory_header.html'")
       .icons.col-90
         i.fa.fa-sun-o.fa-fw.fa-sr
         span {{item.date | amDateFormat:'DD' }}
-      .payee.rest-90 {{item.title}}
+      .payee.rest-90 
+        span.label.label-info.hidden-inline-xs.space-right-xs(ng-if='item.categories.length > 0') {{item.categories | joinBy}}
+        {{item.title}}

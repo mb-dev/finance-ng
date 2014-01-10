@@ -223,6 +223,17 @@ class MemoriesCollection extends Collection
 
   migrateIfNeeded: ->
 
+  getByDynamicFilter: (filter, sortColumns) ->
+    results = Lazy(@collection).filter((item) -> 
+      if filter.date
+        date = moment(item.date)
+        return false if !(date.month() == filter.date.month && date.year() == filter.date.year)
+      if filter.onlyParents
+        return false if !item.parentMemoryId && (!item.events || item.events.length == 0)
+      true
+    )
+    @sortLazy(results, sortColumns)
+
   getItemsByMonthYear: (month, year, sortColumns) ->
     results = Lazy(@collection).filter((item) -> 
       date = moment(item.date)
