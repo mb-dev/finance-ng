@@ -4,7 +4,8 @@ setupFilesystem = ($q, fileSystem) =>
   fileSystem.getFolderContents('/db').then ->
     defer.resolve('ok')
   , ->
-    fileSystem.requestQuotaIncrease(20).then(fileSystem.createFolder('/db')).then ->
+    fileSystem.requestQuotaIncrease(20)
+    fileSystem.createFolder('/db').then ->
       defer.resolve('ok')
     , ->
       defer.reject('failed')
@@ -21,7 +22,7 @@ angular.module('app.controllers')
     $scope.onSubmit = ->
       $localStorage.encryptionKey = $scope.key
 
-      setupFSState.then ->
+      setupFilesystem($q, fileSystem).then ->
         $location.path('/line_items')
       , () ->
         $scope.error = 'Failed to set file system'
