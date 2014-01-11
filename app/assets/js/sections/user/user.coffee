@@ -10,9 +10,16 @@ setupFilesystem = ($q, fileSystem) =>
       defer.reject('failed')
 
 angular.module('app.controllers')
-   .controller 'UserLoginController', ($scope, $window) ->
+   .controller 'UserLoginController', ($scope, $window, userService) ->
     $scope.loginOauth = (provider) ->
       $window.location.href = '/auth/' + provider;
+
+    $scope.register = ->
+      userService.register($scope.user).then (successResponse) ->
+        $location.path('/key')
+      , (failedResponse) ->
+        $scope.error = 'failed'
+
 
   .controller 'UserKeyController', ($scope, $window, $localStorage, $location, fileSystem, $q) ->
     $scope.key = ''
@@ -55,3 +62,7 @@ angular.module('app.controllers')
       $localStorage.encryptionKey = $scope.key
       $location.path('/line_items')
 
+angular.module('app.services')
+  .factory 'userService', ($http, $localStorage) ->
+    register: (user) ->
+      $http.post('/auth/register', user)

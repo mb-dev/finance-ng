@@ -10,6 +10,12 @@ module.exports = (passport, config) ->
     User.findById id, (err, user) ->
       done(err, user)
 
+  passport.use(new LocalStrategy(
+    (username, password, done) ->
+      User.findOne { username: username, password: password }, (err, user) ->
+        done(err, user)
+  ))
+
   passport.use(new GoogleStrategy({
     clientID: config.google.clientID
     clientSecret: config.google.clientSecret

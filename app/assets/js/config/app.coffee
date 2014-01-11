@@ -86,7 +86,7 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/login_success', redirectTo: '/welcome/')
     .when('/login', {templateUrl: '/partials/user/login.html', controller: 'UserLoginController'})
     .when('/key', {templateUrl: '/partials/user/key.html', controller: 'UserKeyController'})
-    .when('/register', {templateUrl: '/partials/user/register.html'})
+    .when('/register', {templateUrl: '/partials/user/register.html', controller: 'UserLoginController'})
     .when('/profile', {templateUrl: '/partials/user/profile.html', controller: 'UserProfileController' })
     .when('/edit_profile', {templateUrl: '/partials/user/edit_profile.html', controller: 'UserEditProfileController'})
 
