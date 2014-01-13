@@ -14,7 +14,7 @@ angular.module('app.controllers')
     }
 
     updateFunc = null
-    if Lazy($location.$$url).endsWith('new')
+    if $location.$$url.indexOf('new') > 0
       $scope.groupNames = ''
       $scope.title = 'New person'
       $scope.item = {}

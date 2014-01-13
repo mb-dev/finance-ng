@@ -5,7 +5,7 @@ angular.module('app.controllers')
 
   .controller 'AccountsFormController', ($scope, $routeParams, $location, db, errorReporter) ->
     updateFunc = null
-    if Lazy($location.$$url).endsWith('new')
+    if $location.$$url.indexOf('new') > 0
       $scope.title = 'New account'
       $scope.item = {import_format: 'ProvidentChecking'}
       updateFunc = db.accounts().insert
