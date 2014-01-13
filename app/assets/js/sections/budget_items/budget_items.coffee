@@ -14,7 +14,7 @@ angular.module('app.controllers')
 
   .controller 'BudgetItemsFormController', ($scope, $routeParams, $location, db, errorReporter) ->
     updateFunc = null
-    if Lazy($location.$$url).endsWith('new')
+    if $location.$$url.indexOf('new') > 0
       $scope.title = 'New budget item'
       $scope.item = {budgetYear: moment().year()}
       updateFunc = db.budgetItems().insert

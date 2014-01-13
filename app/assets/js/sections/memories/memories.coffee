@@ -26,7 +26,7 @@ angular.module('app.controllers')
       multiple: true
     }
     updateFunc = null
-    if Lazy($location.$$url).indexOf('new') > 0
+    if $location.$$url.indexOf('new') > 0
       $scope.type = 'new'
       $scope.categoryNames = ''
       $scope.title = 'New memory'

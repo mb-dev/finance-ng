@@ -36,7 +36,7 @@ angular.module('app.controllers')
     $scope.accounts = db.accounts().getAll().toArray()
 
     updateFunc = null
-    if Lazy($location.$$url).endsWith('new')
+    if $location.$$url.indexOf('new') > 0
       $scope.type = 'new'
       $scope.title = 'New line item'
       # TODO: Allow defining any account as default

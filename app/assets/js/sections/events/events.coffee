@@ -32,7 +32,7 @@ angular.module('app.controllers')
       multiple: true
     }
 
-    if Lazy($location.$$url).endsWith('new')
+    if $location.$$url.indexOf('new') > 0
       $scope.title = 'New event'
       $scope.item = {date: moment().valueOf(), associatedMemories: []}
       $scope.participants = []
