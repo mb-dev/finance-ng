@@ -8,9 +8,9 @@ angular.element('.list-group').injector().get('mdb').events().collection.forEach
 --
 events:
 angular.element('.list-group').injector().get('mdb').events().collection.forEach(function(item, index) { 
-  if(item.participants) { 
-   item.participants.forEach(function(association, index) {
-     item.participants[index] = parseInt(item.participants[index], 10); 
+  if(item.participantIds) { 
+   item.participantIds.forEach(function(association, index) {
+     item.participantIds[index] = parseInt(item.participantIds[index], 10); 
    }) 
   }
   if(item.associatedMemories) {

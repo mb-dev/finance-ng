@@ -14,7 +14,7 @@ ng-include(src="'/partials/common/memory_header.html'")
         .left-pane Categories
         .right-pane {{item.categories | joinBy}}
       .row
-        td.col-xs-12(colspan='2') {{item.comments}}
+        .col-xs-12(ng-bind-html="item.comments | newline")
 
   a.btn.btn-primary.pull-right(ng-href='/memories/new?personId={{item.id}}&returnto={{currentLocation}}') Add
   h3 Associated Memories:

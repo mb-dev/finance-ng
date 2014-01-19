@@ -3,7 +3,7 @@ class window.LineItemsReportView
     @db = db
     @year = year
     
-    @lineItems = db.lineItems().getItemsByYear('date', @year).toArray()    
+    @lineItems = db.lineItems().getByDynamicFilter({date: {year: @year}}).toArray()    
 
     rootCategoriesMap = {}
     @rootCategoryToCategories = {}
@@ -86,7 +86,10 @@ class window.LineItemsReportView
     reportTotals = {monthly: []}
     totalAmount = new BigNumber(0)
     [0..11].forEach (month) =>
-      reportTotals.monthly[month] = incomeSection.monthlyTotals[month].total.plus(expenseSection.monthlyTotals[month].total)
+      if expenseSection.monthlyTotals[month]
+        reportTotals.monthly[month] = incomeSection.monthlyTotals[month].total.plus(expenseSection.monthlyTotals[month].total)
+      else
+        reportTotals.monthly[month] = new BigNumber(0)
       totalAmount = totalAmount.plus(reportTotals.monthly[month])
     reportTotals.avg = totalAmount.div(12)
     reportTotals.sum = totalAmount

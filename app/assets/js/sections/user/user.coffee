@@ -4,7 +4,8 @@ setupFilesystem = ($q, fileSystem) =>
   fileSystem.getFolderContents('/db').then ->
     defer.resolve('ok')
   , ->
-    fileSystem.requestQuotaIncrease(20).then(fileSystem.createFolder('/db')).then ->
+    fileSystem.requestQuotaIncrease(20)
+    fileSystem.createFolder('/db').then ->
       defer.resolve('ok')
     , ->
       defer.reject('failed')
@@ -22,6 +23,7 @@ angular.module('app.controllers')
 
 
   .controller 'UserKeyController', ($scope, $window, $localStorage, $location, fileSystem, $q) ->
+    setupFSState = setupFilesystem($q, fileSystem)
     $scope.key = ''
 
     $scope.onSubmit = ->

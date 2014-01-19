@@ -11,6 +11,10 @@ body {
   nav {
     margin-bottom: 10px;
   }
+
+  footer {
+    margin-top: 20px;
+  }
 }
 
 .table td {
@@ -25,6 +29,15 @@ body {
     td {
       border-top: none;
     }
+  }
+}
+
+.hidden-inline-xs {
+    display: inline !important;
+}
+@media (max-width: 767px) {
+  .hidden-inline-xs {
+    display: none !important;
   }
 }
 
@@ -152,6 +165,9 @@ form {
 // section specific styles
 
 .main_list {
+  .space-right-xs {
+    margin-right: 7px;
+  }
   .list-group-item.header {
     padding: 10px 15px;
     > * {

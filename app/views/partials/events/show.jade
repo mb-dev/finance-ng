@@ -23,7 +23,7 @@ ng-include(src="'/partials/common/memory_header.html'")
           a(ng-repeat='person in participants', ng-href='/people/{{person.id}}')
             {{person.name}}{{$last ? '' : ', '}}
       .row
-        td.col-xs-12(colspan='2') {{item.content}}
+        .col-xs-12(colspan='2', ng-bind-html="item.content | newline")
   
   a.btn.btn-primary.pull-right(ng-href='/memories/new?eventId={{item.id}}&returnto={{currentLocation}}') Add
   h3 Associated memories

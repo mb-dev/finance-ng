@@ -32,12 +32,12 @@ angular.module('app.controllers')
       multiple: true
     }
 
-    if Lazy($location.$$url).endsWith('new')
+    if $location.$$url.indexOf('new') > 0
       $scope.title = 'New event'
       $scope.item = {date: moment().valueOf(), associatedMemories: []}
       $scope.participants = []
       updateFunc = db.events().insert
-      $scope.item.participantIds = [$routeParams.personId] if $routeParams.personId
+      $scope.item.participantIds = [parseInt($routeParams.personId, 10)] if $routeParams.personId
     else
       $scope.title = 'Edit event'
       $scope.item = db.events().findById($routeParams.itemId)
@@ -47,7 +47,7 @@ angular.module('app.controllers')
 
     $scope.onSubmit = ->
       db.categories().findOrCreate($scope.item.categories)
-      onSuccess = -> $location.path($routeParams.returnto || '/events/')
+      onSuccess = -> $location.path($routeParams.returnto || '/events/' + $scope.item.id)
       saveTables = -> db.saveTables([db.tables.events, db.tables.categories])
       updateFunc($scope.item).then(saveTables).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 

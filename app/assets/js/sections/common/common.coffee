@@ -153,7 +153,10 @@ class window.LineItemCollection extends Collection
     results = Lazy(@collection).filter((item) -> 
       if filter.date
         date = moment(item.date)
-        return false if !(date.month() == filter.date.month && date.year() == filter.date.year)
+        if filter.date.month && filter.date.year
+          return false if !(date.month() == filter.date.month && date.year() == filter.date.year)
+        else if filter.date.year
+          return false if (date.year() != filter.date.year)
       if filter.categories
         return false if filter.categories.indexOf(item.categoryName) < 0
       if filter.accountId
@@ -222,6 +225,17 @@ class ImportedLinesCollection extends Collection
 class MemoriesCollection extends Collection
 
   migrateIfNeeded: ->
+
+  getByDynamicFilter: (filter, sortColumns) ->
+    results = Lazy(@collection).filter((item) -> 
+      if filter.date
+        date = moment(item.date)
+        return false if !(date.month() == filter.date.month && date.year() == filter.date.year)
+      if filter.onlyParents
+        return false if !item.parentMemoryId && (!item.events || item.events.length == 0)
+      true
+    )
+    @sortLazy(results, sortColumns)
 
   getItemsByMonthYear: (month, year, sortColumns) ->
     results = Lazy(@collection).filter((item) -> 

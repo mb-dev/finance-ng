@@ -32,7 +32,7 @@ ng-include(src="'/partials/common/memory_header.html'")
           a(ng-repeat='person in people', ng-href='/people/{{person.id}}')
             {{person.name}}{{$last ? '' : ', '}}
       .row
-        .col-xs-12(colspan='2', ng-bind-html="item.content | newline")
+        .col-xs-12(ng-bind-html="item.content | newline")
 
   a.btn.btn-primary.pull-right(ng-href='/memories/new?parentMemoryId={{item.id}}&returnto={{currentLocation}}') Add
   h3 Child memories
