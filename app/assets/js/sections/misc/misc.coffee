@@ -165,6 +165,32 @@ angular.module('app.importers', [])
           lineItem.date = moment(date).valueOf()
           lineItem
 
+  .factory 'ImportProvidentVisa', () ->
+    import: (fileContent) ->
+      rows = CSV.parse(fileContent)
+      rows.splice(0, 1)
+      rows.map (row) =>
+        date = row[0].trim()
+        comments = row[2].trim()
+        if date.length == 8
+          description = row[2].trim().replace(new RegExp("[ ]+", "g"), ' ')
+          referenceNumber = row[3].trim()
+        else
+          description = row[3].trim().replace(new RegExp("[ ]+", "g"), ' ')
+          referenceNumber = row[2].trim()
+        amount = row[4].toString().trim()
+
+        amountAsFloat = parseFloat(amount.match(/[0-9.\-]+/g).join(''))
+
+        if amount != NaN
+          lineItem = {}
+          lineItem.source = LineItemCollection.SOURCE_IMPORT
+          lineItem.type = if amountAsFloat >= 0 then LineItemCollection.EXPENSE else LineItemCollection.INCOME
+          lineItem.amount = Math.abs(amountAsFloat).toString()
+          lineItem.payeeName = description.trim()
+          lineItem.date = moment(date).valueOf()
+          lineItem
+
   .factory 'ImportChaseCC', () ->
     import: (fileContent) ->
       rows = CSV.parse(fileContent)

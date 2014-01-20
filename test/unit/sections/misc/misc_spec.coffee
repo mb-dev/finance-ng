@@ -84,6 +84,24 @@ describe 'importers', ->
       expect(result.length).toEqual(5)
       expect(result[0]).toEqual({ source : 'import', type : 1, amount : '52', payeeName : 'BACI CAFE & WINE B HEALDSBURG CAUS', date : 1341212400000 })
       expect(result[1]).toEqual({ source : 'import', type : 1, amount : '1350', comment : 'Check 1015', date : 1341298800000 })
+  describe 'ImportProvidentVisa', ->
+    beforeEach(inject((ImportProvidentVisa) ->
+      root.importer = ImportProvidentVisa
+      jasmine.getFixtures().fixturesPath= 'base/test/fixtures';
+    ))
+    it 'should import the csv', ->
+      content = readFixtures('provident_visa_example.csv')
+      result = root.importer.import(content)
+      expect(result.length).toEqual(4)
+      expect(result[0]).toEqual({ source : 'import', type : 1, amount : '6.05', payeeName : "LEE'S DELI - 615 M SAN FRANCISCO CA", date : 1341558000000 })
+      expect(result[1]).toEqual({ source : 'import', type : 1, amount : '41.54', payeeName : "TRADER JOE'S #236 QPS SAN FRANCISCO CA", date : 1341730800000 })
+      expect(result[2]).toEqual({ source : 'import', type : 1, amount : '1', payeeName : 'Interest Charge on Purchases', date : 1344322800000 })
+      expect(result[3]).toEqual({ source : 'import', type : 1, amount : '0', payeeName : 'Interest Charge on Cash Advan', date : 1344322800000 })
+      content = readFixtures('provident_visa_new_example.csv')
+      result = root.importer.import(content)
+      expect(result.length).toEqual(2)
+      expect(result[0]).toEqual({ source : 'import', type : 2, amount : '80.69', payeeName : 'AUTOMATIC PAYMENT - THANK YOU', date : 1369638000000 })
+      expect(result[1]).toEqual({ source : 'import', type : 1, amount : '40', payeeName : 'RECREATION.GOV 888-448-1474 NY', date : 1370415600000 })
   describe 'ImportChaseCC', ->
     beforeEach(inject((ImportChaseCC) ->
       root.importer = ImportChaseCC
