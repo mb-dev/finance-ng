@@ -4,7 +4,7 @@ angular.module('app.controllers')
     if $routeParams.month && $routeParams.year
       $scope.currentDate.year(+$routeParams.year).month(+$routeParams.month - 1)
 
-    $scope.items = db.memories().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).toArray().reverse()
+    $scope.items = db.memories().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).reverse().toArray()
     $scope.nextMonth = ->
       $scope.currentDate.add('months', 1)
       $location.path('/memories/' + $scope.currentDate.year().toString() + '/' + ($scope.currentDate.month()+1).toString())

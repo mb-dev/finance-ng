@@ -1,7 +1,7 @@
 angular.module('app.controllers')
   .controller 'EventsIndexController', ($scope, $routeParams, $location, db) ->
     applyDateChanges = ->
-      $scope.items = db.events().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).toArray()
+      $scope.items = db.events().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).reverse().toArray()
 
     $scope.currentDate = moment()
     if $routeParams.month && $routeParams.year
