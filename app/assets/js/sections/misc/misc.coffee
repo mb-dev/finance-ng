@@ -35,7 +35,7 @@ angular.module('app.controllers')
     $scope.onFileLoaded = (fileContent) ->
       account = db.accounts().findById($scope.accountId)
       importedLines = db.importedLines().getAll().pluck('content').reduce (result, item, index) -> 
-        result[item] = index
+        result[item] = true
         result
       , {}
       importer = $injector.get('Import' + account.importFormat)

@@ -22,7 +22,8 @@ describe 'ImportItemsController', ->
     jasmine.getFixtures().fixturesPath= 'base/test/fixtures';
     content = readFixtures('provident_checking_example.csv')
 
-    spyOn(root.db, 'saveTables')
+    spyOn(root.db, 'saveTables').andCallFake -> 
+      {then: -> true }
     spyOn(root.$location, 'path')
 
     # one item was already imported, we have one rule already
@@ -30,7 +31,7 @@ describe 'ImportItemsController', ->
     root.db.processingRules().set('amount:130', {payeeName: 'Home Owner', categoryName: 'Rent'})
     root.db.processingRules().set('name:TARGET T2767 OAKLA OAKLAND CAUS', {payeeName: 'Target', categoryName: 'Shopping'})
 
-    # step 1: load file\
+    # step 1: load file
     root.$scope.accountId = root.account.id
     root.$scope.onFileLoaded(content)
 

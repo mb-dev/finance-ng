@@ -6,6 +6,11 @@ root.$http = {}
 root.$sessionStorage = {}
 root.fdb = null
 
+makeObject = (id, value) ->
+  result = {}
+  result[id] = value
+  result
+
 describe 'line items', ->
   beforeEach(module('app'))
   beforeEach(inject((_$rootScope_, $q, fdb) ->
@@ -44,8 +49,8 @@ describe 'line items', ->
       root.db.lineItems().deleteById(root.item1Id)
       expect(root.db.lineItems().length()).toEqual(1)
 
-      expect(root.db.lineItems().idIndex).toEqual({2: 1})
-      expect(root.db.lineItems().actionsLog[2]).toEqual({action: 'delete', id: '1'})
+      expect(root.db.lineItems().idIndex).toEqual(makeObject(root.item2Id, 1))
+      expect(root.db.lineItems().actionsLog[2]).toEqual({action: 'delete', id: root.item1Id})
 
     it 'should return items by month', ->
       expect(root.db.lineItems().getItemsByMonthYear(10, 2012).toArray().length).toEqual(1)

@@ -1,6 +1,6 @@
 ng-include(src="'/partials/common/logged_out_header.html'")
 .login_page.container
-  .error(ng-if='error')
+  .alert.alert-danger(ng-if='error')
     {{error}}
   .panel.panel-default
     .panel-heading

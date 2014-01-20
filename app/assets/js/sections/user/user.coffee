@@ -11,23 +11,35 @@ setupFilesystem = ($q, fileSystem) =>
       defer.reject('failed')
 
 angular.module('app.controllers')
-   .controller 'UserLoginController', ($scope, $window, userService) ->
+   .controller 'UserLoginController', ($scope, $window, userService, $localStorage, $location) ->
+    $scope.user = {}
+
     $scope.loginOauth = (provider) ->
       $window.location.href = '/auth/' + provider;
 
     $scope.register = ->
       userService.register($scope.user).then (successResponse) ->
+        $location.path('/login')
+      , (failedResponse) ->
+        $scope.error = failedResponse.data.error
+
+    $scope.login = ->
+      userService.login($scope.user).then (successResponse) ->
+        response = successResponse.data
+        $localStorage.user = {id: response.user.id, email: response.user.email, lastModifiedDate: response.user.lastModifiedDate}
         $location.path('/key')
       , (failedResponse) ->
-        $scope.error = 'failed'
-
+        $scope.error = failedResponse.data.error      
 
   .controller 'UserKeyController', ($scope, $window, $localStorage, $location, fileSystem, $q) ->
     setupFSState = setupFilesystem($q, fileSystem)
     $scope.key = ''
 
+    if !$localStorage.user
+      $location.path('/login')
+
     $scope.onSubmit = ->
-      $localStorage.encryptionKey = $scope.key
+      $localStorage["#{$localStorage.user.id}-encryptionKey"] = $scope.key
 
       setupFilesystem($q, fileSystem).then ->
         $location.path('/line_items')
@@ -61,10 +73,26 @@ angular.module('app.controllers')
 
   .controller 'UserEditProfileController', ($scope, $window, $localStorage, $location) ->
     $scope.onSubmit = ->
-      $localStorage.encryptionKey = $scope.key
+      $localStorage["#{$localStorage.user.id}-encryptionKey"] = $scope.key
       $location.path('/line_items')
+
+  .controller 'WelcomePageController', ($scope, $window, $localStorage, $location) ->
+    $scope.user = $localStorage.user
+    
+  .controller 'UserLogoutController', ($scope, $window, $localStorage, userService, $location) ->
+    if $localStorage.user
+      userService.logout().then ->
+        delete $localStorage["#{$localStorage.user.id}-encryptionKey"]
+        $localStorage.user = null
+        $location.path('/login')
+    else      
+      $location.path('/login')
 
 angular.module('app.services')
   .factory 'userService', ($http, $localStorage) ->
     register: (user) ->
       $http.post('/auth/register', user)
+    login: (user) ->
+      $http.post('/auth/login', user)
+    logout: ->
+      $http.post('/auth/logout')

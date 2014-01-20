@@ -43,7 +43,7 @@ App.config ($routeProvider, $locationProvider) ->
   memoryNgAllDb = (mdb) -> [mdb.tables.memories, mdb.tables.events, mdb.tables.people, mdb.tables.categories]
   
   $routeProvider
-    .when('/', {templateUrl: '/partials/welcome.html'})
+    .when('/', {templateUrl: '/partials/welcome.html', controller: 'WelcomePageController'})
 
     .when('/accounts/', {templateUrl: '/partials/accounts/index.html', controller: 'AccountsIndexController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
     .when('/accounts/new', {templateUrl: '/partials/accounts/form.html', controller: 'AccountsFormController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
@@ -89,6 +89,7 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/register', {templateUrl: '/partials/user/register.html', controller: 'UserLoginController'})
     .when('/profile', {templateUrl: '/partials/user/profile.html', controller: 'UserProfileController' })
     .when('/edit_profile', {templateUrl: '/partials/user/edit_profile.html', controller: 'UserEditProfileController'})
+    .when('/logout', {template: ' ', controller: 'UserLogoutController'})
 
     # download backup
 

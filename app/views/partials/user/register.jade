@@ -1,17 +1,25 @@
 ng-include(src="'/partials/common/logged_out_header.html'")
 .login_page.container
-  .panel.panel-default
-    .panel-heading
-      h4.panel-title Register
-    form.panel-body.form_inline(role='form')
-      .form-group
-        input.form-control(type='text', ng-model="user", placeholder='Username')
-      .form-group
-        input.form-control(type='text', ng-model="password", placeholder='Password')
-      a.btn.btn-default(ng-click="register()") Submit
+  .alert.alert-danger(ng-if='error')
+    {{error}}
+  .row
+    .col-xs-12.col-md-6.col-md-offset-3
+      .panel.panel-default
+        .panel-heading
+          h4.panel-title Register
+        form.panel-body.form_inline(role='form')
+          .form-group
+            input.form-control(type='text', ng-model="user.email", placeholder='E-Mail')
+          .form-group
+            input.form-control(type='password', ng-model="user.password", placeholder='Password')
+          a.btn.btn-default(ng-click="register()") Submit
 
-  .btn-group
-    a.btn.btn-block.btn-social.btn-google-plus(href="", ng-click="loginOauth('google')")
-      i.fa.fa-google-plus 
-      |Sign in with Google
+  
+  .row
+    .col-xs-12.col-md-6.col-md-offset-3
+      .well
+        .btn-group
+          a.btn.btn-block.btn-social.btn-google-plus(href="", ng-click="loginOauth('google')")
+            i.fa.fa-google-plus 
+            |Sign in with Google
       

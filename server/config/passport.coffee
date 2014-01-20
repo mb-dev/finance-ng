@@ -1,19 +1,33 @@
 mongoose = require('mongoose')
 GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 User = mongoose.model('User')
+LocalStrategy = require('passport-local').Strategy
 
 module.exports = (passport, config) ->
   passport.serializeUser (user, done) ->
+    console.log('user', user)
     done(null, user.id)
 
   passport.deserializeUser (id, done) ->
     User.findById id, (err, user) ->
       done(err, user)
 
-  passport.use(new LocalStrategy(
+  passport.use(new LocalStrategy({
+      usernameField: 'email'
+    },
     (username, password, done) ->
-      User.findOne { username: username, password: password }, (err, user) ->
-        done(err, user)
+      User.findOne { email: username }, (err, user) ->
+        return done(err) if err
+        return done(null, false, { message: 'Unknown user ' + username }) if !user
+        user.comparePassword password, (err, isMatch) ->
+          return done(err) if err
+          if isMatch
+            if !user.approved
+              done(null, false, { message: 'User not approved'}) 
+            else
+              done(null, user)
+          else
+            done(null, false, { message: 'Invalid password' })
   ))
 
   passport.use(new GoogleStrategy({

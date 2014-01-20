@@ -1,3 +1,5 @@
+ng-include(src="'/partials/common/logged_out_header.html'")
+
 .welcome_page
   .welcome.well
     .content.text-center.
@@ -11,9 +13,14 @@
         a.btn.btn-primary.form-control(ng-href="/line_items/") Finance
     br/
     br/
-    .row
+    .row(ng-if='!user')
       .col-xs-3.col-xs-offset-3
         a.btn.btn-primary.form-control(ng-href='/login') Login
       .col-xs-3
         a.btn.btn-primary.form-control(ng-href='/register') Register
+    .row(ng-if='user')
+      .col-xs-3.col-xs-offset-3.text-center
+        span Logged In
+      .col-xs-3
+        a.btn.btn-primary.form-control(ng-href='/logout') Logout
   

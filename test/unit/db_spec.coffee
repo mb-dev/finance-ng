@@ -12,6 +12,11 @@
 
 root = {}
 
+makeObject = (id, value) ->
+  result = {}
+  result[id] = value
+  result
+
 describe 'Database', ->
   beforeEach(module('app'))
   beforeEach(inject(($httpBackend, $http, $q, $rootScope) ->
@@ -21,16 +26,17 @@ describe 'Database', ->
     root.$http = $http
     root.$rootScope = $rootScope
     root.appName = 'finance'
-    root.fileSystemFileName = '/db/finance-people.json'
+    root.userId = '52acfdc87d75a5a83e000001'
+    root.fileSystemFileName = '/db/' + root.userId + '-finance-people.json'
     root.tableName = 'people'
     root.authenticateURL = '/data/authenticate'
     root.getURL = '/data/finance/people'
-    root.authenticateOkResponseDataStale = {user: {email: 'a@a.com', lastModifiedDate: {'finance-people': root.timeNewerData} }}
-    root.authenticateOkResponseDataOk = {user: {email: 'a@a.com', lastModifiedDate: {'finance-people': root.timeNow} }}
+    root.authenticateOkResponseDataStale = {user: {id: root.userId, email: 'a@a.com', lastModifiedDate: {'finance-people': root.timeNewerData} }}
+    root.authenticateOkResponseDataOk = {user: {id: root.userId, email: 'a@a.com', lastModifiedDate: {'finance-people': root.timeNow} }}
     root.getResponse = {actions: []}
     root.postResponse = {message: 'write_ok', updatedAt: root.timeNewerData}
     root.item = {name: 'Moshe'}
-    root.originalName = 'Moshe'
+    root.originalName = 'Moshe'    
     root.encryptionKey = "ABC"
     root.storageContent = {
       version: '1.0'
@@ -41,7 +47,8 @@ describe 'Database', ->
     root.$httpBackend.when('POST', root.postURL).respond(root.postResponse)
     root.$q = $q
     root.$sessionStorage = {}
-    root.$localStorage = {encryptionKey: root.encryptionKey}
+    root.$localStorage = {}
+    root.$localStorage[root.userId + '-encryptionKey'] = root.encryptionKey
     root.fileSystemContent = {}
     root.fileSystem = {
       readFile: (fileName) =>
@@ -63,7 +70,7 @@ describe 'Database', ->
    root.$httpBackend.verifyNoOutstandingRequest();
   describe 'getTables when logged in', ->
     beforeEach ->
-      root.$sessionStorage.user = {email: 'a@a.com', lastModifiedDate: {'finance-people': root.timeNow}}
+      root.$localStorage.user = {id: root.userId, email: 'a@a.com', lastModifiedDate: {'finance-people': root.timeNow}}
     it 'should load data from the network when filesystem has no data', ->
       # setup db
       db = new Database(root.appName, root.$http, root.$q, root.$sessionStorage, root.$localStorage, root.fileSystem)
@@ -91,7 +98,7 @@ describe 'Database', ->
     it 'should save to the server', ->
       resolvedValue = null
       # setup user and data
-      root.$sessionStorage.user = {email: 'a@a.com', lastModifiedDate: {'finance-people': root.timeNow}}
+      root.$localStorage.user = {id: root.userId, email: 'a@a.com', lastModifiedDate: {'finance-people': root.timeNow}}
       root.fileSystemContent[root.fileSystemFileName] = angular.toJson(root.storageContent)
       # setup db
       db = new Database(root.appName, root.$http, root.$q, root.$sessionStorage, root.$localStorage, root.fileSystem)
@@ -109,16 +116,16 @@ describe 'Database', ->
       # expect data to be saved to fs and web
       expect(JSON.parse(root.fileSystemContent[root.fileSystemFileName]).data[1].name).toEqual('David')
       expect(db.user().lastModifiedDate['finance-people']).toEqual(root.timeNewerData)
-      expect(root.$sessionStorage.user.lastModifiedDate['finance-people']).toEqual(root.timeNewerData)
+      expect(root.$localStorage.user.lastModifiedDate['finance-people']).toEqual(root.timeNewerData)
       expect(resolvedValue).toEqual(true)
   describe 'authAndCheckData', ->
-    it 'should get data when there is data and there is stale data', ->
+    it 'should get data when there is data and the data is stale', ->
       resolvedValue = null
       # setup database
       db = new Database(root.appName, root.$http, root.$q, root.$sessionStorage, root.$localStorage, root.fileSystem)
       testCollection = db.createCollection(root.tableName, new Collection(root.$q, 'name'))
       # user and data in file system
-      root.$sessionStorage.user = {email: 'a@a.com', lastModifiedDate: {'finance-people': root.timeNow}}
+      root.$localStorage.user = {id: root.userId, email: 'a@a.com', lastModifiedDate: {'finance-people': root.timeNow}}
       root.fileSystemContent[root.fileSystemFileName] = angular.toJson(root.storageContent)
       # load from FS
       db.getTables([root.tableName])
@@ -145,7 +152,7 @@ describe 'Database', ->
       db = new Database(root.appName, root.$http, root.$q, root.$sessionStorage, root.$localStorage, root.fileSystem)
       testCollection = db.createCollection(root.tableName, new Collection(root.$q, 'name'))
       # user and data in file system
-      root.$sessionStorage.user = {email: 'a@a.com', lastModifiedDate: {'finance-people': root.timeNow}}
+      root.$localStorage.user = {id: root.userId, email: 'a@a.com', lastModifiedDate: {'finance-people': root.timeNow}}
       root.fileSystemContent[root.fileSystemFileName] = angular.toJson(root.storageContent)
       # load from FS
       db.getTables([root.tableName])
@@ -178,18 +185,21 @@ describe 'Database', ->
       expect(resolvedValue.data).toEqual({reason: 'not_logged_in'})
 
 describe 'SimpleCollection', ->
-  beforeEach ->
+  beforeEach(module('app'))
+  beforeEach inject ($httpBackend, $http, $q, $rootScope) ->
     root.timeNow = Date.now()
     root.db = new Database(root.appName, root.$http, root.$q, root.$sessionStorage, root.$localStorage, root.fileSystem)
     root.testCollection = root.db.createCollection(root.tableName, new SimpleCollection(root.$q))
   it 'should insert item', ->
     root.testCollection.findOrCreate('item')
-    expect(root.testCollection.actionsLog).toEqual( [{ action: 'insert', id: 1, item: { id: 1, key: 'item', value: true } }] )
-    expect(root.testCollection.idIndex).toEqual({1: 0})
+    root.itemId = root.testCollection.lastIssuedId
+    expect(root.testCollection.actionsLog).toEqual( [{ action: 'insert', id: root.itemId, item: { id: root.itemId, key: 'item', value: true } }] )
+    expect(root.testCollection.idIndex).toEqual(makeObject(root.itemId, 0))
   it 'should delete item', ->
     root.testCollection.findOrCreate('item')
     root.testCollection.delete('item')
-    expect(root.testCollection.actionsLog[1]).toEqual( { action: 'delete', id: 1} )
+    root.itemId = root.testCollection.lastIssuedId
+    expect(root.testCollection.actionsLog[1]).toEqual( { action: 'delete', id: root.itemId} )
     expect(root.testCollection.idIndex).toEqual({})
     expect(root.testCollection.get('test')).toEqual(undefined)
   it 'should support loading collection', ->
