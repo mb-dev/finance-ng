@@ -555,10 +555,44 @@ angular.module('app.directives', ['app.services', 'app.filters'])
 
       resize  = (el)  ->
         el.style.height = 'auto';
-        el.style.height = (el.scrollHeight  + offset ) + 'px';    
+        el.style.height = (el.scrollHeight  + offset ) + 'px'
    
-      element.bind('input', -> resize(element[0]));
-      element.bind('keyup', -> resize(element[0]));
+      element.bind('input', -> resize(element[0]))
+      element.bind('keyup', -> resize(element[0]))
+
+  .directive 'selectize', ($timeout) ->       
+    restrict: 'A',
+    require: '?ngModel',
+    link: (scope, element, attrs, ngModel) ->
+
+      $timeout ->
+        if attrs.selectize == 'stringsWithCreate'
+          allItems = scope.$eval(attrs.allItems)
+          if allItems
+            alteredAllItems = allItems.map (item) -> {value: item, text: item} 
+            if !attrs.multiple
+              selectedItem = ngModel.$modelValue
+              alteredAllItems.push({value: selectedItem, text: selectedItem}) if selectedItem && allItems.indexOf(selectedItem) < 0
+          $(element).selectize({
+            plugins: ['restore_on_backspace']
+            persist: false
+            createOnBlur: true
+            sortField: 'text'
+            options: alteredAllItems
+            create: (input) ->
+              value: input
+              text: input
+          })
+        else if attrs.selectize == 'objectsWithIdName'
+          ngModel.$parsers.push (value) ->
+            value.map (item) -> parseInt(item, 10)
+          allItems = scope.$eval(attrs.allItems)
+          $(element).selectize({
+            create: false,
+            valueField: 'id'
+            labelField: 'name'
+            searchField: 'name'
+          })
 
  angular.module('app.filters', [])
   .filter 'localDate', ($filter) ->
@@ -597,7 +631,7 @@ angular.module('app.directives', ['app.services', 'app.filters'])
 
   .filter 'joinBy', () ->
     (input, delimiter) ->
-      (input || []).join(delimiter || ',')
+      (input || []).join(delimiter || ', ')
 
   .filter 'newline', ($sce) ->
     (string) ->

@@ -96,6 +96,7 @@ module.exports = (grunt) ->
             'build/js/vendor/pickadate.date.js'
             'build/js/vendor/pickadate.time.js'
             'build/js/vendor/csv.js'
+            'build/js/vendor/selectize.js'
           ]
       css:
         files: [

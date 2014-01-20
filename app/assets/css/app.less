@@ -1,6 +1,9 @@
 @import "bootstrap/bootstrap.less";
 @import "bootstrap/typeahead.js-bootstrap.less";
 
+@import "selectize/selectize.less";
+@import "selectize/selectize.bootstrap3.less";
+
 ::-webkit-validation-bubble-message { display: none; }
 
 .form_area {
@@ -90,12 +93,13 @@ input[pickadate] {
 
 form {
   .inline-controls {
-    .form-control {
-      width: auto;
-      margin-right: 5px;
+    .right-inline {
+      width: calc(100% - 30px);
+      float: left;
     }
     input[type=checkbox] {
-      display: inline-block;
+      float: right;
+      width: auto;
     }
   }
 }

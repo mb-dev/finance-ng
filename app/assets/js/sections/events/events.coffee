@@ -20,29 +20,18 @@ angular.module('app.controllers')
     return
 
   .controller 'EventsFormController', ($scope, $routeParams, $location, db, errorReporter) ->
-    $scope.people = db.people().getAll().toArray()
     $scope.allCategories = db.categories().getAll().toArray()
+    $scope.allPeople = db.people().getAll().toArray()
     updateFunc = null
-    $scope.categoriesOptions = {
-      multiple: true,
-      simple_tags: true,
-      tags: $scope.allCategories
-    }
-    $scope.peopleOptions = {
-      multiple: true
-    }
 
     if $location.$$url.indexOf('new') > 0
       $scope.title = 'New event'
       $scope.item = {date: moment().valueOf(), associatedMemories: []}
-      $scope.participants = []
       updateFunc = db.events().insert
       $scope.item.participantIds = [parseInt($routeParams.personId, 10)] if $routeParams.personId
     else
       $scope.title = 'Edit event'
       $scope.item = db.events().findById($routeParams.itemId)
-      $scope.categories = $scope.item.categories
-      $scope.participants = $scope.item.$participants()
       updateFunc = db.events().editById
 
     $scope.onSubmit = ->

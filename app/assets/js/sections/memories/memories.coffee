@@ -16,19 +16,11 @@ angular.module('app.controllers')
 
   .controller 'MemoriesFormController', ($scope, $routeParams, $location, db, errorReporter) ->
     $scope.allCategories = db.categories().getAll().toArray()
-    $scope.people = db.people().getAll().toArray()
-    $scope.categoriesOptions = {
-      multiple: true,
-      simple_tags: true,
-      tags: $scope.allCategories
-    }
-    $scope.peopleOptions = {
-      multiple: true
-    }
+    $scope.allPeople = db.people().getAll().toArray()
+    
     updateFunc = null
     if $location.$$url.indexOf('new') > 0
       $scope.type = 'new'
-      $scope.categoryNames = ''
       $scope.title = 'New memory'
       $scope.item = {date: moment().valueOf()}
       updateFunc = db.memories().insert

@@ -8,7 +8,8 @@ ng-include(src="'/partials/common/memory_header.html'")
       .form-group
         label.col-xs-4.col-sm-2.control-label Categories
         .col-xs-8.col-sm-10
-          input.form-control(type='text', placeholder='Categories', ng-model='item.categories', ui-select2='categoriesOptions')
+          select(ng-model='item.categories', selectize="stringsWithCreate", multiple)
+            option(ng-repeat='category in allCategories', value='{{category}}', ng-selected="{{item.categories.indexOf(category) >= 0}}") {{category}}
       .form-group
         label.col-xs-4.col-sm-2.control-label Name
         .col-xs-8.col-sm-10

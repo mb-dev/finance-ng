@@ -56,22 +56,22 @@ ng-include(src="'/partials/common/finance_header.html'")
     
     form.main_list.list-group(role='form')
       .list-group-item.row.header
-        .date.col-xs-2.col-md-1 Date
-        .payee.col-xs-5.col-md-3 Payee Name (Add Rule)
+        .date.col-xs-2.col-md-2 Date (Add Rule)
+        .payee.col-xs-5.col-md-3 Payee Name
         .payee.col-xs-5.col-md-3 Category Name
         .amount.col-xs-3.col-md-1 Amount
-        .comment.hidden-xs.col-md-4 Comment
+        .comment.hidden-xs.col-md-3 Comment
       .list-group-item.row(ng-repeat='item in items | notIgnored')
-        .date.col-xs-4.col-md-1
+        .date.col-xs-4.col-md-2.inline-controls
           {{item.date | amDateFormat:'MM/DD/YYYY' }}
+          input.form-control(type='checkbox', ng-model='item.$addRule')
         .payee.col-xs-5.col-md-3
-          .inline-controls
-            input.sfTypeahead.form-control(type='text', ng-model='item.payeeName', datasets="$parent.allPayees", ng-trim='false')
-            input.form-control(type='checkbox', ng-model='item.$addRule')
+          input.sfTypeahead.form-control(type='text', ng-model='item.payeeName', datasets="$parent.allPayees", ng-trim='false')
         .payee.col-xs-5.col-md-3
-          input.sfTypeahead.form-control(type='text', ng-model='item.categoryName', datasets="$parent.allCategories", ng-trim='false')
+          select(ng-model='item.categoryName', selectize="stringsWithCreate", all-items="$parent.allCategories")
+            option(value='{{item.categoryName}}', selected="true", ) {{item.categoryName}}
         .amount.col-xs-3.col-md-1 {{item.$signedAmount()}}
-        .comment.hidden-xs.col-md-4 {{item.comment}}
+        .comment.hidden-xs.col-md-3 {{item.comment}}
     
     .row.btn-toolbar.text-center
       button.btn.btn-default(ng-click="onBackToReviewItems()") &lt;&lt; Back to review items

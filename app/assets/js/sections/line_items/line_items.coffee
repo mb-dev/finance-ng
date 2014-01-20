@@ -24,14 +24,8 @@ angular.module('app.controllers')
     return
 
   .controller 'LineItemsFormController', ($scope, $routeParams, $location, db, errorReporter) ->
-    $scope.allCategories = {
-      name: 'categories'
-      local: db.categories().getAll().toArray()
-    }
-    $scope.allPayees = {
-      name: 'payees'
-      local: db.payees().getAll().toArray()
-    }
+    $scope.allCategories = db.categories().getAll().toArray()
+    $scope.allPayees = db.payees().getAll().toArray()
     $scope.tags = ['Cash', 'Exclude from Reports']
     $scope.accounts = db.accounts().getAll().toArray()
 
@@ -64,14 +58,11 @@ angular.module('app.controllers')
       db.lineItems().reBalance($scope.item)
       onSuccess = -> 
         itemDate = moment($scope.item.date)
-        $location.path($routeParams.returnto || "/line_items/#{itemDate.year()}/#{itemDate.month()}")
+        $location.path($routeParams.returnto || "/line_items/#{itemDate.year()}/#{itemDate.month()+1}")
       db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees]).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
   .controller 'LineItemsSplitController', ($scope, $routeParams, $location, db, errorReporter) ->
-    $scope.allCategories = {
-      name: 'categories'
-      local: db.categories().getAll().toArray()
-    }
+    $scope.allCategories = db.categories().getAll().toArray()
 
     $scope.item = db.lineItems().findById($routeParams.itemId)
     $scope.newItem = db.lineItems().cloneLineItem($scope.item)

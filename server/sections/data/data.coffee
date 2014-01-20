@@ -54,12 +54,11 @@ exports.getDataSet = (req, res) ->
   Model.find {updatedAt: {$gt: loadFrom}}, (err, items) ->
     items.forEach (item) ->
       if item.deleted
-        actions.push({action: 'delete', id: item.id, updatedAt: item.updatedAt.getTime()})
+        actions.push({action: 'delete', id: item.id, updatedAt: item.updatedAt.getTime()}) if req.query.updatedAt != '0'
       else
         actions.push({action: 'update', id: item.id, item: item.jsonData, updatedAt: item.updatedAt.getTime()})
     res.json 200, {actions: actions}
   
-
 exports.postDataSet = (req, res) ->
   if !req.isAuthenticated()
     res.json 403, { reason: 'not_logged_in' }

@@ -7,11 +7,6 @@ angular.module('app.controllers')
 
   .controller 'PeopleFormController', ($scope, $routeParams, $location, db, errorReporter) ->
     $scope.allCategories = db.categories().getAll().toArray()
-    $scope.categoriesOptions = {
-      multiple: true,
-      simple_tags: true,
-      tags: $scope.allCategories
-    }
 
     updateFunc = null
     if $location.$$url.indexOf('new') > 0

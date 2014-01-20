@@ -5,7 +5,6 @@ LocalStrategy = require('passport-local').Strategy
 
 module.exports = (passport, config) ->
   passport.serializeUser (user, done) ->
-    console.log('user', user)
     done(null, user.id)
 
   passport.deserializeUser (id, done) ->

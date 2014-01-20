@@ -18,7 +18,7 @@ ng-include(src="'/partials/common/finance_header.html'")
       .form-group
         label.col-xs-4.col-sm-2.control-label For Category
         .col-xs-8.col-sm-10
-          input.sfTypeahead.form-control(type='text', ng-model='newItem.categoryName', datasets="allCategories", ng-trim='false')
+          select(ng-model='newItem.categoryName', selectize="stringsWithCreate", all-items="allCategories")
       .form-group
         label.col-xs-4.col-sm-2.control-label Amount Left
         .col-xs-8.col-sm-10.form-label {{amountLeft | currency}}

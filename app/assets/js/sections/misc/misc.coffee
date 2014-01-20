@@ -12,10 +12,7 @@ toImportString = (item) ->
 angular.module('app.controllers')
   .controller 'ImportItemsController', ($scope, $routeParams, $location, db, $injector) ->
     $scope.states = {SELECT_FILE: 'selectFile', REVIEW_ITEMS: 'reviewItems', RENAME_ITEMS: 'renameItems'}
-    $scope.allCategories = {
-      name: 'categories'
-      local: db.categories().getAll().toArray()
-    }
+    $scope.allCategories = db.categories().getAll().toArray()
     $scope.allPayees = {
       name: 'payees'
       local: db.payees().getAll().toArray()
@@ -23,6 +20,10 @@ angular.module('app.controllers')
 
     $scope.accounts = db.accounts().getAll().toArray()
     $scope.accountId = $scope.accounts[0].id if $scope.accounts.length > 0
+
+    if $routeParams.accountId
+      $scope.accountId = parseInt($routeParams.accountId, 10)
+
     $scope.weHaveItems = false
     $scope.state = $scope.states.SELECT_FILE
 

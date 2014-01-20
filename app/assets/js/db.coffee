@@ -7,7 +7,7 @@ angular.element('.list-group').injector().get('mdb').events().collection.forEach
 angular.element('.list-group').injector().get('mdb').events().collection.forEach(function(item, index) { item.associatedMemories && item.associatedMemories.forEach(function(item, index) {item.associatedMemories[index] = parseInt(item.associatedMemories[index], 10) }) })
 --
 events:
-angular.element('.list-group').injector().get('mdb').events().collection.forEach(function(item, index) { 
+angular.element('ng-view').injector().get('mdb').events().collection.forEach(function(item, index) { 
   if(item.participantIds) { 
    item.participantIds.forEach(function(association, index) {
      item.participantIds[index] = parseInt(item.participantIds[index], 10); 
@@ -19,7 +19,7 @@ angular.element('.list-group').injector().get('mdb').events().collection.forEach
    })  
   }
 }) 
-angular.element('.list-group').injector().get('mdb').saveTables(['events'], true)
+angular.element('ng-view').injector().get('mdb').saveTables(['events'], true)
 ---
 memories:
 angular.element('.list-group').injector().get('mdb').memories().collection.forEach(function(item, index) { 
@@ -428,16 +428,20 @@ class window.Database
         getDataFrom = dbModel.updatedAt
 
       promise = @$http.get("/data/#{@appName}/#{tableName}?" + $.param({updatedAt: getDataFrom})).then (response) =>
-        dbModel.actionsLog = []
-        response.data.actions.forEach (op) =>
-          if op.action == 'update'
-            try
-              dbModel.$updateOrSet(JSON.parse(sjcl.decrypt(@$localStorage["#{@db.user.id}-encryptionKey"], op.item)), op.updatedAt)
-            catch
-              console.log 'failed to decrypt', tableName, op
-              throw 'failed to decrypt'
-          else if op.action == 'delete'
-            dbModel.$deleteItem(op.id, op.updatedAt)
+        try
+          dbModel.actionsLog = []
+          response.data.actions.forEach (op) =>
+            if op.action == 'update'
+              try
+                dbModel.$updateOrSet(JSON.parse(sjcl.decrypt(@$localStorage["#{@db.user.id}-encryptionKey"], op.item)), op.updatedAt)
+              catch
+                console.log 'failed to decrypt', tableName, op
+                throw 'failed to decrypt'
+            else if op.action == 'delete'
+              dbModel.$deleteItem(op.id, op.updatedAt)
+        catch err
+          console.log "error updating #{tableName} after getting response from web"
+          throw err
 
       promises.push(promise)
     
