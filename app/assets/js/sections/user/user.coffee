@@ -47,12 +47,8 @@ angular.module('app.controllers')
         $scope.error = 'Failed to set file system'
 
   .controller 'UserProfileController', ($scope, $window, $localStorage, $location, fdb, mdb) ->
-    fdb.getTables(financeTables).then(mdb.getTables(memoryTables)).then( ->
-      # do something
-    () ->
-      $scope.error = "failed to fetch tables"
-    )
-
+    $scope.email = $localStorage.user.email
+    
     financeTables = Object.keys(fdb.tables)
     memoryTables = Object.keys(mdb.tables)
     $scope.downloadBackup = ->
