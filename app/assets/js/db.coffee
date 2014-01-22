@@ -22,7 +22,7 @@ angular.element('ng-view').injector().get('mdb').events().collection.forEach(fun
 angular.element('ng-view').injector().get('mdb').saveTables(['events'], true)
 ---
 memories:
-angular.element('.list-group').injector().get('mdb').memories().collection.forEach(function(item, index) { 
+angular.element('ng-view').injector().get('mdb').memories().collection.forEach(function(item, index) { 
  if(item.events) { 
    item.events.forEach(function(association, index) {
      item.events[index] = parseInt(item.events[index], 10); 
@@ -34,10 +34,10 @@ angular.element('.list-group').injector().get('mdb').memories().collection.forEa
    }) 
  }
  if(item.parentMemoryId) {
-    item.parentMemoryId = parseInt(parentMemoryId, 10);
+    item.parentMemoryId = parseInt(item.parentMemoryId, 10);
  }
 }) 
-angular.element('.list-group').injector().get('mdb').saveTables(['memories'], true)
+angular.element('ng-view').injector().get('mdb').saveTables(['memories'], true)
 --
 line items:
 angular.element('.list-group').injector().get('fdb').lineItems().collection.forEach(function(item, index) { 

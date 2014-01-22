@@ -1,9 +1,11 @@
 mongoose = require('mongoose')
 User = mongoose.model('User')
 
-exports.isLoggedIn = (req, res) ->
-  req.isAuthenticated()
-  res.json 200, { "email": req.user.username }
+exports.checkLogin = (req, res) ->
+  if req.isAuthenticated()
+    res.json 200, {user: {id: req.user.id, email: req.user.email, lastModifiedDate: req.user.lastModifiedDate }}
+  else
+    res.json 401, {reason: 'not_logged_in'}
 
 
 exports.register = (req, res) ->

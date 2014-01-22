@@ -456,6 +456,19 @@ angular.module('app.services', ['ngStorage'])
       (reason) ->
         $scope.error = "failure for reason: " + reason
 
+  .factory 'storageService', ($sessionStorage, $localStorage, fileSystem) ->
+    {
+      getUserDetails: ->
+        $localStorage.user
+      setUserDetails: (userDetails) ->
+        $localStorage.user = userDetails
+      getEncryptionKey: ->
+        $localStorage["#{$localStorage.user.id}-encryptionKey"]
+      setEncryptionKey: (encryptionKey) ->
+        $localStorage["#{$localStorage.user.id}-encryptionKey"] = encryptionKey
+    }
+
+
 angular.module('app.directives', ['app.services', 'app.filters'])
   .directive 'currencyWithSign', ($filter) ->
     {

@@ -83,13 +83,13 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/misc/importedLines/:year/:month', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: resolveFDb((fdb) ->[fdb.tables.importedLines]) })    
     .when('/misc/importedLines/', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: resolveFDb((fdb) ->[fdb.tables.importedLines]) })    
 
-    .when('/login_success', redirectTo: '/welcome/')
+    .when('/login_success', template: 'Loading...', controller: 'LoginOAuthSuccessController')
     .when('/login', {templateUrl: '/partials/user/login.html', controller: 'UserLoginController'})
     .when('/key', {templateUrl: '/partials/user/key.html', controller: 'UserKeyController'})
     .when('/register', {templateUrl: '/partials/user/register.html', controller: 'UserLoginController'})
     .when('/profile', {templateUrl: '/partials/user/profile.html', controller: 'UserProfileController' })
     .when('/edit_profile', {templateUrl: '/partials/user/edit_profile.html', controller: 'UserEditProfileController'})
-    .when('/logout', {template: ' ', controller: 'UserLogoutController'})
+    .when('/logout', {template: 'Logging out...', controller: 'UserLogoutController'})
 
     # download backup
 

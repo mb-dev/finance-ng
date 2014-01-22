@@ -11,7 +11,7 @@ setupFilesystem = ($q, fileSystem) =>
       defer.reject('failed')
 
 angular.module('app.controllers')
-   .controller 'UserLoginController', ($scope, $window, userService, $localStorage, $location) ->
+   .controller 'UserLoginController', ($scope, $window, userService, storageService, $location) ->
     $scope.user = {}
 
     $scope.loginOauth = (provider) ->
@@ -26,29 +26,44 @@ angular.module('app.controllers')
     $scope.login = ->
       userService.login($scope.user).then (successResponse) ->
         response = successResponse.data
-        $localStorage.user = {id: response.user.id, email: response.user.email, lastModifiedDate: response.user.lastModifiedDate}
-        $location.path('/key')
+        storageService.setUserDetails(response.user)
+        if storageService.getEncryptionKey()
+          $location.path('/welcome')
+        else
+          $location.path('/key')
       , (failedResponse) ->
         $scope.error = failedResponse.data.error      
 
-  .controller 'UserKeyController', ($scope, $window, $localStorage, $location, fileSystem, $q) ->
+  .controller 'LoginOAuthSuccessController', ($scope, $window, userService, storageService, $location) ->
+    userService.checkLogin().then (successResponse) ->
+      response = successResponse.data
+      storageService.setUserDetails(response.user)
+      if storageService.getEncryptionKey()
+        $location.path('/welcome')
+      else
+        $location.path('/key')
+    , (failedResponse) ->
+        $scope.error = failedResponse.data.error      
+        $location.path '/login'
+
+  .controller 'UserKeyController', ($scope, $window, storageService, $location, fileSystem, $q) ->
     setupFSState = setupFilesystem($q, fileSystem)
     $scope.key = ''
 
-    if !$localStorage.user
+    if !storageService.getUserDetails()
       $location.path('/login')
 
     $scope.onSubmit = ->
-      $localStorage["#{$localStorage.user.id}-encryptionKey"] = $scope.key
+      storageService.setEncryptionKey($scope.key)
 
       setupFilesystem($q, fileSystem).then ->
-        $location.path('/line_items')
+        $location.path('/welcome')
       , () ->
         $scope.error = 'Failed to set file system'
 
   .controller 'UserProfileController', ($scope, $window, $localStorage, $location, fdb, mdb) ->
     $scope.email = $localStorage.user.email
-    
+
     financeTables = Object.keys(fdb.tables)
     memoryTables = Object.keys(mdb.tables)
     $scope.downloadBackup = ->
@@ -86,6 +101,8 @@ angular.module('app.controllers')
 
 angular.module('app.services')
   .factory 'userService', ($http, $localStorage) ->
+    checkLogin: (user) ->
+      $http.get('/auth/check_login')
     register: (user) ->
       $http.post('/auth/register', user)
     login: (user) ->
