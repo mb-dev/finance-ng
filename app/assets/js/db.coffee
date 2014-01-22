@@ -396,7 +396,7 @@ class window.Database
 
     @$http.get('/data/authenticate')
       .success (response, status, headers) =>
-        @$localStorage.user = {id: response.user.id, email: response.user.email, lastModifiedDate: response.user.lastModifiedDate}
+        @$localStorage.user = response.user
         defer.resolve()
       .error (data, status, headers) ->
         defer.reject({data: data, status: status, headers: headers})
@@ -458,9 +458,7 @@ class window.Database
     loadedDataFromFS = false
 
     copyUserDataFromSession = =>
-      @db.user.id = @$localStorage.user.id
-      @db.user.email = @$localStorage.user.email
-      @db.user.lastModifiedDate = @$localStorage.user.lastModifiedDate
+      @db.user = angular.copy(@$localStorage.user)
 
     onAuthenticated = =>
       if !@$localStorage["#{@db.user.id}-encryptionKey"]

@@ -3,7 +3,7 @@ ng-include(src="'/partials/common/logged_out_header.html'")
 .welcome_page
   .welcome.well
     .content.text-center.
-      Welcome to Finance App
+      Welcome {{$root.userDetails.firstName}} to Finance App
     br/
     .row
       .col-xs-3.col-xs-offset-3
@@ -20,7 +20,7 @@ ng-include(src="'/partials/common/logged_out_header.html'")
         a.btn.btn-primary.form-control(ng-href='/register') Register
     .row(ng-if='user')
       .col-xs-3.col-xs-offset-3.text-center
-        span Logged In
+        a.btn.btn-primary.form-control(ng-href='/profile') Profile
       .col-xs-3
         a.btn.btn-primary.form-control(ng-href='/logout') Logout
   

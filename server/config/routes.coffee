@@ -6,7 +6,7 @@ module.exports = (app, passport) ->
   app.get '/auth/google', passport.authenticate('google', {
     successRedirect: '/login_success',
     failureRedirect: '/login'
-    scope: [ 'https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/userinfo.email' ]
+    scope: [ 'https://www.googleapis.com/auth/plus.login', 'email', 'profile' ]
   })
 
   app.get '/auth/google/callback', passport.authenticate('google', {

@@ -2,6 +2,21 @@ mongoose = require('mongoose')
 GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 User = mongoose.model('User')
 LocalStrategy = require('passport-local').Strategy
+# googleapis = require('googleapis')
+# OAuth2 = googleapis.auth.OAuth2Client
+
+# oauth2Client = new OAuth2(config.google.clientID, config.google.clientSecret, config.google.callbackURL)
+# oauth2Client.credentials = {
+# access_token: accessToken,
+# refresh_token: refreshToken
+# }
+# googleapis.discover('plus','v1').execute (err, client) ->
+# client.plus.people.get({'userId': 'me'}).withAuthClient(oauth2Client).execute (err, result) ->
+# if err
+#   done(error)
+#   return
+
+request = require('request')
 
 module.exports = (passport, config) ->
   passport.serializeUser (user, done) ->
@@ -43,7 +58,8 @@ module.exports = (passport, config) ->
           name: profile.displayName,
           email: profile.emails[0].value,
           provider: 'google',
-          googleId: profile.id
+          googleId: profile.id,
+          authToken: accessToken
         })
         user.save (err) ->
           if (err) 
@@ -52,6 +68,9 @@ module.exports = (passport, config) ->
             console.log 'saved user for session', user
             done(err, user)
       else
-        user.accessToken
-        done(err, user)
+        user.name = profile.displayName
+        user.email = profile.emails[0].value
+        user.authToken = accessToken
+        user.save (err) ->
+          done(err, user)
   ))

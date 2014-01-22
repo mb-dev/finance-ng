@@ -21,7 +21,7 @@ nav.navbar-default(role='navigation')
     ul.nav.navbar-nav.navbar-right
       li.dropdown
         a.dropdown-toggle(href='#', data-toggle='dropdown')
-          | Welcome!
+          | Welcome {{$root.userDetails.firstName}}!
           b.caret
         ul.dropdown-menu
           li

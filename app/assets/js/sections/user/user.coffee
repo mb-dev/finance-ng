@@ -19,7 +19,7 @@ angular.module('app.controllers')
 
     $scope.register = ->
       userService.register($scope.user).then (successResponse) ->
-        $location.path('/login')
+        $location.path('/login_success')
       , (failedResponse) ->
         $scope.error = failedResponse.data.error
 
@@ -32,7 +32,7 @@ angular.module('app.controllers')
         else
           $location.path('/key')
       , (failedResponse) ->
-        $scope.error = failedResponse.data.error      
+        $scope.error = "Failed to login: " + failedResponse.data.message      
 
   .controller 'LoginOAuthSuccessController', ($scope, $window, userService, storageService, $location) ->
     userService.checkLogin().then (successResponse) ->
@@ -43,7 +43,6 @@ angular.module('app.controllers')
       else
         $location.path('/key')
     , (failedResponse) ->
-        $scope.error = failedResponse.data.error      
         $location.path '/login'
 
   .controller 'UserKeyController', ($scope, $window, storageService, $location, fileSystem, $q) ->
@@ -62,8 +61,6 @@ angular.module('app.controllers')
         $scope.error = 'Failed to set file system'
 
   .controller 'UserProfileController', ($scope, $window, $localStorage, $location, fdb, mdb) ->
-    $scope.email = $localStorage.user.email
-
     financeTables = Object.keys(fdb.tables)
     memoryTables = Object.keys(mdb.tables)
     $scope.downloadBackup = ->

@@ -124,7 +124,7 @@ App.config ($routeProvider, $locationProvider) ->
   # Without server side support html5 must be disabled.
   $locationProvider.html5Mode(true)
 
-App.run ($rootScope, $location, $injector, $timeout) ->
+App.run ($rootScope, $location, $injector, $timeout, storageService) ->
   $rootScope.$on "$routeChangeError", (event, current, previous, rejection) ->
     if rejection.status == 403 && rejection.data.reason == 'not_logged_in'
       $location.path '/login'
@@ -141,6 +141,9 @@ App.run ($rootScope, $location, $injector, $timeout) ->
       $rootScope.noticeMsg = $sessionStorage.noticeMsg
     $sessionStorage.successMsg = null
     $sessionStorage.noticeMsg = null
+    $rootScope.userDetails = storageService.getUserDetails()
+    if $rootScope.userDetails
+      $rootScope.userDetails.firstName = $rootScope.userDetails.name.split(' ')[0]
 
   $rootScope.$on 'auth_fail', ->
     $rootScope.flashNotice('You were logged out on the server, please login again')

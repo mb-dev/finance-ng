@@ -37,7 +37,7 @@ exports.authenticate = (req, res) ->
     res.json 403, { reason: 'not_logged_in' }
     return
 
-  res.json 200, {user: {id: req.user.id, email: req.user.email, lastModifiedDate: req.user.lastModifiedDate }}
+  res.json 200, {user: {id: req.user.id, email: req.user.email, lastModifiedDate: req.user.lastModifiedDate, name: req.user.name }}
 
 exports.getDataSet = (req, res) ->
   if !req.isAuthenticated()

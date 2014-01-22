@@ -29,7 +29,6 @@ UserSchema.pre 'save', (next) ->
   return next() if !user.isModified('password')
   bcrypt.genSalt SALT_WORK_FACTOR, (err, salt) ->
     return next(err) if err
-    console.log 'hasing - ', user.password
     bcrypt.hash user.password, salt, (err, hash) ->
       return next(err) if err
       user.password = hash
