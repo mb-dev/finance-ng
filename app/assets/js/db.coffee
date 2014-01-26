@@ -458,7 +458,7 @@ class window.Database
     loadedDataFromFS = false
 
     copyUserDataFromSession = =>
-      @db.user = angular.copy(@$localStorage.user)
+      @db.user = angular.extend(@db.user, angular.copy(@$localStorage.user))
 
     onAuthenticated = =>
       if !@$localStorage["#{@db.user.id}-encryptionKey"]
