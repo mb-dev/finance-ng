@@ -146,7 +146,7 @@ angular.module('app.importers', [])
     import: (fileContent) ->
       rows = CSV.parse(fileContent)
       rows.splice(0, 1)
-      rows.map (row) =>
+      Lazy(rows).map((row) =>
         date = row[0]
         description = row[1]
         comments = row[2]
@@ -165,6 +165,7 @@ angular.module('app.importers', [])
           lineItem.payeeName = description.trim() if !checkNumber
           lineItem.date = moment(date).valueOf()
           lineItem
+      ).compact().toArray()
 
   .factory 'ImportProvidentVisa', () ->
     import: (fileContent) ->
