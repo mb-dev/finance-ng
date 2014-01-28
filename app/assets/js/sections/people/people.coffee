@@ -22,6 +22,7 @@ angular.module('app.controllers')
     $scope.onSubmit = ->
       updateFunc($scope.item)
       db.categories().findOrCreate($scope.item.categories)
+      db.categories().findOrCreate($scope.item.interests)
 
       onSuccess = -> $location.path($routeParams.returnto || '/people/' + $scope.item.id)
       saveTables = -> db.saveTables([db.tables.people, db.tables.categories])

@@ -49,10 +49,10 @@ angular.module('app.directives', ['app.services', 'app.filters'])
       require: 'ngModel'
       link: (scope, element, attr, ngModelCtrl) ->
         ngModelCtrl.$formatters.unshift (value) ->
-          dateFilter(value)
+          if value then dateFilter(value) else ''
         
         ngModelCtrl.$parsers.push (value) ->
-          moment(value).valueOf()          
+          if value then moment(value).valueOf() else null
     }
 
   .directive 'floatToString', ($filter) ->
@@ -99,6 +99,21 @@ angular.module('app.directives', ['app.services', 'app.filters'])
             element.pickadate({
               format: 'mm/dd/yyyy'
             })
+            # picker = element.pickadate('picker')
+            # $inputText = element.on(
+            #   change: ->
+            #     parsedDate = Date.parse(@value)
+            #     if parsedDate
+            #       picker.set "select", [parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate()]
+            #     else
+            #       alert("Invalid date")
+            #   focus: ->
+            #     picker.open(false)
+            #   blur: ->
+            #     picker.close()
+            # )
+            # picker.on "set", ->
+            #   element.val(@get("value"))
             initialized = true
         )
     }

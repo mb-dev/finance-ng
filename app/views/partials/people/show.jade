@@ -14,6 +14,15 @@ ng-include(src="'/partials/common/memory_header.html'")
         .left-pane Categories
         .right-pane {{item.categories | joinBy}}
       .row
+        .left-pane Interests
+        .right-pane {{item.interests | joinBy}}
+      .row
+        .left-pane Workplace
+        .right-pane {{item.workplace}}
+      .row
+        .left-pane Birth date
+        .right-pane {{item.birthDate | localDate}}
+      .row
         .col-xs-12(ng-bind-html="item.comments | newline")
 
   a.btn.btn-primary.pull-right(ng-href='/memories/new?personId={{item.id}}&returnto={{currentLocation}}') Add

@@ -254,8 +254,10 @@ class window.SimpleCollection
   set: (key, value, isLoadingProcess, loadedId) =>
     if @actualCollection[key]
       item = @actualCollection[key]
-      @actionsLog.push({action: 'update', id: item.id, item: item.value}) if !isLoadingProcess
-      @actualCollection[key].value = value
+      item.value = value
+      item = @collection[@idIndex[item.id]]
+      item.value = value
+      @actionsLog.push({action: 'update', id: item.id, item: item}) if !isLoadingProcess
     else
       if isLoadingProcess && loadedId
         newId = loadedId
@@ -283,6 +285,7 @@ class window.SimpleCollection
   findOrCreate: (items) =>
     return if !items
     items = [items] if !(items instanceof Array)
+    return if !items[0]
     items.forEach (item) =>
       @set(item, true)  
 

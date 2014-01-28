@@ -195,6 +195,19 @@ describe 'SimpleCollection', ->
     root.itemId = root.testCollection.lastIssuedId
     expect(root.testCollection.actionsLog).toEqual( [{ action: 'insert', id: root.itemId, item: { id: root.itemId, key: 'item', value: true } }] )
     expect(root.testCollection.idIndex).toEqual(makeObject(root.itemId, 0))
+  it 'should update simple item', ->
+    root.testCollection.findOrCreate('item')
+    root.itemId = root.testCollection.lastIssuedId
+    root.testCollection.findOrCreate('item')
+    expect(root.testCollection.actionsLog[1]).toEqual( { action: 'update', id: root.itemId, item: { id: root.itemId, key: 'item', value: true } } )
+    expect(root.testCollection.collection.length).toEqual(1)
+  it 'should update actual item', ->
+    root.testCollection.set('item', 'value1')
+    root.itemId = root.testCollection.lastIssuedId
+    root.testCollection.set('item', 'value2')
+    expect(root.testCollection.actionsLog[1]).toEqual( { action: 'update', id: root.itemId, item: { id: root.itemId, key: 'item', value: 'value2' } } )
+    expect(root.testCollection.collection[0].value).toEqual('value2')
+    expect(root.testCollection.actualCollection['item'].value).toEqual('value2')
   it 'should delete item', ->
     root.testCollection.findOrCreate('item')
     root.testCollection.delete('item')

@@ -15,6 +15,19 @@ ng-include(src="'/partials/common/memory_header.html'")
         .col-xs-8.col-sm-10
           input.form-control(type='text', placeholder='Name', ng-model='item.name')
       .form-group
+        label.col-xs-4.col-sm-2.control-label Interests
+        .col-xs-8.col-sm-10
+          select(ng-model='item.interests', selectize="stringsWithCreate", multiple)
+            option(ng-repeat='category in allCategories', value='{{category}}', ng-selected="{{item.interests.indexOf(category) >= 0}}") {{category}}
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Work
+        .col-xs-8.col-sm-10
+          input.form-control(type='text', placeholder='Workplace Name', ng-model='item.workplace')
+      .form-group
+        label.col-xs-4.col-sm-2.control-label Birthdate
+        .col-xs-8.col-sm-10
+          input.form-control(pickadate, type='text', placeholder='Birth Date', ng-model='item.birthDate', date-format='')
+      .form-group
         label.col-xs-4.col-sm-2.control-label Comments
         .col-xs-8.col-sm-10
           textarea.form-control(autoresize, type='text', ng-model='item.comments')
