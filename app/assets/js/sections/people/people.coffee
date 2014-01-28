@@ -23,7 +23,7 @@ angular.module('app.controllers')
       updateFunc($scope.item)
       db.categories().findOrCreate($scope.item.categories)
 
-      onSuccess = -> $location.path('/people/')
+      onSuccess = -> $location.path($routeParams.returnto || '/people/' + $scope.item.id)
       saveTables = -> db.saveTables([db.tables.people, db.tables.categories])
       saveTables().then(onSuccess, errorReporter.errorCallbackToScope($scope))
 

@@ -60,6 +60,7 @@ module.exports = (grunt) ->
           "public/js/app.js": [
               "build/js/app/db.js"
               "build/js/app/app.js"
+              "build/js/app/app-db.js"
               "build/js/app/common.js" 
               "build/js/app/accounts.js"
               "build/js/app/budget_items.js"

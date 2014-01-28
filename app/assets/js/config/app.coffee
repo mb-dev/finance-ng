@@ -21,10 +21,12 @@ App.config ($routeProvider, $locationProvider) ->
   authAndCheckData = (tableList, db) ->
     setTimeout ->
       $injector = angular.element('ng-view').injector()
-      db.authAndCheckData(tableList(db)).then (ok) ->
-        a = 1
-      , (failure) ->
-        $injector.get('$rootScope').$broadcast('auth_fail', failure)
+      storageService = $injector.get('storageService')
+      if storageService.isAuthenticateTimeAndSet()
+        db.authAndCheckData(tableList(db)).then (ok) ->
+          coffeescript_needs_this_line = true
+        , (failure) ->
+          $injector.get('$rootScope').$broadcast('auth_fail', failure)
     , 5000
     db
 
