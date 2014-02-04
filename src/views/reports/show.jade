@@ -1,0 +1,41 @@
+ng-include(src="'/partials/common/finance_header.html'")
+.reports_index.index_page.container
+  .month-nav.row.well.wells-sm
+    a.col-xs-3.prev_month(ng-click='prevYear()', href='#') &lt;&lt; Prev
+    span.col-xs-6.current_month {{currentYear}}
+    a.col-xs-3.next_month(ng-click='nextYear()', href='#') Next &gt;&gt;
+
+  table.table.table-striped.table-bordered.table-condensed.report_table.row
+    thead
+      tr
+        th.name Category Name
+        th.date(ng-repeat='month in months')
+          span {{month}}
+        th.avg Avarage
+        th.total Total
+        th.percent Percent
+    tbody
+      tr.item-row(ng-repeat='subCategoryInfo in rootCategoryInfo.subCategoriesInfo')
+        td
+          {{subCategoryInfo.name}}
+        td(ng-repeat='column in subCategoryInfo.monthlyTotals')
+          a(href='/line_items/{{currentYear}}/{{$index+1}}?categories={{subCategoryInfo.name | encodeUri}}', target='_blank')
+            {{column.total | currency}}
+        td
+          {{subCategoryInfo.avg | currency}}
+        td
+          {{subCategoryInfo.total | currency}}
+        td
+          {{subCategoryInfo.percent | percent}}
+    tbody
+      tr
+        td.total
+          |Total {{rootCategoryInfo.name}}
+        td(ng-repeat='column in rootCategoryInfo.monthlyTotals')
+          currency-with-sign(amount='column.total')
+        td
+          currency-with-sign(amount='rootCategoryInfo.avg')
+        td
+          currency-with-sign(amount='rootCategoryInfo.total')
+        td 
+          {{rootCategoryInfo.percent | percent}}

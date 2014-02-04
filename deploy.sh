@@ -1,7 +1,8 @@
-# global install: nodejs, grunt, grunt-cli, forever, coffee-script, bower
+# global install: nodejs, gulp, forever, coffee-script, bower
 # copy config
+sudo stop site-finance
 git pull
 npm install --production
-grunt build
-forever stop 0
-NODE_ENV=production forever start -c coffee server.coffee
+bower install --config.interactive=false
+gulp build
+sudo start site-finance

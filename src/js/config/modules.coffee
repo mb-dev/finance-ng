@@ -1,0 +1,5 @@
+angular.module('app.services', [])
+angular.module('app.importers', [])
+angular.module('app.controllers', ['app.services', 'app.importers'])
+angular.module('app.filters', [])
+angular.module('app.directives', ['app.services', 'app.filters'])
