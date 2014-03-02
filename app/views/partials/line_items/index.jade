@@ -24,7 +24,7 @@ ng-include(src="'/partials/common/finance_header.html'")
         .date.col-xs-2.col-md-1
           i.fa.fa-tags.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.tags[0]}}', ng-show='{{item.tags && item.tags.length > 0}}')/
           i.fa.fa-comment.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.comment}}', ng-show='{{item.comment.length > 0}}')/
-          i.fa.fa-plane.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.grouped_label}}', ng-show='{{item.grouped_label.length > 0}}')
+          i.fa.fa-plane.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.groupedLabel}}', ng-show='{{item.groupedLabel.length > 0}}')
           | &nbsp;
         .date.col-xs-2.col-md-1
           {{item.date | amDateFormat:'DD' }}
