@@ -45,7 +45,7 @@ ng-include(src="'/partials/common/finance_header.html'")
 
   h3 Groups:
   ul
-    li(ng-repeat='(key, value) in report.groups')
-      {{key}} - {{value | currency}} | 
-      a(href='/line_items/?year={{currentYear}}&groupedLabel={{key}}') 
+    li(ng-repeat='group in report.groups | orderBy:firstDate')
+      {{group.groupedLabel}} ({{group.firstDate | amDateFormat:'MM/DD'}} - {{group.lastDate | amDateFormat:'MM/DD'}})- {{group.amount | currency}} | 
+      a(href='/line_items/?year={{currentYear}}&groupedLabel={{group.groupedLabel}}') 
         | View

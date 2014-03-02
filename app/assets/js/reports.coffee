@@ -142,8 +142,13 @@ class window.BudgetReportView
       else if categoryToBudget[lineItem.categoryName]
         @expenseBox.addToValue(categoryToBudget[lineItem.categoryName].name, lineItem.$date().month(), 'expense', lineItem.$signedAmount())      
       if lineItem.groupedLabel
-        @groups[lineItem.groupedLabel] ||= new BigNumber(0)
-        @groups[lineItem.groupedLabel] = @groups[lineItem.groupedLabel].plus(lineItem.$signedAmount())
+        @groups[lineItem.groupedLabel] ||= {groupedLabel: lineItem.groupedLabel, amount: new BigNumber(0), firstDate: lineItem.date, lastDate: lineItem.date}
+        @groups[lineItem.groupedLabel].amount = @groups[lineItem.groupedLabel].amount.plus(lineItem.$signedAmount())
+        if lineItem.date < @groups[lineItem.groupedLabel].firstDate
+          @groups[lineItem.groupedLabel].firstDate = lineItem.date
+        else if lineItem.date > @groups[lineItem.groupedLabel].lastDate
+          @groups[lineItem.groupedLabel].lastDate = lineItem.date
+
     # add future expenses
     if @year == moment().year()
       currentMonth = moment().month()
@@ -226,7 +231,7 @@ class window.BudgetReportView
       incomeRow: incomeRow, 
       expenseRows: expenseRowsForBudgetItem, 
       totalBudgeted: totalLimit,
-      groups: @groups
+      groups: Lazy(@groups).values().toArray()
     }
 
 #   def budget_year_range
