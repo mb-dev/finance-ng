@@ -24,6 +24,8 @@ class window.LineItemCollection extends Collection
         return false if filter.categories.indexOf(item.categoryName) < 0
       if filter.accountId?
         return false if item.accountId != filter.accountId
+      if filter.groupedLabel?
+        return false if item.groupedLabel != filter.groupedLabel
       true
     )
     @sortLazy(results, sortColumns)

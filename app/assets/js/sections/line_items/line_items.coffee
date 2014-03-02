@@ -10,8 +10,11 @@ angular.module('app.controllers')
     $scope.currentDate = moment()
     if $routeParams.month? && $routeParams.year?
       $scope.currentDate.year(+$routeParams.year).month(+$routeParams.month - 1)
+      applyDateChanges()
+    else if($routeParams.year? && $routeParams.groupedLabel?)
+      $scope.currentDate.year(+$routeParams.year).month(0)
+      $scope.lineItems = db.lineItems().getByDynamicFilter({date: {year: $scope.currentDate.year()}, groupedLabel: $routeParams.groupedLabel}).toArray().reverse()
 
-    applyDateChanges()
     $scope.nextMonth = ->
       $scope.currentDate.add('months', 1)
       $location.path('/line_items/' + $scope.currentDate.year().toString() + '/' + ($scope.currentDate.month()+1).toString())

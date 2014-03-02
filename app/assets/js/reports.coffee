@@ -132,6 +132,7 @@ class window.BudgetReportView
     @incomeBox = new Box()
     @incomeBox.addRow('income')
     @incomeBox.setColumns([0..11], ['amount', 'future_income'])
+    @groups = {}
     # add expenses/income
     Lazy(@lineItems).each (lineItem) =>
       return if lineItem.tags && lineItem.tags.indexOf(LineItemCollection.EXCLUDE_FROM_REPORT) >= 0
@@ -140,7 +141,9 @@ class window.BudgetReportView
         @incomeBox.addToValue('income', lineItem.$date().month(), 'amount', lineItem.$signedAmount())
       else if categoryToBudget[lineItem.categoryName]
         @expenseBox.addToValue(categoryToBudget[lineItem.categoryName].name, lineItem.$date().month(), 'expense', lineItem.$signedAmount())      
-
+      if lineItem.groupedLabel
+        @groups[lineItem.groupedLabel] ||= new BigNumber(0)
+        @groups[lineItem.groupedLabel] = @groups[lineItem.groupedLabel].plus(lineItem.$signedAmount())
     # add future expenses
     if @year == moment().year()
       currentMonth = moment().month()
@@ -158,6 +161,8 @@ class window.BudgetReportView
       #       else
       #         @expenseBox.addToValue(categoryToBudget[plannedItem.category_name].name, month, 'planned_expense', plannedItem.amount)
 
+
+
   isInFuture: (month) =>
     month > moment().month() && @year == moment().year()
   
@@ -170,7 +175,6 @@ class window.BudgetReportView
   percentExpense: (budgetItem) ->
     return 'N/A' if @totalIncome().equals(0)
     ((@totalExpensesForBudgetItemInYear(budgetItem).div(@totalIncome())).times(100)).toFixed(0) + '%'
-  
 
   
   generateReport: =>
@@ -221,7 +225,8 @@ class window.BudgetReportView
       incomeCategories: @db.user().config.incomeCategories.join(','),
       incomeRow: incomeRow, 
       expenseRows: expenseRowsForBudgetItem, 
-      totalBudgeted: totalLimit
+      totalBudgeted: totalLimit,
+      groups: @groups
     }
 
 #   def budget_year_range
