@@ -209,7 +209,7 @@ angular.module('app.importers', [])
         lineItem.source = LineItemCollection.SOURCE_IMPORT
         lineItem.type = if amountAsFloat < 0 then LineItemCollection.EXPENSE else LineItemCollection.INCOME
         lineItem.amount = Math.abs(amountAsFloat).toString()
-        lineItem.payeeName = description.trim()
+        lineItem.payeeName = description.toString().trim()
         lineItem.date = moment(date).valueOf()
         lineItem
       

@@ -4,7 +4,7 @@ angular.module('app.controllers')
       $scope.items = db.events().getItemsByMonthYear($scope.currentDate.month(), $scope.currentDate.year()).reverse().toArray()
 
     $scope.currentDate = moment()
-    if $routeParams.month && $routeParams.year
+    if $routeParams.month? && $routeParams.year?
       $scope.currentDate.year(+$routeParams.year).month(+$routeParams.month - 1)
 
     applyDateChanges()
