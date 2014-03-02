@@ -22,6 +22,11 @@ class window.LineItemCollection extends Collection
           return false if (date.year() != filter.date.year)
       if filter.categories?
         return false if filter.categories.indexOf(item.categoryName) < 0
+      if filter.categoryName == 'empty'
+        return false if typeof(item.categoryName) != 'undefined' 
+        return false if item.categoryName? && item.categoryName.length > 0
+      else if filter.categoryName?
+        return false if item.categoryName != filter.categoryName
       if filter.accountId?
         return false if item.accountId != filter.accountId
       if filter.groupedLabel?

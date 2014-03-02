@@ -68,8 +68,10 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/processing_rules/:itemId', {templateUrl: '/partials/processing_rules/show.html'})
     
     .when('/budgets/:year?', {templateUrl: '/partials/budgets/index.html', controller: 'BudgetsIndexController', resolve: resolveFDb((fdb) ->[fdb.tables.budgetItems, fdb.tables.lineItems]) })
+    .when('/budgets/:year/new', {templateUrl: '/partials/budgets/form.html', controller: 'BudgetItemsFormController', resolve: resolveFDb((fdb) ->[fdb.tables.budgetItems, fdb.tables.categories]) })
     .when('/budgets/:year/:itemId', {templateUrl: '/partials/budgets/show.html'})
     .when('/budgets/:year/:itemId/edit', {templateUrl: '/partials/budgets/form.html', controller: 'BudgetItemsFormController', resolve: resolveFDb((fdb) ->[fdb.tables.budgetItems, fdb.tables.categories]) })
+
 
     .when('/planned_items/:year?', {templateUrl: '/partials/planned_items/index.html'})
     .when('/planned_items/:year/:name/edit', {templateUrl: '/partials/planned_items/edit.html'})

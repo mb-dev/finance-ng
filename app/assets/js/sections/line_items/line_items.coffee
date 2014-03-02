@@ -14,6 +14,9 @@ angular.module('app.controllers')
     else if($routeParams.year? && $routeParams.groupedLabel?)
       $scope.currentDate.year(+$routeParams.year).month(0)
       $scope.lineItems = db.lineItems().getByDynamicFilter({date: {year: $scope.currentDate.year()}, groupedLabel: $routeParams.groupedLabel}).toArray().reverse()
+    else if($routeParams.year? && $routeParams.categoryName?)
+      $scope.currentDate.year(+$routeParams.year).month(0)
+      $scope.lineItems = db.lineItems().getByDynamicFilter({date: {year: $scope.currentDate.year()}, categoryName: $routeParams.categoryName}).toArray().reverse()
 
     $scope.nextMonth = ->
       $scope.currentDate.add('months', 1)

@@ -4,7 +4,9 @@ ng-include(src="'/partials/common/finance_header.html'")
     a.col-xs-3.prev_month(ng-click='prevYear()', href='#') &lt;&lt; Prev
     span.col-xs-6.current_month {{currentYear}}
     a.col-xs-3.next_month(ng-click='nextYear()', href='#') Next &gt;&gt;
-    
+  
+  a.btn.btn-primary(ng-href="/budgets/{{currentYear}}/new") Add
+
   .row
     table.table.table-striped.table-bordered.table-condensed.report_table
       thead
@@ -48,4 +50,10 @@ ng-include(src="'/partials/common/finance_header.html'")
     li(ng-repeat='group in report.groups | orderBy:firstDate')
       {{group.groupedLabel}} ({{group.firstDate | amDateFormat:'MM/DD'}} - {{group.lastDate | amDateFormat:'MM/DD'}})- {{group.amount | currency}} | 
       a(href='/line_items/?year={{currentYear}}&groupedLabel={{group.groupedLabel}}') 
+        | View
+  h3 Unbudgeted Categories:
+  ul
+    li(ng-repeat='item in report.unbudgetedCategories')
+      | {{item}}
+      a(href='/line_items/?year={{currentYear}}&categoryName={{item}}') 
         | View

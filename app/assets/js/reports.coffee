@@ -133,6 +133,7 @@ class window.BudgetReportView
     @incomeBox.addRow('income')
     @incomeBox.setColumns([0..11], ['amount', 'future_income'])
     @groups = {}
+    @unbudgetedCategories = []
     # add expenses/income
     Lazy(@lineItems).each (lineItem) =>
       return if lineItem.tags && lineItem.tags.indexOf(LineItemCollection.EXCLUDE_FROM_REPORT) >= 0
@@ -140,7 +141,13 @@ class window.BudgetReportView
       if db.user().config.incomeCategories.indexOf(lineItem.categoryName) >= 0
         @incomeBox.addToValue('income', lineItem.$date().month(), 'amount', lineItem.$signedAmount())
       else if categoryToBudget[lineItem.categoryName]
-        @expenseBox.addToValue(categoryToBudget[lineItem.categoryName].name, lineItem.$date().month(), 'expense', lineItem.$signedAmount())      
+        @expenseBox.addToValue(categoryToBudget[lineItem.categoryName].name, lineItem.$date().month(), 'expense', lineItem.$signedAmount())
+      else if typeof(lineItem.categoryName) == 'undefined'
+        @unbudgetedCategories.push('empty')
+      else if lineItem.categoryName? && lineItem.categoryName.length == 0
+        @unbudgetedCategories.push('empty')
+      else
+        @unbudgetedCategories.push(lineItem.categoryName)
       if lineItem.groupedLabel
         @groups[lineItem.groupedLabel] ||= {groupedLabel: lineItem.groupedLabel, amount: new BigNumber(0), firstDate: lineItem.date, lastDate: lineItem.date}
         @groups[lineItem.groupedLabel].amount = @groups[lineItem.groupedLabel].amount.plus(lineItem.$signedAmount())
@@ -232,6 +239,7 @@ class window.BudgetReportView
       expenseRows: expenseRowsForBudgetItem, 
       totalBudgeted: totalLimit,
       groups: Lazy(@groups).values().toArray()
+      unbudgetedCategories: Lazy(@unbudgetedCategories).uniq().toArray()
     }
 
 #   def budget_year_range
