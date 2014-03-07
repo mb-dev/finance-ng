@@ -23,6 +23,8 @@ angular.module('app.services')
         $localStorage["#{$localStorage.user.id}-encryptionKey"]
       setEncryptionKey: (encryptionKey) ->
         $localStorage["#{$localStorage.user.id}-encryptionKey"] = encryptionKey
+      resetLastAuthenticate: ->
+        $localStorage.lastAuthenticateTime = null
     }
 
 

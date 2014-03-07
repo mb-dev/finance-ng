@@ -27,6 +27,7 @@ angular.module('app.controllers')
       userService.login($scope.user).then (successResponse) ->
         response = successResponse.data
         storageService.setUserDetails(response.user)
+        storageService.resetLastAuthenticate()
         if storageService.getEncryptionKey()
           $location.path('/welcome')
         else
