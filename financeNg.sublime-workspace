@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"catego",
+				"categoryName"
+			],
+			[
+				"cate",
+				"categoryName"
+			],
+			[
+				"grou",
+				"groupedLabel"
+			],
+			[
 				"style",
 				"stylesheets"
 			],
@@ -76,10 +88,6 @@
 				"lineItem"
 			],
 			[
-				"cate",
-				"categoryToBudget"
-			],
-			[
 				"sign",
 				"signedAmount"
 			],
@@ -132,50 +140,42 @@
 	"buffers":
 	[
 		{
+			"file": "app/assets/js/sections/line_items/line_items.coffee",
+			"settings":
+			{
+				"buffer_size": 4692,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/assets/js/config/app.coffee",
+			"settings":
+			{
+				"buffer_size": 11635,
+				"line_ending": "Unix"
+			}
+		},
+		{
 			"file": "app/assets/js/sections/memories/memories.coffee",
 			"settings":
 			{
-				"buffer_size": 2102,
+				"buffer_size": 5760,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "server/sections/home/index.jade",
+			"file": "app/assets/js/sections/people/people.coffee",
 			"settings":
 			{
-				"buffer_size": 951,
+				"buffer_size": 1556,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "server/config/express.coffee",
+			"file": "app/assets/js/sections/misc/misc.coffee",
 			"settings":
 			{
-				"buffer_size": 1539,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "Gruntfile.coffee",
-			"settings":
-			{
-				"buffer_size": 3918,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": ".nodemonignore",
-			"settings":
-			{
-				"buffer_size": 98,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "app/assets/js/db.coffee",
-			"settings":
-			{
-				"buffer_size": 11122,
+				"buffer_size": 8260,
 				"line_ending": "Unix"
 			}
 		},
@@ -183,15 +183,55 @@
 			"file": "app/assets/js/reports.coffee",
 			"settings":
 			{
-				"buffer_size": 8173,
+				"buffer_size": 14635,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "deploy.sh",
+			"file": "app/views/partials/budgets/index.jade",
 			"settings":
 			{
-				"buffer_size": 183,
+				"buffer_size": 2515,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/views/partials/line_items/index.jade",
+			"settings":
+			{
+				"buffer_size": 2306,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "server/sections/user/user.coffee",
+			"settings":
+			{
+				"buffer_size": 1247,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/assets/js/sections/user/user.coffee",
+			"settings":
+			{
+				"buffer_size": 3979,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "server/config/passport.coffee",
+			"settings":
+			{
+				"buffer_size": 2421,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "server/config/routes.coffee",
+			"settings":
+			{
+				"buffer_size": 1284,
 				"line_ending": "Unix"
 			}
 		},
@@ -199,15 +239,79 @@
 			"file": "app/assets/js/sections/common/common.coffee",
 			"settings":
 			{
-				"buffer_size": 2354,
+				"buffer_size": 7412,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "test/karma.conf.js",
+			"file": "vendor/js/angular/ngStorage.js",
 			"settings":
 			{
-				"buffer_size": 1667,
+				"buffer_size": 3637,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/assets/js/sections/budget_items/budget_items.coffee",
+			"settings":
+			{
+				"buffer_size": 1606,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/views/partials/line_items/form.jade",
+			"settings":
+			{
+				"buffer_size": 2964,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/views/partials/budgets/form.jade",
+			"settings":
+			{
+				"buffer_size": 1368,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/assets/js/sections/events/events.coffee",
+			"settings":
+			{
+				"buffer_size": 2410,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/assets/js/sections/journal/journal.coffee",
+			"settings":
+			{
+				"buffer_size": 1402,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/assets/js/db.coffee",
+			"settings":
+			{
+				"buffer_size": 19228,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/assets/js/sections/common/app-db.coffee",
+			"settings":
+			{
+				"buffer_size": 12039,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "vendor/js/lazy.js",
+			"settings":
+			{
+				"buffer_size": 145914,
 				"line_ending": "Unix"
 			}
 		}
@@ -256,10 +360,22 @@
 	},
 	"file_history":
 	[
-		"/Users/moshebergman/workspace/finance-ng/public/partials/memories/form.html",
-		"/Users/moshebergman/workspace/finance-ng/.nodemonignore",
-		"/Users/moshebergman/workspace/finance-ng/Gruntfile.js",
+		"/Users/moshebergman/workspace/finance-ng/server/config/config.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/categories/categories.coffee",
+		"/Users/moshebergman/workspace/finance-ng/package.json",
+		"/Users/moshebergman/workspace/finance-ng/server/sections/home/index.jade",
+		"/Users/moshebergman/workspace/finance-ng/server/config/express.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/memories/memories.coffee",
 		"/Users/moshebergman/workspace/finance-ng/test/karma.conf.js",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/common/common.coffee",
+		"/Users/moshebergman/workspace/finance-ng/deploy.sh",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/reports.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/db.coffee",
+		"/Users/moshebergman/workspace/finance-ng/.nodemonignore",
+		"/Users/moshebergman/workspace/finance-ng/Gruntfile.coffee",
+		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/line_items/line_items.coffee",
+		"/Users/moshebergman/workspace/finance-ng/public/partials/memories/form.html",
+		"/Users/moshebergman/workspace/finance-ng/Gruntfile.js",
 		"/Users/moshebergman/workspace/finance-ng/app/assets/js/db.js.coffee",
 		"/Users/moshebergman/workspace/finance-ng/app/views/partials/common/finance_header.jade",
 		"/Users/moshebergman/workspace/finance-ng/app/views/partials/common/memory_header.jade",
@@ -268,21 +384,16 @@
 		"/Users/moshebergman/workspace/finance-ng/app/assets/js/config/app.coffee",
 		"/Users/moshebergman/workspace/finance-ng/config.coffee",
 		"/Users/moshebergman/workspace/finance-ng/test/unit/db_spec.js.coffee",
-		"/Users/moshebergman/workspace/finance-ng/package.json",
-		"/Users/moshebergman/workspace/finance-ng/server/sections/home/index.jade",
 		"/Users/moshebergman/workspace/finance-ng/app/assets/js/app.js.coffee",
 		"/Users/moshebergman/workspace/finance-ng/app/views/partials/memories/index.jade",
 		"/Users/moshebergman/workspace/finance-ng/server.coffee",
-		"/Users/moshebergman/workspace/finance-ng/server/config/express.coffee",
 		"/Users/moshebergman/workspace/finance-ng/node_modules/.bin/express",
 		"/Users/moshebergman/workspace/finance-ng/vendor/styles/vendor.less",
 		"/Users/moshebergman/workspace/finance-ng/app/assets/styles/app-styles.less",
 		"/Users/moshebergman/workspace/finance-ng/node_modules/connect-assets/bin/connect-assets.js",
 		"/Users/moshebergman/workspace/finance-ng/node_modules/connect-assets/node_modules/mincer/lib/mincer/context.js",
 		"/Users/moshebergman/workspace/finance-ng/public/js/app.js",
-		"/Users/moshebergman/workspace/finance-ng/server/config/config.coffee",
 		"/Users/moshebergman/workspace/finance-ng/server/sections/home/home.coffee",
-		"/Users/moshebergman/workspace/finance-ng/deploy.sh",
 		"/Users/moshebergman/workspace/finance-ng/server/config/passport.coffee",
 		"/Users/moshebergman/workspace/finance-ng/app/views/partials/line_items/index.jade",
 		"/Users/moshebergman/workspace/finance-ng/server/sections/data/data.coffee",
@@ -299,7 +410,6 @@
 		"/Users/moshebergman/workspace/finance-ng/app/assets/js/config/finance-app.coffee",
 		"/Users/moshebergman/workspace/finance-ng/server/sections/home/finance.jade",
 		"/Users/moshebergman/workspace/finance-ng/app/assets/js/finance.js.coffee",
-		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/common/common.coffee",
 		"/Users/moshebergman/workspace/finance-ng/app/assets/js/memory.js.coffee",
 		"/Users/moshebergman/workspace/finance-ng/data_files/52acff535a33d33740000001/lineItems.data",
 		"/Users/moshebergman/workspace/finance-ng/LICENSE.md",
@@ -307,7 +417,6 @@
 		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/user/user.coffee",
 		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/budget_items/budget_items.coffee",
 		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/accounts/accounts.coffee",
-		"/Users/moshebergman/workspace/finance-ng/app/assets/js/sections/line_items/line_items.coffee",
 		"/Users/moshebergman/workspace/finance-ng/app/views/partials/user/login.jade",
 		"/Users/moshebergman/workspace/finance-ng/server/models/user.coffee",
 		"/Users/moshebergman/workspace/finance-ng/test/unit/report_spec.js.coffee",
@@ -378,12 +487,7 @@
 		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/app/partials/todo.jade",
 		"/Users/moshebergman/Documents/mbdev/sites/finance-ng/bower_components/console-polyfill/component.json",
 		"/Users/moshebergman/Documents/mbdev/sites/financeRails/config/mongoid.yml",
-		"/Users/moshebergman/Documents/mbdev/sites/moshebergman-chef/recipes/linode.rb",
-		"/Users/moshebergman/Documents/mbdev/sites/moshebergman-chef/recipes/localhost.rb",
-		"/Users/moshebergman/Documents/mbdev/sites/moshebergman-chef/attributes/linode.rb",
-		"/Users/moshebergman/Documents/mbdev/sites/moshebergman-chef/attributes/default.rb",
-		"/var/folders/g2/bgc3j29x5v50954l3k7yhllh0000gn/T/knife-edit-121522204406410458781.js",
-		"/var/folders/g2/bgc3j29x5v50954l3k7yhllh0000gn/T/knife-edit-066632591092975.json"
+		"/Users/moshebergman/Documents/mbdev/sites/moshebergman-chef/recipes/linode.rb"
 	],
 	"find":
 	{
@@ -403,6 +507,15 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"performGet",
+			"localStorage",
+			"add",
+			"values",
+			"amDateFormat",
+			"$date",
+			"abs",
+			"bignumber",
+			"getByDynamicFilter",
 			"css",
 			"vendor/js",
 			"css",
@@ -523,24 +636,24 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 19,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "app/assets/js/sections/memories/memories.coffee",
+					"file": "app/assets/js/sections/line_items/line_items.coffee",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2102,
+						"buffer_size": 4692,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1670,
-								1670
+								1115,
+								1115
 							]
 						],
 						"settings":
@@ -557,28 +670,28 @@
 				},
 				{
 					"buffer": 1,
-					"file": "server/sections/home/index.jade",
+					"file": "app/assets/js/config/app.coffee",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 951,
+						"buffer_size": 11635,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								681,
-								705
+								617,
+								633
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Jade/Syntaxes/Jade.tmLanguage",
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
+						"translation.x": 2.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
@@ -586,19 +699,19 @@
 				},
 				{
 					"buffer": 2,
-					"file": "server/config/express.coffee",
+					"file": "app/assets/js/sections/memories/memories.coffee",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1539,
+						"buffer_size": 5760,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								162,
-								162
+								198,
+								198
 							]
 						],
 						"settings":
@@ -615,19 +728,19 @@
 				},
 				{
 					"buffer": 3,
-					"file": "Gruntfile.coffee",
-					"semi_transient": false,
+					"file": "app/assets/js/sections/people/people.coffee",
+					"semi_transient": true,
 					"settings":
 					{
-						"buffer_size": 3918,
+						"buffer_size": 1556,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								798,
-								798
+								0,
+								0
 							]
 						],
 						"settings":
@@ -635,33 +748,6 @@
 							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 77.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": ".nodemonignore",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 98,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								98,
-								98
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -670,20 +756,20 @@
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "app/assets/js/db.coffee",
+					"buffer": 4,
+					"file": "app/assets/js/sections/misc/misc.coffee",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 11122,
+						"buffer_size": 8260,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								9944,
-								9944
+								8180,
+								8180
 							]
 						],
 						"settings":
@@ -693,60 +779,91 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4530.0,
+						"translation.y": 2470.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "app/assets/js/reports.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14635,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7169,
+								7169
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1691.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 6,
-					"file": "app/assets/js/reports.coffee",
+					"file": "app/views/partials/budgets/index.jade",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8173,
+						"buffer_size": 2515,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								13,
-								13
+								374,
+								374
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"syntax": "Packages/Jade/Syntaxes/Jade.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 310.0,
+						"translation.y": 8.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 7,
-					"file": "deploy.sh",
+					"file": "app/views/partials/line_items/index.jade",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 183,
+						"buffer_size": 2306,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								125,
-								182
+								1390,
+								1390
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/ShellScript/Shell-Unix-Generic.tmLanguage"
+							"syntax": "Packages/Jade/Syntaxes/Jade.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -756,19 +873,19 @@
 				},
 				{
 					"buffer": 8,
-					"file": "app/assets/js/sections/common/common.coffee",
+					"file": "server/sections/user/user.coffee",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2354,
+						"buffer_size": 1247,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1109,
-								1109
+								0,
+								0
 							]
 						],
 						"settings":
@@ -785,19 +902,367 @@
 				},
 				{
 					"buffer": 9,
-					"file": "test/karma.conf.js",
+					"file": "app/assets/js/sections/user/user.coffee",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1667,
+						"buffer_size": 3979,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								339,
-								339
+								1472,
+								1493
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 865.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "server/config/passport.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2421,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "server/config/routes.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1284,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								485,
+								498
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "app/assets/js/sections/common/common.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7412,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1041,
+								1045
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "vendor/js/angular/ngStorage.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3637,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								305,
+								317
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 708.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "app/assets/js/sections/budget_items/budget_items.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1606,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1110,
+								1120
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "app/views/partials/line_items/form.jade",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2964,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2173,
+								2185
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Jade/Syntaxes/Jade.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 12.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"file": "app/views/partials/budgets/form.jade",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1368,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Jade/Syntaxes/Jade.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 17,
+					"file": "app/assets/js/sections/events/events.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2410,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								351,
+								351
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 18,
+					"file": "app/assets/js/sections/journal/journal.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1402,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								197,
+								197
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 19,
+					"file": "app/assets/js/db.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 19228,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								13430,
+								13440
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 6892.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 20,
+					"file": "app/assets/js/sections/common/app-db.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 12039,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								987,
+								987
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 21,
+					"file": "vendor/js/lazy.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 145914,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
 							]
 						],
 						"settings":
@@ -807,7 +1272,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 125.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -858,8 +1323,132 @@
 		"selected_items":
 		[
 			[
+				"db",
+				"app/assets/js/db.coffee"
+			],
+			[
+				"app",
+				"app/assets/js/config/app.coffee"
+			],
+			[
+				"user",
+				"server/sections/user/user.coffee"
+			],
+			[
+				"ngsto",
+				"vendor/js/angular/ngStorage.js"
+			],
+			[
+				"comm",
+				"app/assets/js/sections/common/common.coffee"
+			],
+			[
+				"user/user",
+				"app/assets/js/sections/user/user.coffee"
+			],
+			[
+				"rou",
+				"server/config/routes.coffee"
+			],
+			[
+				"rot",
+				"server/config/routes.coffee"
+			],
+			[
+				"config",
+				"server/config/config.coffee"
+			],
+			[
+				"passport",
+				"server/config/passport.coffee"
+			],
+			[
+				"usser.c",
+				"server/sections/user/user.coffee"
+			],
+			[
+				"index",
+				"app/views/partials/line_items/index.jade"
+			],
+			[
+				"budget",
+				"app/assets/js/sections/budget_items/budget_items.coffee"
+			],
+			[
 				"form",
-				"public/partials/memories/form.html"
+				"app/views/partials/budgets/form.jade"
+			],
+			[
+				"repo",
+				"app/assets/js/reports.coffee"
+			],
+			[
+				"line",
+				"app/assets/js/sections/line_items/line_items.coffee"
+			],
+			[
+				"app-db",
+				"app/assets/js/sections/common/app-db.coffee"
+			],
+			[
+				"report",
+				"app/assets/js/reports.coffee"
+			],
+			[
+				"budget_",
+				"app/assets/js/sections/budget_items/budget_items.coffee"
+			],
+			[
+				"budgetindex",
+				"app/views/partials/budgets/index.jade"
+			],
+			[
+				"lineindex",
+				"app/views/partials/line_items/index.jade"
+			],
+			[
+				"common",
+				"app/assets/js/sections/common/common.coffee"
+			],
+			[
+				"app-d",
+				"app/assets/js/sections/common/app-db.coffee"
+			],
+			[
+				"line_i",
+				"app/assets/js/sections/line_items/line_items.coffee"
+			],
+			[
+				"cate",
+				"app/assets/js/sections/categories/categories.coffee"
+			],
+			[
+				"budgets",
+				"app/assets/js/sections/budget_items/budget_items.coffee"
+			],
+			[
+				"misc",
+				"app/assets/js/sections/misc/misc.coffee"
+			],
+			[
+				"package",
+				"package.json"
+			],
+			[
+				"lazy",
+				"vendor/js/lazy.js"
+			],
+			[
+				"db.",
+				"app/assets/js/db.coffee"
+			],
+			[
+				"line_ite",
+				"app/assets/js/sections/line_items/line_items.coffee"
+			],
+			[
+				"line_item",
+				"app/assets/js/sections/line_items/line_items.coffee"
 			],
 			[
 				"de",
@@ -872,10 +1461,6 @@
 			[
 				"index.jad",
 				"server/sections/home/index.jade"
-			],
-			[
-				"db.",
-				"app/assets/js/db.js.coffee"
 			],
 			[
 				"index.jade",
@@ -924,10 +1509,6 @@
 			[
 				"packa",
 				"package.json"
-			],
-			[
-				"db",
-				"app/assets/js/db.js.coffee"
 			],
 			[
 				"db_sp",
@@ -994,10 +1575,6 @@
 				"server/config/config.coffee"
 			],
 			[
-				"passport",
-				"server/config/passport.coffee"
-			],
-			[
 				"line_items",
 				"app/views/partials/line_items/index.jade"
 			],
@@ -1022,16 +1599,8 @@
 				"app/assets/js/app.js.coffee"
 			],
 			[
-				"config",
-				"server/config/config.coffee"
-			],
-			[
 				"db.c",
 				"app/assets/js/db.js.coffee"
-			],
-			[
-				"user",
-				"server/models/user.coffee"
 			],
 			[
 				"login",
@@ -1042,24 +1611,12 @@
 				"server/sections/home/home.coffee"
 			],
 			[
-				"app",
-				"app/assets/js/app.js.coffee"
-			],
-			[
 				"ap",
 				"app/assets/js/app.js.coffee"
 			],
 			[
 				"serv",
 				"server.coffee"
-			],
-			[
-				"package",
-				"package.json"
-			],
-			[
-				"report",
-				"app/assets/js/reports.js.coffee"
 			],
 			[
 				"lazyjs",
@@ -1074,16 +1631,8 @@
 				"test/unit/db_spec.js.coffee"
 			],
 			[
-				"index",
-				"app/views/index.jade"
-			],
-			[
 				"ngstora",
 				"bower_components/ngstorage/ngStorage.js"
-			],
-			[
-				"lazy",
-				"vendor/js/lazy.js"
 			],
 			[
 				"db..",
@@ -1206,10 +1755,6 @@
 				"app/views/partials/line_items/new.jade"
 			],
 			[
-				"line",
-				"app/styles/line_items.less"
-			],
-			[
 				"nodemonigno",
 				".nodemonignore"
 			],
@@ -1288,86 +1833,6 @@
 			[
 				"nginx",
 				"recipes/nginx.rb"
-			],
-			[
-				"defa",
-				"attributes/default.rb"
-			],
-			[
-				"finan",
-				"recipes/financeRails.rb"
-			],
-			[
-				"m",
-				"metadata.rb"
-			],
-			[
-				"gem",
-				"Gemfile"
-			],
-			[
-				"vagra",
-				"Vagrantfile"
-			],
-			[
-				"ngin",
-				"templates/default/nginx.conf.erb"
-			],
-			[
-				"wo",
-				"recipes/wordpress.rb"
-			],
-			[
-				"word",
-				"recipes/wordpress.rb"
-			],
-			[
-				"vag",
-				"Vagrantfile"
-			],
-			[
-				"deep_create_folder",
-				"definitions/deep_create_folder.rb"
-			],
-			[
-				"jenkin",
-				"recipes/jenkins.rb"
-			],
-			[
-				"va",
-				"Vagrantfile"
-			],
-			[
-				"jenkins.bas",
-				"templates/default/jenkins.bash_profile.sh.erb"
-			],
-			[
-				"vagran",
-				"Vagrantfile"
-			],
-			[
-				"word.",
-				"templates/default/wordpress.nginx.erb"
-			],
-			[
-				"gemfie",
-				"Gemfile.lock"
-			],
-			[
-				"ng",
-				"~/Documents/mbdev/sites/moshebergman-chef/templates/wordpress/nginx.erb"
-			],
-			[
-				"gemfi",
-				"Gemfile"
-			],
-			[
-				"user.rb",
-				"app/models/user.rb"
-			],
-			[
-				"investment_a",
-				"app/controllers/investment_assets_controller.rb"
 			]
 		],
 		"width": 0.0
