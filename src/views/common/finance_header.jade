@@ -8,8 +8,6 @@ nav.navbar-default(role='navigation')
     a.navbar-brand(href='/') Finance
   .collapse.navbar-collapse
     ul.nav.navbar-nav
-      li(ng-class="{active: isActive('accounts')}")
-        a(href='/accounts') Accounts
       li(ng-class="{active: isActive('line_items')}")
         a(href='/line_items') Line Items
       li(ng-class="{active: isActive('reports')}")
@@ -34,23 +32,18 @@ nav.navbar-default(role='navigation')
               i.fa.fa-power-off.fa-fw.fa-sr
               | Logout
     ul.nav.navbar-nav.navbar-right(ng-if='!loggedIn')
-      li.dropdown
-        a.dropdown-toggle(href='#', data-toggle='dropdown')
-          | Welcome Guest
-          b.caret
-        ul.dropdown-menu
-          li
-            a(href='/login') 
-              i.fa.fa-sign-in.fa-fw.fa-sr
-              | Login
-          li.divider
-          li
-            a(href='/register') 
-              i.fa.fa-pencil-square-o.fa-fw.fa-sr
-              | Register
+      a.btn.navbar-btn.btn-social.btn-google-plus(href="", ng-href="{{loginUrl}}")
+        i.fa.fa-google
+        |Sign in with Google
 div.alert.alert-success(ng-if="successMsg && successMsg.length > 0")
   span.fa-stack.fa-lg
     i.fa.fa-circle.fa-stack-2x
     i.fa.fa-check.fa-stack-1x.fa-inverse
   |&nbsp;
   span {{$root.successMsg}}
+div.alert.alert-danger(ng-if="errorMsg && errorMsg.length > 0")
+  span.fa-stack.fa-lg
+    i.fa.fa-circle.fa-stack-2x
+    i.fa.fa-times.fa-stack-1x.fa-inverse
+  |&nbsp;
+  span {{$root.errorMsg}}

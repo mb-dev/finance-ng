@@ -24,6 +24,9 @@ class window.LineItemsReportView
         @rootCategoryToCategories[rootCategoryName] ||= {}
         @rootCategoryToCategories[rootCategoryName][categoryName] = true
 
+    @db.config().incomeCategories.forEach (incomeCategory) =>
+      @lineItemsBox.addRow(incomeCategory)
+
     
     @lineItemsBox.setColumns([0..11], ['amount'])
     @childCategoriesBox.setColumns([0..11], ['amount'])
@@ -34,17 +37,20 @@ class window.LineItemsReportView
       @lineItemsBox.addToValue(rootCategoriesMap[item.categoryName], item.$date().month(), 'amount', item.$signedAmount())
       @childCategoriesBox.addToValue(item.categoryName, item.$date().month(), 'amount', item.$signedAmount())
 
+    @db.config().incomeCategories.forEach (incomeCategory) =>
+      @lineItemsBox.addToValue(incomeCategory, 4, 'amount', 0.0)
+
   generateReport: =>
     incomeSection = {name: 'Income', rootCategories: [], monthlyTotals: [], totalAvg: '0', totalSum: '0'}
     expenseSection = {name: 'Expense', rootCategories: [], monthlyTotals: [], totalAvg: '0', totalSum: '0'}
     reportSections = [incomeSection, expenseSection]
 
     totalIncome = new BigNumber(0)
-    @db.user().config.incomeCategories.forEach (categoryName) =>
+    @db.config().incomeCategories.forEach (categoryName) =>
       totalIncome = totalIncome.plus(@lineItemsBox.rowTotals(categoryName).amount)
     incomeSection.totalSum = totalIncome
     incomeSection.totalAvg = totalIncome.div(12)
-    @db.user().config.incomeCategories.forEach (categoryName) =>
+    @db.config().incomeCategories.forEach (categoryName) =>
       categoryInfo = {
         name: categoryName
         monthlyTotals: []
@@ -67,12 +73,16 @@ class window.LineItemsReportView
     expenseSection.totalAvg = totalExpenses.times(-1).div(12)
     Object.keys(@lineItemsBox.rowByHash).sort().forEach (rootCategoryName) =>
       return if Lazy(rootCategoryName).startsWith('Income')
+      if totalExpenses.equals(0)
+        percent = "0"
+      else
+        percent = @lineItemsBox.rowTotals(rootCategoryName).amount.times(-1).div(totalExpenses).times(100).toFixed(0)
       categoryInfo = {
         name: rootCategoryName
         monthlyTotals: []
         avg: @lineItemsBox.rowTotals(rootCategoryName).amount.times(-1).div(12).toFixed(2)
         total: @lineItemsBox.rowTotals(rootCategoryName).amount.times(-1),
-        percent: @lineItemsBox.rowTotals(rootCategoryName).amount.times(-1).div(totalExpenses).times(100).toFixed(0),
+        percent: percent,
         categories: Object.keys(@rootCategoryToCategories[rootCategoryName]).join(',')
         subCategoriesInfo: []
       }
@@ -150,7 +160,7 @@ class window.BudgetReportView
     Lazy(@lineItems).each (lineItem) =>
       return if lineItem.tags && lineItem.tags.indexOf(LineItemCollection.EXCLUDE_FROM_REPORT) >= 0
       return if lineItem.categoryName == LineItemCollection.TRANSFER_TO_CASH
-      if db.user().config.incomeCategories.indexOf(lineItem.categoryName) >= 0
+      if db.config().incomeCategories.indexOf(lineItem.categoryName) >= 0
         @incomeBox.addToValue('income', lineItem.$date().month(), 'amount', lineItem.$signedAmount())
       else if categoryToBudget[lineItem.categoryName]
         @expenseBox.addToValue(categoryToBudget[lineItem.categoryName].name, lineItem.$date().month(), 'expense', lineItem.$signedAmount())
@@ -246,7 +256,7 @@ class window.BudgetReportView
     totalLimit = Lazy(@budgetItems).pluck('limit').sum()
     {
       incomeMeta: {totalIncome: @totalIncome().toFixed(2)}, 
-      incomeCategories: @db.user().config.incomeCategories.join(','),
+      incomeCategories: @db.config().incomeCategories.join(','),
       incomeRow: incomeRow, 
       expenseRows: expenseRowsForBudgetItem, 
       totalBudgeted: totalLimit,

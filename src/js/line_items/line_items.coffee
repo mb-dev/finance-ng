@@ -35,12 +35,16 @@ angular.module('app.controllers')
     $scope.tags = ['Cash', 'Exclude from Reports']
     $scope.accounts = db.accounts().getAll().toArray()
 
+    if($scope.accounts.length == 0)
+      $scope.showError('No acounts found, add some on the main page')
+      return
+
     updateFunc = null
     if $location.$$url.indexOf('new') > 0
       $scope.type = 'new'
       $scope.title = 'New line item'
       # TODO: Allow defining any account as default
-      $scope.item = {type: 1, date: moment().valueOf(), tags: ['Cash'], accountId: $scope.accounts[1].id}
+      $scope.item = {type: 1, date: moment().valueOf(), tags: ['Cash'], accountId: $scope.accounts[0].id}
       updateFunc = db.lineItems().insert
     else
       $scope.type = 'edit'

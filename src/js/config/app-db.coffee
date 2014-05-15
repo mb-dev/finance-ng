@@ -82,6 +82,13 @@ class window.LineItemCollection extends Collection
     delete newItem['balance']
     newItem
 
+  balancesByAccount: =>
+    results = {}
+    @sortLazy(Lazy(@collection), ['date', 'id']).each((item) -> 
+      results[item.accountId] = item.balance
+    )
+    results
+
 class BudgetItemCollection extends Collection
   getYearRange: ->
     Lazy(@collection).pluck('budget_year').uniq().sortBy(Lazy.identity).toArray()
@@ -161,6 +168,7 @@ angular.module('app.services')
       item.$eventDateEnd = ->
         moment(@event_date_end)
 
+    financeDbConfig = {incomeCategories: ['Income:Salary', 'Income:Dividend', 'Income:Misc']}
     
     accessFunc = {
       tables: tablesList
@@ -172,8 +180,8 @@ angular.module('app.services')
         tables.accounts
       budgetItems: ->
         tables.budgetItems
-      user: ->
-        db.user()
+      config: ->
+        financeDbConfig
       plannedItems: ->
         tables.plannedItems
       categories: ->
@@ -184,17 +192,12 @@ angular.module('app.services')
         tables.importedLines
       processingRules: ->
         tables.processingRules
+      createAllFiles: (tableNames) ->
+        db.createAllFiles(tableNames)
       authAndCheckData: (tableList) =>
         db.authAndCheckData(tableList)
       getTables: (tableList, forceRefreshAll = false) =>
-        defer = $q.defer()
-        db.getTables(tableList, forceRefreshAll).then((db) =>
-          $rootScope.user = accessFunc.user()
-          defer.resolve(accessFunc)
-        , (err) =>
-          defer.reject(err)
-        )
-        defer.promise
+        db.getTables(tableList, forceRefreshAll)
       saveTables: (tableList, forceServerCleanAndSaveAll = false) ->
         db.saveTables(tableList, forceServerCleanAndSaveAll)
       dumpAllCollections: (tableList) -> 

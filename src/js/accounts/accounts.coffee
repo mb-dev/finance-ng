@@ -5,19 +5,19 @@ angular.module('app.controllers')
 
   .controller 'AccountsFormController', ($scope, $routeParams, $location, db, errorReporter) ->
     updateFunc = null
+    $scope.importFormats = {ChaseCC: 'Chase Credit Card', ProvidentVisa: 'Provident Visa', ProvidentChecking: 'Provident Checking', Scottrade: 'Scottrade'}
+
     if $location.$$url.indexOf('new') > 0
       $scope.title = 'New account'
-      $scope.item = {import_format: 'ProvidentChecking'}
+      $scope.item = {importFormat: Object.keys($scope.importFormats)[0]}
       updateFunc = db.accounts().insert
     else
       $scope.title = 'Edit account'
       $scope.item = db.accounts().findById($routeParams.itemId)
       updateFunc = db.accounts().editById
 
-    $scope.importFormats = {ChaseCC: 'Chase CC', ProvidentVisa: 'Provident Visa', ProvidentChecking: 'Provident Checking', Scottrade: 'Scottrade'}
-
     $scope.onSubmit = ->
-      onSuccess = -> $location.path('/accounts/')
+      onSuccess = -> $location.path('/')
       saveTables = -> db.saveTables([db.tables.accounts])
       updateFunc($scope.item).then(saveTables).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 

@@ -1,3 +1,46 @@
 ng-include(src="'/partials/common/finance_header.html'")
-.well.row 
-  !Welcome to Finance!
+.main_page.index_page.container(ng-show="!loggedIn")
+  .jumbotron
+    .container
+      h2 Welcome to Finance!
+      p My side project to manage your personal finances similar to sites like Mint or YNAB.
+
+  .container
+    h2 Features:
+    ul
+      li Lists all your expenses
+      li Data is encrypted on the client side
+
+    h2 Screenshots
+    .row
+      .col-xs-offset-1
+        h3 Transactions
+        a(href='http://imgur.com/aR8OraL')
+          img(src='http://i.imgur.com/aR8OraLl.png', title='Transactions')
+    .row
+      .col-xs-offset-1
+        h3 Reports
+        a(href='http://imgur.com/pm0M4YG')
+          img(src='http://i.imgur.com/pm0M4YGl.png', title='Report')
+    .row
+      .col-xs-offset-1 
+        h3 Budgets
+        a(href='http://imgur.com/dfA5X6q')
+          img(src='http://i.imgur.com/dfA5X6ql.png', title='Budgets')
+
+.main_page.index_page.container(ng-show="loggedIn")
+
+  .new.row.toolbar
+    a.btn.btn-primary.col-md-2.add_account.pull-right(ng-href='/accounts/new') Add Account
+
+  .main_list.list-group
+    .list-group-item.row(ng-repeat='item in accounts')
+      a.col-xs-12.col-md-10(ng-href='/accounts/{{item.id}}')
+        |{{item.name}}
+      .col-md-2.text-right
+        |{{balances[item.id] | currency}}
+
+  .well.row(ng-show="!accounts.length")
+    span The account list is empty. Please add an account.
+
+  .main_list.list-group(ng-if='loggedIn')

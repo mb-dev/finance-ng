@@ -9,6 +9,9 @@ App = angular.module('app', [
   'app.directives'
   'app.filters'
   'app.services'
+  'core.controllers'
+  'core.directives'
+  'core.filters'
   'ngRoute'
   'angularMoment'
   'ui.select2',
@@ -17,28 +20,34 @@ App = angular.module('app', [
 ])
 
 App.config ($routeProvider, $locationProvider) ->
-  authAndCheckData = (tableList, db) ->
+  authAndCheckData = (tableList, db, storageService, $rootScope) ->
     setTimeout ->
-      $injector = angular.element('ng-view').injector()
-      storageService = $injector.get('storageService')
       if storageService.isAuthenticateTimeAndSet()
-        db.authAndCheckData(tableList(db)).then (ok) ->
+        db.authAndCheckData(tableList).then (ok) ->
           coffeescript_needs_this_line = true
         , (failure) ->
-          $injector.get('$rootScope').$broadcast('auth_fail', failure)
+          $rootScope.$broadcast('auth_fail', failure)
     , 5000
     db
 
-  resolveFDb = (tableList) ->
+  resolveFDb = (tableList, allowLoggedOut) ->
     {
-      db: (fdb) -> 
-        fdb.getTables(tableList(fdb)).then -> authAndCheckData(tableList, fdb)
+      db: ($q, fdb, storageService, $rootScope) -> 
+        defer = $q.defer()
+        if allowLoggedOut && !storageService.isUserExists()
+          defer.resolve(null)
+        else
+          fdb.getTables(tableList(fdb)).then -> 
+            authAndCheckData(Object.keys(fdb.tables), fdb, storageService, $rootScope)
+            defer.resolve(fdb)
+          , (err) ->
+            defer.reject(err)
+        defer.promise
     }
 
   $routeProvider
-    .when('/', {templateUrl: '/partials/home/welcome.html', controller: 'WelcomePageController'})
+    .when('/', {templateUrl: '/partials/home/welcome.html', controller: 'WelcomePageController', resolve: resolveFDb(((fdb) -> [fdb.tables.lineItems, fdb.tables.accounts]), true) })
 
-    .when('/accounts/', {templateUrl: '/partials/accounts/index.html', controller: 'AccountsIndexController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
     .when('/accounts/new', {templateUrl: '/partials/accounts/form.html', controller: 'AccountsFormController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
     .when('/accounts/:itemId/edit', {templateUrl: '/partials/accounts/form.html', controller: 'AccountsFormController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
     .when('/accounts/:itemId', {templateUrl: '/partials/accounts/show.html', controller: 'AccountsShowController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
@@ -80,10 +89,8 @@ App.config ($routeProvider, $locationProvider) ->
 
 
     .when('/login_success', template: 'Loading...', controller: 'LoginOAuthSuccessController')
-    .when('/login', {templateUrl: '/partials/user/login.html', controller: 'UserLoginController'})
-    .when('/key', {templateUrl: '/partials/user/key.html', controller: 'UserKeyController'})
-    .when('/register', {templateUrl: '/partials/user/register.html', controller: 'UserLoginController'})
-    .when('/profile', {templateUrl: '/partials/user/profile.html', controller: 'UserProfileController' })
+    .when('/key', {templateUrl: '/partials/user/key.html', controller: 'UserKeyController', resolve:  {db: (fdb) -> fdb}})
+    .when('/profile', {templateUrl: '/partials/user/profile.html', controller: 'UserProfileController', resolve:  {db: (fdb) -> fdb} })
     .when('/edit_profile', {templateUrl: '/partials/user/edit_profile.html', controller: 'UserEditProfileController'})
     .when('/logout', {template: 'Logging out...', controller: 'UserLogoutController'})
 
@@ -93,23 +100,24 @@ App.config ($routeProvider, $locationProvider) ->
   # Without server side support html5 must be disabled.
   $locationProvider.html5Mode(true)
 
-App.run ($rootScope, $location, $injector, $timeout, storageService) ->
+App.run ($rootScope, $location, $injector, $timeout, storageService, userService) ->
   redirectOnFailure = (failure) ->
     if failure.reason == 'not_logged_in'
-      $location.path '/login'
+      storageService.onLogout()
+      $location.path '/?refresh'
     else if failure.reason == 'missing_key'
       $location.path '/key'
 
   $rootScope.appName = 'Finance'
   $rootScope.domain = 'finance'
+  $rootScope.headerPath = '/partials/common/finance_header.html'
+  $rootScope.loginUrl = userService.oauthUrl($rootScope.domain)
+
   storageService.setAppName($rootScope.appName, $rootScope.domain)
   
   $rootScope.$on "$routeChangeError", (event, current, previous, rejection) ->
-    if rejection.status == 403 && rejection.data.reason
+    if rejection.data.reason
       redirectOnFailure(rejection.data)
-
-    if rejection.status == 403 && rejection.data.reason == 'missing_key'
-      $location.path '/key'
   
   $rootScope.$on '$routeChangeStart', ->
     $rootScope.currentLocation = $location.path()
@@ -124,18 +132,20 @@ App.run ($rootScope, $location, $injector, $timeout, storageService) ->
     if $rootScope.userDetails
       $rootScope.userDetails.firstName = $rootScope.userDetails.name.split(' ')[0]
 
-  $rootScope.$on 'auth_fail', ->
+  $rootScope.$on 'auth_fail', (event, failure) ->
     if failure.data.reason
       redirectOnFailure(failure.data)
 
   $rootScope.isActive = (urlPart) =>
     $location.path().indexOf(urlPart) > 0
-
   $rootScope.flashSuccess = (msg) ->
     storageService.setSuccessMsg(msg)
-
   $rootScope.flashNotice = (msg) ->
     storageService.setNoticeMsg(msg)
+  $rootScope.showSuccess = (msg) ->
+    $rootScope.successMsg = msg
+  $rootScope.showError = (msg) ->
+    $rootScope.errorMsg = msg
 
   $rootScope.$on '$viewContentLoaded', ->
     storageService.clearMsgs()

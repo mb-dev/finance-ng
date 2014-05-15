@@ -1,9 +1,14 @@
 ng-include(src="'/partials/common/finance_header.html'")
 .line_items_index.index_page.container
-  .new.row
-    a.btn.btn-primary.col-xs-12.add_transaction(ng-href='/line_items/new') Add Transaction
+  .new.row.btn-toolbar.top
+    a.btn.btn-primary.add_transaction(ng-href='/line_items/new') 
+      i.fa.fa-plus 
+      | Add Transaction
+    a.btn.btn-primary.import(ng-href='/misc/import') 
+      i.fa.fa-upload.fa-fw 
+      | Import
 
-  .month-nav.row.well.wells-sm
+  .month-nav.row.well.well-sm
     a.col-xs-3.prev_month(ng-click='prevMonth()', href='#') &lt;&lt; Prev
     span.col-xs-6.current_month {{currentDate | amDateFormat:'MMMM, YYYY'}}
     a.col-xs-3.next_month(ng-click='nextMonth()', href='#') Next &gt;&gt;
@@ -17,7 +22,7 @@ ng-include(src="'/partials/common/finance_header.html'")
         .balance.hidden-xs.col-md-3 Category Name
         .amount.col-xs-3.col-md-1 Amount
         .balance.hidden-xs.col-md-2 Balance
-      .hidden-xs.col-md-2 Actions
+      .hidden-xs.col-md-2.text-center Actions
       
     .list-group-item.row(ng-repeat='item in lineItems', ng-click='onClickItem(item)')
       a.col-xs-12.col-md-10(ng-href='/line_items/{{item.id}}')
@@ -39,8 +44,3 @@ ng-include(src="'/partials/common/finance_header.html'")
         a.btn.btn-default.btn-sm.split(ng-href='/line_items/{{item.id}}/split?returnto={{currentLocation}}') Split 
         &nbsp; 
         a.btn.btn-default.btn-sm.delete(ng-href='/line_items/{{item.id}}/delete') Delete
-    
-
-  .footer.well.row
-    a.btn.btn-default(ng-href='/processing_rules') @
-    a.btn.btn-default(ng-href='/reports') !!

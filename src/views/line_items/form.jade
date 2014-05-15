@@ -1,7 +1,6 @@
 ng-include(src="'/partials/common/finance_header.html'")
 .line_item_form.container
-  .error {{error}}
-  .panel.panel-default
+  .panel.panel-default(ng-show='accounts.length > 0')
     .panel-heading
       h4.panel-title {{title}}
     form.panel-body.form-horizontal(role='form')
@@ -55,7 +54,7 @@ ng-include(src="'/partials/common/finance_header.html'")
           label.checkbox-inline(ng-repeat='tag in tags')
             input(type='checkbox', class='', checklist-model='item.tags', checklist-value="tag") 
             |{{tag}}
-      .form-group(ng-show="item.type === 'edit'")
+      .form-group(ng-show="type === 'edit'")
         label.col-xs-4.col-sm-2.control-label Original Date
         .col-xs-8.col-sm-10
           input.form-control(pickadate, type='text', placeholder='Date', ng-model='item.originalDate', date-format='')

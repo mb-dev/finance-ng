@@ -30,7 +30,7 @@ paths.views = ['./src/views/**/*.jade', 'bower_components/mbdev-core/src/views/*
 
 gulp.task 'build-views', ->
   gulp.src(paths.views)
-    .pipe(jade())
+    .pipe(jade().on('error', gutil.log))
     .pipe(gulp.dest('./public/partials'))
 
 gulp.task 'build-js', ->

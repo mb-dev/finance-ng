@@ -1,11 +1,14 @@
 ng-include(src="'/partials/common/finance_header.html'")
 .budgets_index.index_page.container
-  .month-nav.row.well.wells-sm
+  .month-nav.row.well.well-sm
     a.col-xs-3.prev_month(ng-click='prevYear()', href='#') &lt;&lt; Prev
     span.col-xs-6.current_month {{currentYear}}
     a.col-xs-3.next_month(ng-click='nextYear()', href='#') Next &gt;&gt;
   
-  a.btn.btn-primary(ng-href="/budgets/{{currentYear}}/new") Add
+  .row.btn-toolbar
+    a.btn.btn-primary(ng-href="/budgets/{{currentYear}}/new") 
+      i.fa.fa-plus.fa-fw
+      |Add Budget Category
 
   .row
     table.table.table-striped.table-bordered.table-condensed.report_table
@@ -42,7 +45,7 @@ ng-include(src="'/partials/common/finance_header.html'")
           td
             a.btn.btn-primary.btn-small.edit_btn(href="/budgets/{{currentYear | amDateFormat: 'YYYY'}}/{{expenseRow.meta.budgetItemId}}/edit") Edit
 
-  .well.row
+  .well.well-sm.row
       |Total Budgeted: {{report.totalBudgeted | currency}}
 
   h3 Groups:
