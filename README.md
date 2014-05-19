@@ -6,7 +6,7 @@ My side project to manage your personal finances similar to sites like Mint or Y
 
 ## Interested to help?
 * Contact me: [me@moshebergman.com](me@moshebergman.com)
-* Follow on Twitter: [@MosheBergman](https://twitter.com/MosheBergmanme@moshebergman.com)
+* Follow on Twitter: [@MosheBergman](https://twitter.com/MosheBergmanme)
 
 ## Copyright & License
 
