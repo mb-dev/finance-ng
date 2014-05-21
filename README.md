@@ -2,7 +2,9 @@
 
 Welcome to Finance!
 
-My side project to manage your personal finances similar to sites like Mint or YNAB.
+My side project to manage your personal finances similar to sites like Mint or YNAB. Written in AngularJS and interacts with:
+* Core: https://github.com/mb-dev/mbdev-core
+* API Server: https://github.com/mb-dev/mbdev-core-server
 
 Screenshots:
 * Transactions page: http://imgur.com/aR8OraL
