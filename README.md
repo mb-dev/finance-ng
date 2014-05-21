@@ -5,9 +5,9 @@ Welcome to Finance!
 My side project to manage your personal finances similar to sites like Mint or YNAB.
 
 Screenshots:
-* Transactions page: http://i.imgur.com/aR8OraLl.png
-* Reports page: http://i.imgur.com/pm0M4YGl.png
-* Budgets page: http://i.imgur.com/dfA5X6ql.png
+* Transactions page: http://imgur.com/aR8OraL
+* Reports page: http://imgur.com/pm0M4YG
+* Budgets page: http://imgur.com/dfA5X6q
 
 ## Interested to help?
 * Contact me: [me@moshebergman.com](mailto:me@moshebergman.com)
