@@ -43,4 +43,4 @@ ng-include(src="'/partials/common/finance_header.html'")
         &nbsp; 
         a.btn.btn-default.btn-sm.split(ng-href='/line_items/{{item.id}}/split?returnto={{currentLocation}}') Split 
         &nbsp; 
-        a.btn.btn-default.btn-sm.delete(ng-href='/line_items/{{item.id}}/delete') Delete
+        a.btn.btn-default.btn-sm.delete(ng-confirm-click='Are you sure you want to delete {{item.payeeName}}?', confirmed-click='deleteItem(item)' Delete

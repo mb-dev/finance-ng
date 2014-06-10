@@ -100,7 +100,7 @@ App.config ($routeProvider, $locationProvider) ->
   # Without server side support html5 must be disabled.
   $locationProvider.html5Mode(true)
 
-App.run ($rootScope, $location, $injector, $timeout, storageService, userService) ->
+App.run ($rootScope, $location, $injector, $timeout, $window, storageService, userService) ->
   redirectOnFailure = (failure) ->
     if failure.reason == 'not_logged_in'
       storageService.onLogout()
@@ -146,6 +146,8 @@ App.run ($rootScope, $location, $injector, $timeout, storageService, userService
     $rootScope.successMsg = msg
   $rootScope.showError = (msg) ->
     $rootScope.errorMsg = msg
+  $rootScope.setTitle = (title) ->
+    $window.document.title = $rootScope.appName + ' - ' + title
 
   $rootScope.$on '$viewContentLoaded', ->
     storageService.clearMsgs()

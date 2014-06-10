@@ -11,11 +11,9 @@ debug = require('gulp-debug');
 paths = {}
 paths.scripts = [
               "src/js/config/modules.coffee"
-              "bower_components/mbdev-core/src/js/db.coffee"
+              "bower_components/mbdev-core/src/**/*.coffee"
               "src/js/config/app-db.coffee"
-              "bower_components/mbdev-core/src/js/utils.coffee"
               "src/js/reports/report_generators.coffee"
-              "bower_components/mbdev-core/src/js/user/user.coffee"
               "src/js/accounts/accounts.coffee"
               "src/js/home/home.coffee"
               "src/js/budget_items/budget_items.coffee"

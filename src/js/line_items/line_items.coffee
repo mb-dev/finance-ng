@@ -26,7 +26,8 @@ angular.module('app.controllers')
     $scope.prevMonth = ->
       $scope.currentDate.add('months', -1)
       $location.path('/line_items/' + $scope.currentDate.year().toString() + '/' + ($scope.currentDate.month()+1).toString())
-
+    $scope.deleteItem = (item) ->
+      
     return
 
   .controller 'LineItemsFormController', ($scope, $routeParams, $location, db, errorReporter) ->

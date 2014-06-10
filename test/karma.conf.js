@@ -6,6 +6,22 @@ module.exports = function(karma) {
     // base path, that will be used to resolve files and exclude
     basePath: '../',
 
+    preprocessors: {
+      '**/*.coffee': ['coffee']
+    },
+
+    coffeePreprocessor: {
+      // options passed to the coffee compiler
+      options: {
+        bare: true,
+        sourceMap: true
+      },
+      // transforming the filenames
+      transformPath: function(path) {
+        return path.replace(/\.coffee$/, '.js');
+      }
+    },
+
 
     // frameworks to use
     frameworks: ['jasmine'],
@@ -13,14 +29,11 @@ module.exports = function(karma) {
 
     // list of files / patterns to load in the browser
     files: [
-      'http://cdn.jsdelivr.net/sjcl/1.0.0/sjcl.js',
       // Program files
-      'dist/js/vendor.js',
-      'dist/js/utils.js',
-      'dist/js/db.js',
-      'dist/js/user/user.js',
+      'public/js/vendor.js',
+      'public/js/app.js',
+      'test/fixtures/fixtures.coffee',
       'test/unit/**/*_spec.*',
-      {pattern: 'test/fixtures/*.csv', watched: true, served: true, included: false}
     ],
 
     // list of files to exclude
@@ -76,8 +89,7 @@ module.exports = function(karma) {
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-osx-reporter',
-      'karma-coffee-preprocessor',
-      'jasmine-jquery'
+      'karma-coffee-preprocessor'
     ],
 
 

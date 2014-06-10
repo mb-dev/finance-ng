@@ -19,10 +19,9 @@ describe 'ImportItemsController', ->
     root.db.accounts().insert(root.account)
   ))
   it 'should import the file', ->
-    jasmine.getFixtures().fixturesPath= 'base/test/fixtures';
-    content = readFixtures('provident_checking_example.csv')
+    content = window.fixtures.csv.provident_checking
 
-    spyOn(root.db, 'saveTables').andCallFake -> 
+    spyOn(root.db, 'saveTables').and.callFake -> 
       {then: -> true }
     spyOn(root.$location, 'path')
 
@@ -76,41 +75,38 @@ describe 'importers', ->
   describe 'ImportProvidentChecking', ->
     beforeEach(inject((ImportProvidentChecking) ->
       root.importer = ImportProvidentChecking
-      jasmine.getFixtures().fixturesPath= 'base/test/fixtures';
     ))
     it 'should import the csv', ->
-      content = readFixtures('provident_checking_example.csv')
+      content = window.fixtures.csv.provident_checking
       result = root.importer.import(content)
       expect(result.length).toEqual(5)
-      expect(result[0]).toEqual({ source : 'import', type : 1, amount : '52', payeeName : 'BACI CAFE & WINE B HEALDSBURG CAUS', date : 1341212400000 })
-      expect(result[1]).toEqual({ source : 'import', type : 1, amount : '1350', comment : 'Check 1015', date : 1341298800000 })
+      expect(result[0]).toEqual({ source : 'import', type : 1, amount : '52', payeeName : 'BACI CAFE & WINE B HEALDSBURG CAUS', date : moment('07/02/2012').valueOf() })
+      expect(result[1]).toEqual({ source : 'import', type : 1, amount : '1350', comment : 'Check 1015', date : moment('07/03/2012').valueOf() })
   describe 'ImportProvidentVisa', ->
     beforeEach(inject((ImportProvidentVisa) ->
       root.importer = ImportProvidentVisa
-      jasmine.getFixtures().fixturesPath= 'base/test/fixtures';
     ))
     it 'should import the csv', ->
-      content = readFixtures('provident_visa_example.csv')
+      content = window.fixtures.csv.provident_visa
       result = root.importer.import(content)
       expect(result.length).toEqual(4)
-      expect(result[0]).toEqual({ source : 'import', type : 1, amount : '6.05', payeeName : "LEE'S DELI - 615 M SAN FRANCISCO CA", date : 1341558000000 })
-      expect(result[1]).toEqual({ source : 'import', type : 1, amount : '41.54', payeeName : "TRADER JOE'S #236 QPS SAN FRANCISCO CA", date : 1341730800000 })
-      expect(result[2]).toEqual({ source : 'import', type : 1, amount : '1', payeeName : 'Interest Charge on Purchases', date : 1344322800000 })
-      expect(result[3]).toEqual({ source : 'import', type : 1, amount : '0', payeeName : 'Interest Charge on Cash Advan', date : 1344322800000 })
-      content = readFixtures('provident_visa_new_example.csv')
+      expect(result[0]).toEqual({ source : 'import', type : 1, amount : '6.05', payeeName : "LEE'S DELI - 615 M SAN FRANCISCO CA", date : moment('07/06/2012').valueOf() })
+      expect(result[1]).toEqual({ source : 'import', type : 1, amount : '41.54', payeeName : "TRADER JOE'S #236 QPS SAN FRANCISCO CA", date : moment('07/08/2012').valueOf() })
+      expect(result[2]).toEqual({ source : 'import', type : 1, amount : '1', payeeName : 'Interest Charge on Purchases', date : moment('08/07/2012').valueOf() })
+      expect(result[3]).toEqual({ source : 'import', type : 1, amount : '0', payeeName : 'Interest Charge on Cash Advan', date : moment('08/07/2012').valueOf() })
+      content = window.fixtures.csv.provident_visa_new
       result = root.importer.import(content)
       expect(result.length).toEqual(2)
-      expect(result[0]).toEqual({ source : 'import', type : 2, amount : '80.69', payeeName : 'AUTOMATIC PAYMENT - THANK YOU', date : 1369638000000 })
-      expect(result[1]).toEqual({ source : 'import', type : 1, amount : '40', payeeName : 'RECREATION.GOV 888-448-1474 NY', date : 1370415600000 })
+      expect(result[0]).toEqual({ source : 'import', type : 2, amount : '80.69', payeeName : 'AUTOMATIC PAYMENT - THANK YOU', date : moment('05/27/13').valueOf() })
+      expect(result[1]).toEqual({ source : 'import', type : 1, amount : '40', payeeName : 'RECREATION.GOV 888-448-1474 NY', date : moment('06/05/13').valueOf() })
   describe 'ImportChaseCC', ->
     beforeEach(inject((ImportChaseCC) ->
       root.importer = ImportChaseCC
-      jasmine.getFixtures().fixturesPath= 'base/test/fixtures';
     ))
     it 'should import the csv', ->
-      content = readFixtures('chase_cc_example.csv')
+      content = window.fixtures.csv.chase_cc
       result = root.importer.import(content)
       expect(result.length).toEqual(2)
-      expect(result[0]).toEqual({ source : 'import', type : 1, amount : '1.5', payeeName : 'IMPARK00740010A', date : 1381993200000 })
-      expect(result[1]).toEqual({ source : 'import', type : 1, amount : '26.5', payeeName : 'FANDANGO.COM', date : 1381993200000 })
+      expect(result[0]).toEqual({ source : 'import', type : 1, amount : '1.5', payeeName : 'IMPARK00740010A', date : moment('10/17/2013').valueOf() })
+      expect(result[1]).toEqual({ source : 'import', type : 1, amount : '26.5', payeeName : 'FANDANGO.COM', date : moment('10/17/2013').valueOf() })
     

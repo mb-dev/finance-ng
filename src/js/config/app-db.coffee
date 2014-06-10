@@ -55,11 +55,14 @@ class window.LineItemCollection extends Collection
     )
     @sortLazy(results, sortColumns)
 
+  getItemsByAccountIdSorted: (accountId) =>
+    @getItemsByAccountId(modifiedItem.accountId, ['originalDate', 'id']).toArray()
+
   reBalance: (modifiedItem) =>
     return if !@collection || @collection.length == 0
     return if !modifiedItem || !modifiedItem.accountId
     
-    sortedCollection = @getItemsByAccountId(modifiedItem.accountId, ['originalDate', 'id']).toArray()
+    sortedCollection = @getItemsByAccountIdSorted(modifiedItem.accountId)
     currentBalance = new BigNumber(0)
 
     if !modifiedItem || (modifiedItem.id == sortedCollection[0].id)
@@ -71,7 +74,11 @@ class window.LineItemCollection extends Collection
     [startIndex..(sortedCollection.length-1)].forEach (index) =>
       if !(sortedCollection[index].tags && sortedCollection[index].tags.indexOf(LineItemCollection.TAG_CASH) >= 0) # don't increase balance for cash
         currentBalance = currentBalance.plus(sortedCollection[index].$signedAmount())
-      sortedCollection[index].balance = currentBalance.toString()
+
+      newBalance = currentBalance.toString()
+      if sortedCollection[index].balance != newBalance
+        sortedCollection[index].balance = newBalance
+        @editById(sortedCollection[index])
 
   cloneLineItem: (originalItem) =>
     newItem = {}
@@ -88,6 +95,17 @@ class window.LineItemCollection extends Collection
       results[item.accountId] = item.balance
     )
     results
+
+  deleteItemAndRebalance: (item) =>
+    items = @getItemsByAccountIdSorted(item.accountId)
+    modifiedItemIndex = Lazy(items).pluck('id').indexOf(item.id)
+    if modifiedItemIndex == 0
+      previousItem = items[1]
+    else
+      previousItem = items[modifiedItemIndex - 1]
+    @deleteById(item.id)
+    @reBalance(previousItem)
+
 
 class BudgetItemCollection extends Collection
   getYearRange: ->
