@@ -11,7 +11,7 @@ makeObject = (id, value) ->
   result[id] = value
   result
 
-describe 'line items', ->
+describe 'fdb - line items', ->
   beforeEach(module('app'))
   beforeEach(inject((_$rootScope_, $q, fdb) ->
     root.$q = $q
@@ -49,7 +49,7 @@ describe 'line items', ->
       root.db.lineItems().deleteById(root.item1Id)
       expect(root.db.lineItems().length()).toEqual(1)
 
-      expect(root.db.lineItems().idIndex).toEqual(makeObject(root.item2Id, 1))
+      expect(root.db.lineItems().idIndex).toEqual(makeObject(root.item2Id, 0))
       expect(root.db.lineItems().actionsLog[2]).toEqual({action: 'delete', id: root.item1Id})
 
     it 'should return items by month', ->

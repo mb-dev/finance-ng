@@ -13,14 +13,14 @@ paths = {}
 paths.scripts = [
               "src/js/config/modules.coffee"
               "bower_components/mbdev-core/dist/js/core.js"
-              "src/js/config/app-db.coffee"
-              "src/js/reports/report_generators.coffee"
-              "src/js/accounts/accounts.coffee"
-              "src/js/home/home.coffee"
-              "src/js/budget_items/budget_items.coffee"
-              "src/js/line_items/line_items.coffee"
-              "src/js/misc/misc.coffee"
-              "src/js/reports/reports.coffee"
+              "src/js/services/financedb.coffee"
+              "src/js/services/importers.coffee"
+
+              "src/js/lib/report_generators.coffee"
+
+              "src/js/models/**/*.coffee"
+              "src/js/controllers/**/*.coffee"
+
               "src/js/config/app.coffee"
             ]
 paths.styles_base = 'bower_components/mbdev-core/src/css/'
@@ -37,7 +37,7 @@ gulp.task 'build-js', ->
     .pipe(sourcemaps.init())
     .pipe(gulpif(/[.]coffee$/, coffee({bare: true}).on('error', gutil.log)))
     .pipe(concat('app.js'))
-    .pipe(sourcemaps.write())
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('public/js'))
 
 gulp.task 'build-css', ->
