@@ -1,17 +1,18 @@
-gulp = require('gulp');
-gutil = require('gulp-util');
-coffee = require('gulp-coffee');
+gulp = require('gulp')
+gutil = require('gulp-util')
+coffee = require('gulp-coffee')
 less = require('gulp-less')
 jade = require('gulp-jade')
 concat = require('gulp-concat')
 gulpif = require('gulp-if')
 path = require('path');
-debug = require('gulp-debug');
+debug = require('gulp-debug')
+sourcemaps = require('gulp-sourcemaps')
 
 paths = {}
 paths.scripts = [
               "src/js/config/modules.coffee"
-              "bower_components/mbdev-core/src/**/*.coffee"
+              "bower_components/mbdev-core/dist/js/core.js"
               "src/js/config/app-db.coffee"
               "src/js/reports/report_generators.coffee"
               "src/js/accounts/accounts.coffee"
@@ -33,8 +34,10 @@ gulp.task 'build-views', ->
 
 gulp.task 'build-js', ->
   gulp.src(paths.scripts)
+    .pipe(sourcemaps.init())
     .pipe(gulpif(/[.]coffee$/, coffee({bare: true}).on('error', gutil.log)))
     .pipe(concat('app.js'))
+    .pipe(sourcemaps.write())
     .pipe(gulp.dest('public/js'))
 
 gulp.task 'build-css', ->

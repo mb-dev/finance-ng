@@ -78,6 +78,8 @@ angular.module('app.controllers')
         return if item.$ignore
         db.importedLines().insert({content: item.$originalJson})
         item.importId = db.importedLines().lastInsertedId
+        if(item.payeeName && item.payeeName.value)
+          item.payeeName = item.payeeName.value
         db.lineItems().insert(item)
         db.categories().findOrCreate(item.categoryName)
         db.payees().findOrCreate(item.payeeName)
