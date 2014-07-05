@@ -7,7 +7,8 @@ module.exports = function(karma) {
     basePath: '../',
 
     preprocessors: {
-      '**/*.coffee': ['coffee']
+      '**/*.coffee': ['coffee'],
+      '**/*.js': ['sourcemap']
     },
 
     coffeePreprocessor: {
@@ -89,7 +90,9 @@ module.exports = function(karma) {
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-osx-reporter',
-      'karma-coffee-preprocessor'
+      'karma-coffee-preprocessor',
+      'karma-sourcemap-loader',
+      'karma-firefox-launcher'
     ],
 
 
