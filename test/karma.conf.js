@@ -23,6 +23,11 @@ module.exports = function(karma) {
       }
     },
 
+    osxReporter: {
+      host: "localhost",
+      port: 1337
+    },
+
 
     // frameworks to use
     frameworks: ['jasmine'],

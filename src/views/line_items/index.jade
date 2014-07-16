@@ -24,7 +24,7 @@ ng-include(src="'/partials/common/finance_header.html'")
         .balance.hidden-xs.col-md-2 Balance
       .hidden-xs.col-md-2.text-center Actions
       
-    .list-group-item.row(ng-repeat='item in lineItems', ng-click='onClickItem(item)')
+    .list-group-item.row.animate-repeat(ng-repeat='item in lineItems', ng-click='onClickItem(item)')
       a.col-xs-12.col-md-10(ng-href='/line_items/{{item.id}}')
         .date.col-xs-2.col-md-1
           i.fa.fa-tags.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.tags[0]}}', ng-show='{{item.tags && item.tags.length > 0}}')/

@@ -29,4 +29,22 @@ TRANSACTION DATE,POST DATE,DESCRIPTION,REFERENCE,AMOUNT
 06/05/13,06/06/13, RECREATION.GOV           888-448-1474 NY           , 24445004XHF0JE64Y,00000000000040.00
 """
 
+window.fixtures.models = {}
+window.fixtures.models.lineItems = {}
+window.fixtures.models.lineItems.getLineItem = (specific_properties, more_opts = {}) ->
+  transactionDate = moment([2014, 0, 1]).valueOf()
+  base_object = {
+    type: LineItemCollection.EXPENSE,
+    accountId: 1, 
+    amount: '100', 
+    balance: '0', 
+    payeeName: 'Valero',
+    categoryName: 'Transportation:Gas', 
+    date: transactionDate, 
+    originalDate: transactionDate, 
+    tags: []
+  }
+  base_object.tags += ['Cash'] if more_opts.cash
+  angular.extend(base_object, specific_properties)
+
 console.log('fixtures loaded')
