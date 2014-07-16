@@ -24,7 +24,10 @@ paths.scripts = [
               "src/js/config/app.coffee"
             ]
 paths.styles_base = 'bower_components/mbdev-core/src/css/'
-paths.styles = ['bower_components/mbdev-core/src/css/*.less']
+paths.styles = [
+  'bower_components/mbdev-core/src/css/*.less'
+  'src/css/finance.less'
+]
 paths.views = ['./src/views/**/*.jade', 'bower_components/mbdev-core/src/views/**/*.jade']
 
 gulp.task 'build-views', ->
