@@ -1,6 +1,4 @@
-# Core Library [![Build Status](https://travis-ci.org/mb-dev/finance-ng.svg?branch=master)](https://travis-ci.org/mb-dev/finance-ng)
-
-# Finance
+# Finance [![Build Status](https://travis-ci.org/mb-dev/finance-ng.svg?branch=master)](https://travis-ci.org/mb-dev/finance-ng)
 
 Welcome to Finance!
 
