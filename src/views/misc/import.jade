@@ -66,7 +66,7 @@ ng-include(src="'/partials/common/finance_header.html'")
           {{item.date | amDateFormat:'MM/DD/YYYY' }}
           input.form-control(type='checkbox', ng-model='item.$addRule')
         .payee.col-xs-5.col-md-3
-          input.sfTypeahead.form-control(type='text', ng-model='item.payeeName', datasets="$parent.allPayees", ng-trim='false')
+          input.sfTypeahead.form-control(type='text', ng-model='item.payeeName', datasets="$parent.allPayees", options="$parent.payeeAutoCompleteOptions")
         .payee.col-xs-5.col-md-3
           select(ng-model='item.categoryName', selectize="stringsWithCreate", all-items="$parent.allCategories")
             option(value='{{item.categoryName}}', selected="true", ) {{item.categoryName}}

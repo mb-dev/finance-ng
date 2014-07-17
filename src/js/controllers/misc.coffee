@@ -13,9 +13,20 @@ angular.module('app.controllers')
   .controller 'ImportItemsController', ($scope, $routeParams, $location, db, $injector) ->
     $scope.states = {SELECT_FILE: 'selectFile', REVIEW_ITEMS: 'reviewItems', RENAME_ITEMS: 'renameItems'}
     $scope.allCategories = db.categories().getAll().toArray()
+    payeesEngine = new Bloodhound({
+      datumTokenizer: (d) -> Bloodhound.tokenizers.whitespace(d.value)
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      local: db.payees().getAll().toArray().map (item) -> {value: item}
+    })
+    payeesEngine.initialize()
+
     $scope.allPayees = {
-      name: 'payees'
-      local: db.payees().getAll().toArray()
+      displayKey: 'value',
+      source: payeesEngine.ttAdapter()
+    }
+
+    $scope.payeeAutoCompleteOptions = {
+      hint: false
     }
 
     $scope.accounts = db.accounts().getAll().toArray()

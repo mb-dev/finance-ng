@@ -43,7 +43,7 @@ describe 'ImportItemsController', ->
     expect(root.$scope.state).toEqual(root.$scope.states.RENAME_ITEMS)
 
     expect(root.$scope.items[0].payeeName).toEqual('Baci Cafe & Wine B Healdsburg Caus')
-    root.$scope.items[0].payeeName = 'Baci Cafe'
+    root.$scope.items[0].payeeName = {value: 'Baci Cafe'}
     root.$scope.items[0].categoryName = 'Restaurants'
     root.$scope.items[0].$addRule = true
 
