@@ -1,3 +1,3 @@
-class BudgetItemCollection extends Collection
+class BudgetItemCollection extends IndexedDbCollection
   getYearRange: ->
     Lazy(@collection).pluck('budget_year').uniq().sortBy(Lazy.identity).toArray()

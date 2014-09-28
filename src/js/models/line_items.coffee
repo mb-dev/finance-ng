@@ -1,4 +1,4 @@
-class window.LineItemCollection extends Collection
+class window.LineItemCollection extends IndexedDbCollection
   @EXPENSE = 1
   @INCOME = 2
 
@@ -8,32 +8,75 @@ class window.LineItemCollection extends Collection
   @TRANSFER_TO_CASH = 'Transfer:Cash'
 
   @TAG_CASH = 'Cash'
+
+  helpers = 
+    $isExpense: ->
+        @type == LineItemCollection.EXPENSE
+    $isIncome: ->
+      @type == LineItemCollection.INCOME
+    $date: ->
+      moment(@date)
+    $multiplier: ->
+      if @type == LineItemCollection.EXPENSE then -1 else 1
+    $signedAmount: ->
+      parseFloat(@amount) * helpers.$multiplier.apply(@)
+    $signedAmountAbs: ->
+      Math.abs(parseFloat(@amount) * @$multiplier())
+    $addProcessingRule: ->
+      return if !@categoryName || !@payeeName
+      if @$originalPayeeName
+        tables.processingRules.set('name:' + @$originalPayeeName, {payeeName: @payeeName, categoryName: @categoryName})
+      else
+        tables.processingRules.set('amount:' + @amount, {payeeName: @payeeName, categoryName: @categoryName})
+    $process: ->
+      processingRule = null
+      if @payeeName && tables.processingRules.has('name:' + @payeeName)
+        processingRule = tables.processingRules.get('name:' + @payeeName)
+      else if tables.processingRules.has('amount:' + @amount)
+        processingRule = tables.processingRules.get('amount:' + @amount)
+
+      if processingRule
+        @payeeName = processingRule.payeeName
+        @categoryName = processingRule.categoryName
+        true
+      else
+        false
+
+  addHelpers: (items) ->
+    items.forEach (item) -> angular.extend(item, helpers)
     
   getYearRange: ->
     Lazy(@collection).map((item) -> moment(item.date).year()).uniq().sortBy(Lazy.identity).toArray()
 
   getByDynamicFilter: (filter, sortColumns) ->
-    results = Lazy(@collection).filter((item) -> 
+    new RSVP.Promise (resolve, reject) =>
       if filter.date
-        date = moment(item.date)
         if filter.date.month? && filter.date.year?
-          return false if date.month() != filter.date.month || date.year() != filter.date.year
+          minDate = moment({month: filter.date.month, year: filter.date.year}).startOf('month').valueOf()
+          maxDate = moment({month: filter.date.month, year: filter.date.year}).endOf('month').valueOf()
         else if filter.date.year
-          return false if (date.year() != filter.date.year)
-      if filter.categories?
-        return false if filter.categories.indexOf(item.categoryName) < 0
-      if filter.categoryName == 'empty'
-        return false if typeof(item.categoryName) != 'undefined' 
-        return false if item.categoryName? && item.categoryName.length > 0
-      else if filter.categoryName?
-        return false if item.categoryName != filter.categoryName
-      if filter.accountId?
-        return false if item.accountId != filter.accountId
-      if filter.groupedLabel?
-        return false if item.groupedLabel != filter.groupedLabel
-      true
-    )
-    @sortLazy(results, sortColumns)
+          minDate = moment({year: filter.date.year}).startOf('year').valueOf()
+          maxDate = moment({year: filter.date.year}).endOf('year').valueOf()
+        
+        @dba.lineItems.query('date').bound(minDate, maxDate).execute().done (lineItems) =>
+          lineItems = Lazy(lineItems).filter((item) -> 
+            if filter.categories?
+              return false if filter.categories.indexOf(item.categoryName) < 0
+            if filter.categoryName == 'empty'
+              return false if typeof(item.categoryName) != 'undefined' 
+              return false if item.categoryName? && item.categoryName.length > 0
+            else if filter.categoryName?
+              return false if item.categoryName != filter.categoryName
+            if filter.accountId?
+              return false if item.accountId != filter.accountId
+            if filter.groupedLabel?
+              return false if item.groupedLabel != filter.groupedLabel
+            true
+          )
+          lineItems = @sortLazy(lineItems, sortColumns)
+          resolve(lineItems)
+      else
+        resolve([])
 
   getItemsByMonthYear: (month, year, sortColumns) ->
     results = Lazy(@collection).filter((item) -> 
@@ -59,26 +102,19 @@ class window.LineItemCollection extends Collection
     @getItemsByAccountId(accountId, ['originalDate', 'id']).toArray()
 
   reBalance: (modifiedItem) =>
-    return if !@collection || @collection.length == 0
-    return if !modifiedItem || !modifiedItem.accountId
-    
-    sortedCollection = @getItemsByAccountIdSorted(modifiedItem.accountId)
-    currentBalance = new BigNumber(0)
+    currentBalance = 0
 
-    if !modifiedItem || (modifiedItem.id == sortedCollection[0].id)
-      startIndex = 0
-    else
-      startIndex = Lazy(sortedCollection).pluck('id').indexOf(modifiedItem.id)
-      currentBalance = new BigNumber(sortedCollection[startIndex-1].balance)
-    
-    [startIndex..(sortedCollection.length-1)].forEach (index) =>
-      if !(sortedCollection[index].tags && sortedCollection[index].tags.indexOf(LineItemCollection.TAG_CASH) >= 0) # don't increase balance for cash
-        currentBalance = currentBalance.plus(sortedCollection[index].$signedAmount())
+    updateBalance = (item) ->
+      unless item.tags and item.tags.indexOf(LineItemCollection.TAG_CASH) >= 0
+        currentBalance += helpers.$signedAmount.apply(item)
+      currentBalance
 
-      newBalance = currentBalance.toString()
-      if sortedCollection[index].balance != newBalance
-        sortedCollection[index].balance = newBalance
-        @editById(sortedCollection[index])
+    new RSVP.Promise (resolve, reject) =>
+      @dba.lineItems.query('date_id')
+      .all()
+      .modify(balance: updateBalance)
+      .execute()
+      .then -> resolve()
 
   cloneLineItem: (originalItem) =>
     newItem = {}

@@ -11,28 +11,28 @@
   "dependencies": {
     "express": "3.4.7",
     "ejs": "^1.0.0",
-    "coffee-script": "~1.7.1",
-    
+    "coffee-script": "~1.8.0",
     "gulp": "~3.8.5",
     "gulp-jade": "~0.6.1",
-    "gulp-coffee": "~2.0.1",
+    "gulp-coffee": "~2.2.0",
     "gulp-less": "~1.2.3",
     "gulp-if": "1.2.1",
     "gulp-debug": "~0.3.0",
     "gulp-concat": "floridoo/gulp-concat#sourcemap_pipe2",
-    "gulp-sourcemaps": "^0.4.4",
+    "gulp-sourcemaps": "1.2.2",
     "gulp-util": "~2.2.14"
   },
   "devDependencies": {
     "karma": "^0.12.16",
     "karma-chrome-launcher": "^0.1.3",
     "karma-jasmine": "~0.2.0",
-    "karma-osx-reporter": "^0.1.0",    
+    "karma-osx-reporter": "^0.1.0",
     "karma-coffee-preprocessor": "^0.2.1",
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-cli": "0.0.4",
     "karma-sourcemap-loader": "^0.2.0",
-    "karma-firefox-launcher": "^0.1.3"
+    "karma-firefox-launcher": "^0.1.3",
+    "gulp-plumber": "^0.6.5"
   },
   "scripts": {
     "test": "./node_modules/.bin/karma start test/karma.conf.js --single-run --browsers Firefox"

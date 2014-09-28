@@ -45,6 +45,37 @@ App.config ($routeProvider, $locationProvider) ->
         defer.promise
     }
 
+  loadIdbCollections = (otherFunctions = []) ->
+    {
+      db: ($q, $route, financeidb) ->
+        defer = $q.defer()
+        financeidb.loadTables().then ->
+          async.each otherFunctions, (func, callback) ->
+            func(financeidb, $route).then -> callback()
+          , (err) ->
+            defer.resolve(financeidb)
+        , (err) ->
+          defer.reject(err)
+        defer.promise
+    }
+
+  loadCategories = (db) ->
+    db.categories().getAllKeys().then (categories) ->
+      db.preloaded.categories = categories
+
+  loadPayees = (db) ->
+    db.payees().getAllKeys().then (payees) ->
+      db.preloaded.payees = payees
+
+  loadAccounts = (db) ->
+    db.accounts().getAll().then (accounts) ->
+      db.preloaded.accounts = accounts
+
+  loadEditingLineItem = (db, $route) ->
+    itemId = parseInt($route.current.params.itemId)
+    db.lineItems().findById(itemId).then (item) ->
+      db.preloaded.item = item
+
   $routeProvider
     .when('/', {templateUrl: '/partials/home/welcome.html', controller: 'WelcomePageController', resolve: resolveFDb(((fdb) -> [fdb.tables.lineItems, fdb.tables.accounts]), true) })
 
@@ -52,12 +83,12 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/accounts/:itemId/edit', {templateUrl: '/partials/accounts/form.html', controller: 'AccountsFormController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
     .when('/accounts/:itemId', {templateUrl: '/partials/accounts/show.html', controller: 'AccountsShowController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
 
-    .when('/line_items/new', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories, fdb.tables.payees, fdb.tables.accounts]) })
-    .when('/line_items/:itemId/edit', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories, fdb.tables.payees, fdb.tables.accounts]) })
-    .when('/line_items/:itemId/split', {templateUrl: '/partials/line_items/split.html', controller: 'LineItemsSplitController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories, fdb.tables.accounts]) })
-    .when('/line_items/:itemId', {templateUrl: '/partials/line_items/show.html', controller: 'LineItemShowController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.accounts]) })
-    .when('/line_items/:year/:month', {templateUrl: '/partials/line_items/index.html', controller: 'LineItemsIndexController', reloadOnSearch: false, resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.accounts]) })
-    .when('/line_items/', {templateUrl: '/partials/line_items/index.html', controller: 'LineItemsIndexController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems]) })
+    .when('/line_items/new', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: loadIdbCollections([loadCategories, loadPayees, loadAccounts]) })
+    .when('/line_items/:itemId/edit', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: loadIdbCollections([loadCategories, loadPayees, loadAccounts, loadEditingLineItem]) })
+    .when('/line_items/:itemId/split', {templateUrl: '/partials/line_items/split.html', controller: 'LineItemsSplitController', resolve: loadIdbCollections() })
+    .when('/line_items/:itemId', {templateUrl: '/partials/line_items/show.html', controller: 'LineItemShowController', resolve: loadIdbCollections() })
+    .when('/line_items/:year/:month', {templateUrl: '/partials/line_items/index.html', controller: 'LineItemsIndexController', reloadOnSearch: false, resolve: loadIdbCollections() })
+    .when('/line_items/', {templateUrl: '/partials/line_items/index.html', controller: 'LineItemsIndexController', resolve: loadIdbCollections() })
 
     .when('/categories/', {templateUrl: '/partials/misc/categories.html'})
     .when('/payees/', {templateUrl: '/partials/misc/payees.html'})

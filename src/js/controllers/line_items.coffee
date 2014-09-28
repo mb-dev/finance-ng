@@ -1,3 +1,8 @@
+resolvedPromise = ->
+  deferred = RSVP.defer()
+  deferred.resolve()
+  deferred.promise
+
 angular.module('app.controllers')
   .controller 'LineItemsIndexController', ($scope, $routeParams, $location, db) ->
     applyDateChanges = ->
@@ -5,7 +10,9 @@ angular.module('app.controllers')
       filter.date = {month: $scope.currentDate.month(), year: $scope.currentDate.year()}
       filter.categories = $routeParams.categories.split(',') if $routeParams.categories
       filter.accountId = parseInt($routeParams.accountId, 10) if $routeParams.accountId
-      $scope.lineItems = db.lineItems().getByDynamicFilter(filter).toArray().reverse()
+      db.lineItems().getByDynamicFilter(filter).then (lineItems) -> $scope.$apply ->
+        $scope.lineItems = lineItems.toArray().reverse()
+        db.lineItems().addHelpers($scope.lineItems)
         
     $scope.currentDate = moment()
     if $routeParams.month? && $routeParams.year?
@@ -13,10 +20,10 @@ angular.module('app.controllers')
       applyDateChanges()
     else if($routeParams.year? && $routeParams.groupedLabel?)
       $scope.currentDate.year(+$routeParams.year).month(0)
-      $scope.lineItems = db.lineItems().getByDynamicFilter({date: {year: $scope.currentDate.year()}, groupedLabel: $routeParams.groupedLabel}).toArray().reverse()
+      db.lineItems().getByDynamicFilter({date: {year: $scope.currentDate.year()}, groupedLabel: $routeParams.groupedLabel}).toArray().reverse()
     else if($routeParams.year? && $routeParams.categoryName?)
       $scope.currentDate.year(+$routeParams.year).month(0)
-      $scope.lineItems = db.lineItems().getByDynamicFilter({date: {year: $scope.currentDate.year()}, categoryName: $routeParams.categoryName}).toArray().reverse()
+      db.lineItems().getByDynamicFilter({date: {year: $scope.currentDate.year()}, categoryName: $routeParams.categoryName}).toArray().reverse()
     else
       applyDateChanges()
 
@@ -35,28 +42,30 @@ angular.module('app.controllers')
     return
 
   .controller 'LineItemsFormController', ($scope, $routeParams, $location, db, errorReporter) ->
-    $scope.allCategories = db.categories().getAll().toArray()
-    $scope.allPayees = db.payees().getAll().toArray()
     $scope.tags = ['Cash', 'Exclude from Reports']
-    $scope.accounts = db.accounts().getAll().toArray()
-
-    if($scope.accounts.length == 0)
-      $scope.showError('No acounts found, add some on the main page')
-      return
 
     updateFunc = null
     if $location.$$url.indexOf('new') > 0
       $scope.type = 'new'
       $scope.title = 'New line item'
       # TODO: Allow defining any account as default
-      $scope.item = {type: 1, date: moment().valueOf(), tags: ['Cash'], accountId: $scope.accounts[0].id}
+      $scope.item = {type: 1, date: moment().valueOf(), tags: ['Cash'], accountId: null}
       updateFunc = db.lineItems().insert
     else
       $scope.type = 'edit'
       $scope.title = 'Edit line item'
-      $scope.item = db.lineItems().findById($routeParams.itemId)
+      $scope.item = db.preloaded.item
       $scope.item.amount = parseFloat($scope.item.amount)
-      updateFunc = db.lineItems().editById
+      updateFunc = db.lineItems().updateById
+      
+    $scope.allCategories = db.preloaded.categories
+    $scope.allPayees = db.preloaded.payees
+    $scope.accounts = db.preloaded.accounts
+      
+    if($scope.accounts.length == 0)
+      $scope.showError('No acounts found, add some on the main page')
+    else if !$scope.item.accountId
+      $scope.item.accountId = $scope.accounts[0].id
 
     $scope.onChangePayee = ->
       # not sure if I want this:
@@ -64,17 +73,18 @@ angular.module('app.controllers')
       # return if !$scope.item.payeeName
       # processingRule = fdb.processingRules().get('name:' + $scope.item.payeeName)
 
+    onSuccess = -> $scope.$apply ->
+      itemDate = moment($scope.item.date)
+      $location.path($routeParams.returnto || "/line_items/#{itemDate.year()}/#{itemDate.month()+1}")
+
     $scope.onSubmit = ->
-      db.categories().findOrCreate($scope.item.categoryName)
-      db.payees().findOrCreate($scope.item.payeeName)
       if $scope.type == 'new'
         $scope.item.originalDate = $scope.item.date
-      updateFunc($scope.item)
-      db.lineItems().reBalance($scope.item)
-      onSuccess = -> 
-        itemDate = moment($scope.item.date)
-        $location.path($routeParams.returnto || "/line_items/#{itemDate.year()}/#{itemDate.month()+1}")
-      db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees]).then(onSuccess, errorReporter.errorCallbackToScope($scope))
+      db.categories().findOrCreate($scope.item.categoryName)
+      .then -> db.payees().findOrCreate($scope.item.payeeName)
+      .then -> updateFunc($scope.item)
+      .then -> db.lineItems().reBalance($scope.item)
+      .then -> db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees]).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
   .controller 'LineItemsSplitController', ($scope, $routeParams, $location, db, errorReporter) ->
     $scope.allCategories = db.categories().getAll().toArray()

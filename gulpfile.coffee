@@ -8,14 +8,13 @@ gulpif = require('gulp-if')
 path = require('path');
 debug = require('gulp-debug')
 sourcemaps = require('gulp-sourcemaps')
+plumber = require('gulp-plumber')
 
 paths = {}
 paths.scripts = [
               "src/js/config/modules.coffee"
               "bower_components/mbdev-core/dist/js/core.js"
-              "src/js/services/financedb.coffee"
-              "src/js/services/importers.coffee"
-
+              "src/js/services/**/*.coffee"
               "src/js/lib/report_generators.coffee"
 
               "src/js/models/**/*.coffee"
