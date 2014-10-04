@@ -1,7 +1,4 @@
 angular.module('app.controllers')
-  .controller 'AccountsIndexController', ($scope, $route, db) ->
-    $scope.accounts = db.accounts().getAll().toArray()
-    return
 
   .controller 'AccountsFormController', ($scope, $routeParams, $location, db, errorReporter) ->
     updateFunc = null
@@ -14,7 +11,7 @@ angular.module('app.controllers')
     else
       $scope.title = 'Edit account'
       $scope.item = db.accounts().findById($routeParams.itemId)
-      updateFunc = db.accounts().editById
+      updateFunc = db.accounts().updateById
 
     $scope.onSubmit = ->
       onSuccess = -> $location.path('/')
@@ -22,4 +19,4 @@ angular.module('app.controllers')
       updateFunc($scope.item).then(saveTables).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
   .controller 'AccountsShowController', ($scope, $routeParams, db) ->
-    $scope.item = db.accounts().findById($routeParams.itemId)
+    $scope.item = db.preloaded.item

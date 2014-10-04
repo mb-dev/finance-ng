@@ -11,7 +11,7 @@ ng-include(src="'/partials/common/finance_header.html'")
         .form-group
           label.col-xs-4.col-sm-2.control-label Account
           .col-xs-8.col-sm-10
-            select.form-control(ng-model='accountId', ng-options="account.id as account.name for account in accounts")
+            select.form-control(ng-model='account', ng-options="account as account.name for account in accounts")
         .form-group
           label.col-xs-4.col-sm-2.control-label File: 
           .col-xs-8.col-sm-10
@@ -66,10 +66,9 @@ ng-include(src="'/partials/common/finance_header.html'")
           {{item.date | amDateFormat:'MM/DD/YYYY' }}
           input.form-control(type='checkbox', ng-model='item.$addRule')
         .payee.col-xs-5.col-md-3
-          input.sfTypeahead.form-control(type='text', ng-model='item.payeeName', datasets="$parent.allPayees", options="$parent.payeeAutoCompleteOptions")
+          input.form-control(type='text', ng-model='item.payeeName', ng-options="payee for payee in $parent.allPayees", bs-typeahead)
         .payee.col-xs-5.col-md-3
-          select(ng-model='item.categoryName', selectize="stringsWithCreate", all-items="$parent.allCategories")
-            option(value='{{item.categoryName}}', selected="true", ) {{item.categoryName}}
+          input.form-control(type='text', ng-model='item.categoryName', ng-options="category for category in $parent.allCategories", bs-typeahead)
         .amount.col-xs-3.col-md-1 {{item.$signedAmount()}}
         .comment.hidden-xs.col-md-3 {{item.comment}}
     

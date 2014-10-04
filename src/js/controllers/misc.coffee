@@ -12,28 +12,14 @@ toImportString = (item) ->
 angular.module('app.controllers')
   .controller 'ImportItemsController', ($scope, $routeParams, $location, db, $injector) ->
     $scope.states = {SELECT_FILE: 'selectFile', REVIEW_ITEMS: 'reviewItems', RENAME_ITEMS: 'renameItems'}
-    $scope.allCategories = db.categories().getAll().toArray()
-    payeesEngine = new Bloodhound({
-      datumTokenizer: (d) -> Bloodhound.tokenizers.whitespace(d.value)
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      local: db.payees().getAll().toArray().map (item) -> {value: item}
-    })
-    payeesEngine.initialize()
+    $scope.allCategories = db.preloaded.categories
+    $scope.allPayees = db.preloaded.payees
 
-    $scope.allPayees = {
-      displayKey: 'value',
-      source: payeesEngine.ttAdapter()
-    }
-
-    $scope.payeeAutoCompleteOptions = {
-      hint: false
-    }
-
-    $scope.accounts = db.accounts().getAll().toArray()
-    $scope.accountId = $scope.accounts[0].id if $scope.accounts.length > 0
+    $scope.accounts = db.preloaded.accounts
+    $scope.account = $scope.accounts[0] if $scope.accounts.length > 0
 
     if $routeParams.accountId
-      $scope.accountId = parseInt($routeParams.accountId, 10)
+      $scope.account = _($scope.accounts).find({id: parseInt($routeParams.accountId, 10)})
 
     $scope.weHaveItems = false
     $scope.state = $scope.states.SELECT_FILE
@@ -45,18 +31,15 @@ angular.module('app.controllers')
       $scope.state = $scope.states.REVIEW_ITEMS
 
     $scope.onFileLoaded = (fileContent) ->
-      account = db.accounts().findById($scope.accountId)
-      importedLines = db.importedLines().getAll().pluck('content').reduce (result, item, index) -> 
-        result[item] = true
-        result
-      , {}
+      account = $scope.account
+      importedLines = db.preloaded.importedLines
       importer = $injector.get('Import' + account.importFormat)
       $scope.items = importer.import(fileContent)
+      db.lineItems().addHelpers($scope.items)
 
       # mark items that were imported before with ignore flag
       $scope.items.forEach (item, index) ->
         item.index = index.toString()
-        db.lineItems().extendItem(item)
         item.$originalJson = toImportString(item)
         item.accountId = account.id
         if(importedLines[item.$originalJson])
@@ -64,9 +47,9 @@ angular.module('app.controllers')
         else
           item.originalDate = item.date
           item.$originalPayeeName = item.payeeName
-          if !item.$process()
+          if !item.$process(db.preloaded.processingRules)
             item.payeeName = correctCase(item.payeeName)
-            item.$addRule = true
+            item.$addRule = false
           else
             item.$addRule = false
 
@@ -85,31 +68,33 @@ angular.module('app.controllers')
 
     $scope.onConfirmImport = ->
       imported = 0
+      promises = []
       $scope.items.forEach (item) ->
         return if item.$ignore
-        db.importedLines().insert({content: item.$originalJson})
-        item.importId = db.importedLines().lastInsertedId
-        if(item.payeeName && item.payeeName.value)
-          item.payeeName = item.payeeName.value
-        db.lineItems().insert(item)
-        db.categories().findOrCreate(item.categoryName)
-        db.payees().findOrCreate(item.payeeName)
+        importedLine = {content: item.$originalJson}
+        promises.push(db.importedLines().insert(importedLine))
+        item.importId = importedLine.lastInsertedId
+        item.payeeName = item.payeeName.value if(item.payeeName && item.payeeName.value) # fix a bug
+        promises.push(db.lineItems().insert(item))
+        promises.push(db.categories().findOrCreate(item.categoryName))
+        promises.push(db.payees().findOrCreate(item.payeeName))
 
         if item.$addRule
-          item.$addProcessingRule()
+          promises.push(item.$addProcessingRule(db.processingRules()))
         imported += 1
 
-      firstModifiedItem = Lazy($scope.items).filter((item) -> !item.$ignore).sortBy((item) -> [item.date, item.id]).first()
-      db.lineItems().reBalance(firstModifiedItem)
-      db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees, db.tables.importedLines, db.tables.processingRules]).then ->
+      RSVP.all(_.compact(promises))
+      .then -> db.lineItems().reBalance()
+      .then -> db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees, db.tables.importedLines, db.tables.processingRules])
+      .then -> $scope.$apply ->
         $scope.flashSuccess(imported.toString() + ' items were imported successfully!')
         $location.path('/line_items')
 
   .controller 'MiscCategoriesController', ($scope, $routeParams, $location, db, $injector) ->
-    $scope.items = db.categories().getAll().toArray().sort()
+    $scope.items = db.preloaded.categories
 
   .controller 'MiscPayeesController', ($scope, $routeParams, $location, db, $injector) ->
-    $scope.items = db.payees().getAll().toArray().sort()
+    $scope.items = db.preloaded.payees
 
   .controller 'MiscProcessingRulesController', ($scope, $routeParams, $location, db, $injector) ->
     processingRules = db.processingRules().getAll().toArray().sort()

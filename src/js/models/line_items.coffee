@@ -22,18 +22,18 @@ class window.LineItemCollection extends IndexedDbCollection
       parseFloat(@amount) * helpers.$multiplier.apply(@)
     $signedAmountAbs: ->
       Math.abs(parseFloat(@amount) * @$multiplier())
-    $addProcessingRule: ->
+    $addProcessingRule: (processingRuleTable) ->
       return if !@categoryName || !@payeeName
       if @$originalPayeeName
-        tables.processingRules.set('name:' + @$originalPayeeName, {payeeName: @payeeName, categoryName: @categoryName})
+        processingRuleTable.set('name:' + @$originalPayeeName, {payeeName: @payeeName, categoryName: @categoryName})
       else
-        tables.processingRules.set('amount:' + @amount, {payeeName: @payeeName, categoryName: @categoryName})
-    $process: ->
+        processingRuleTable.set('amount:' + @amount, {payeeName: @payeeName, categoryName: @categoryName})
+    $process: (processingRules) ->
       processingRule = null
-      if @payeeName && tables.processingRules.has('name:' + @payeeName)
-        processingRule = tables.processingRules.get('name:' + @payeeName)
-      else if tables.processingRules.has('amount:' + @amount)
-        processingRule = tables.processingRules.get('amount:' + @amount)
+      if @payeeName && processingRules['name:' + @payeeName]
+        processingRule = processingRules['name:' + @payeeName]
+      else if processingRules['amount:' + @amount]
+        processingRule = processingRules['amount:' + @amount]
 
       if processingRule
         @payeeName = processingRule.payeeName
@@ -59,7 +59,7 @@ class window.LineItemCollection extends IndexedDbCollection
           maxDate = moment({year: filter.date.year}).endOf('year').valueOf()
         
         @dba.lineItems.query('date').bound(minDate, maxDate).execute().done (lineItems) =>
-          lineItems = Lazy(lineItems).filter((item) -> 
+          lineItems = _.filter(lineItems, (item) -> 
             if filter.categories?
               return false if filter.categories.indexOf(item.categoryName) < 0
             if filter.categoryName == 'empty'
@@ -126,11 +126,11 @@ class window.LineItemCollection extends IndexedDbCollection
     newItem
 
   balancesByAccount: =>
-    results = {}
-    @sortLazy(Lazy(@collection), ['date', 'id']).each((item) -> 
-      results[item.accountId] = item.balance
-    )
-    results
+    new RSVP.Promise (resolve, reject) =>
+      results = {}
+      @dba.lineItems.query('date_id').all().execute().then (items) ->
+        results[item.accountId] = item.balance for item in items
+        resolve(results)
 
   deleteItemAndRebalance: (item) =>
     items = @getItemsByAccountIdSorted(item.accountId)

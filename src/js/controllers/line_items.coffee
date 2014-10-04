@@ -11,7 +11,7 @@ angular.module('app.controllers')
       filter.categories = $routeParams.categories.split(',') if $routeParams.categories
       filter.accountId = parseInt($routeParams.accountId, 10) if $routeParams.accountId
       db.lineItems().getByDynamicFilter(filter).then (lineItems) -> $scope.$apply ->
-        $scope.lineItems = lineItems.toArray().reverse()
+        $scope.lineItems = lineItems.reverse()
         db.lineItems().addHelpers($scope.lineItems)
         
     $scope.currentDate = moment()
@@ -87,9 +87,9 @@ angular.module('app.controllers')
       .then -> db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees]).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 
   .controller 'LineItemsSplitController', ($scope, $routeParams, $location, db, errorReporter) ->
-    $scope.allCategories = db.categories().getAll().toArray()
+    $scope.allCategories = db.preloaded.categories
 
-    $scope.item = db.lineItems().findById($routeParams.itemId)
+    $scope.item = db.preloaded.item
     $scope.newItem = db.lineItems().cloneLineItem($scope.item)
     $scope.amount = new BigNumber($scope.item.amount)
     $scope.newAmount = 0
@@ -103,11 +103,11 @@ angular.module('app.controllers')
       $scope.item.amount = parseFloat($scope.amountLeft.toFixed(2)).toString()
       $scope.newItem.amount = parseFloat($scope.newAmount.toFixed(2)).toString()
       db.categories().findOrCreate($scope.newItem.categoryName)
-      db.lineItems().editById($scope.item)
-      db.lineItems().insert($scope.newItem)
-      db.lineItems().reBalance($scope.item)
-      db.saveTables([db.tables.lineItems, db.tables.categories]).then ->
-        $location.path($routeParams.returnto || "/line_items/#{itemDate.year()}/#{itemDate.month()}")
+      .then ->  db.lineItems().updateById($scope.item)
+      .then ->  db.lineItems().insert($scope.newItem)
+      .then ->  db.lineItems().reBalance($scope.item)
+      .then ->  db.saveTables([db.tables.lineItems, db.tables.categories])
+      .then -> $scope.$apply -> $location.path($routeParams.returnto || "/line_items/#{itemDate.year()}/#{itemDate.month()}")
 
   .controller 'LineItemShowController', ($scope, $routeParams, db) ->
     $scope.item = db.lineItems().findById($routeParams.itemId)

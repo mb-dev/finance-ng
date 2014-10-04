@@ -14,8 +14,7 @@ App = angular.module('app', [
   'core.filters'
   'ngRoute'
   'angularMoment'
-  'ui.select2',
-  'siyfion.sfTypeahead'
+  'mgcrea.ngStrap'
   'checklist-model'
 ])
 
@@ -71,28 +70,40 @@ App.config ($routeProvider, $locationProvider) ->
     db.accounts().getAll().then (accounts) ->
       db.preloaded.accounts = accounts
 
-  loadEditingLineItem = (db, $route) ->
-    itemId = parseInt($route.current.params.itemId)
+  loadImportedLines = (db) ->
+    db.importedLines().getAllContentsAsObject().then (importedLines) ->
+      db.preloaded.importedLines = {}
+      db.preloaded.importedLines[item.key] = item.value for item in importedLines
+
+  loadProcessingRules = (db) ->
+    db.processingRules().getAll().then (processingRules) -> 
+      db.preloaded.processingRules = processingRules
+
+  loadAccountId = (db, $route) ->
+    itemId = parseInt($route.current.params.itemId, 10)
+    db.accounts().findById(itemId).then (account) ->
+      db.preloaded.item = account
+
+  loadLineItem = (db, $route) ->
+    itemId = parseInt($route.current.params.itemId, 10)
     db.lineItems().findById(itemId).then (item) ->
       db.preloaded.item = item
+      db.accounts().findById(item.accountId).then (account) ->
+        db.preloaded.account = account
 
   $routeProvider
-    .when('/', {templateUrl: '/partials/home/welcome.html', controller: 'WelcomePageController', resolve: resolveFDb(((fdb) -> [fdb.tables.lineItems, fdb.tables.accounts]), true) })
+    .when('/', {templateUrl: '/partials/home/welcome.html', controller: 'WelcomePageController', resolve: loadIdbCollections([loadAccounts]) })
 
-    .when('/accounts/new', {templateUrl: '/partials/accounts/form.html', controller: 'AccountsFormController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
-    .when('/accounts/:itemId/edit', {templateUrl: '/partials/accounts/form.html', controller: 'AccountsFormController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
-    .when('/accounts/:itemId', {templateUrl: '/partials/accounts/show.html', controller: 'AccountsShowController', resolve: resolveFDb((fdb) -> [fdb.tables.accounts]) })
+    .when('/accounts/new', {templateUrl: '/partials/accounts/form.html', controller: 'AccountsFormController', resolve: loadIdbCollections() })
+    .when('/accounts/:itemId/edit', {templateUrl: '/partials/accounts/form.html', controller: 'AccountsFormController', resolve: loadIdbCollections([loadAccountId]) })
+    .when('/accounts/:itemId', {templateUrl: '/partials/accounts/show.html', controller: 'AccountsShowController', resolve: loadIdbCollections([loadAccountId]) })
 
     .when('/line_items/new', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: loadIdbCollections([loadCategories, loadPayees, loadAccounts]) })
-    .when('/line_items/:itemId/edit', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: loadIdbCollections([loadCategories, loadPayees, loadAccounts, loadEditingLineItem]) })
-    .when('/line_items/:itemId/split', {templateUrl: '/partials/line_items/split.html', controller: 'LineItemsSplitController', resolve: loadIdbCollections() })
-    .when('/line_items/:itemId', {templateUrl: '/partials/line_items/show.html', controller: 'LineItemShowController', resolve: loadIdbCollections() })
+    .when('/line_items/:itemId/edit', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: loadIdbCollections([loadCategories, loadPayees, loadAccounts, loadLineItem]) })
+    .when('/line_items/:itemId/split', {templateUrl: '/partials/line_items/split.html', controller: 'LineItemsSplitController', resolve: loadIdbCollections([loadCategories, loadPayees, loadAccounts, loadLineItem]) })
+    .when('/line_items/:itemId', {templateUrl: '/partials/line_items/show.html', controller: 'LineItemShowController', resolve: loadIdbCollections([loadLineItem]) })
     .when('/line_items/:year/:month', {templateUrl: '/partials/line_items/index.html', controller: 'LineItemsIndexController', reloadOnSearch: false, resolve: loadIdbCollections() })
     .when('/line_items/', {templateUrl: '/partials/line_items/index.html', controller: 'LineItemsIndexController', resolve: loadIdbCollections() })
-
-    .when('/categories/', {templateUrl: '/partials/misc/categories.html'})
-    .when('/payees/', {templateUrl: '/partials/misc/payees.html'})
-    .when('/batch_assign/', {templateUrl: '/partials/misc/batch_assign.html'})
 
     .when('/processing_rules/', {templateUrl: '/partials/processing_rules/index.html'})
     .when('/processing_rules/:itemId/edit', {templateUrl: '/partials/processing_rules/form.html'})
@@ -111,9 +122,9 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/reports/:year/categories/:item', {templateUrl: '/partials/reports/show.html', controller: 'ReportsShowController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories])})
 
     .when('/misc', {templateUrl: '/partials/misc/index.html'})    
-    .when('/misc/import', {templateUrl: '/partials/misc/import.html', controller: 'ImportItemsController', resolve: resolveFDb((fdb) ->[fdb.tables.accounts, fdb.tables.categories, fdb.tables.payees, fdb.tables.lineItems, fdb.tables.importedLines, fdb.tables.processingRules]) })    
-    .when('/misc/categories', {templateUrl: '/partials/misc/categories.html', controller: 'MiscCategoriesController', resolve: resolveFDb((fdb) ->[fdb.tables.categories]) })    
-    .when('/misc/payees', {templateUrl: '/partials/misc/payees.html', controller: 'MiscPayeesController', resolve: resolveFDb((fdb) ->[fdb.tables.payees]) })    
+    .when('/misc/import', {templateUrl: '/partials/misc/import.html', controller: 'ImportItemsController', resolve: loadIdbCollections([loadAccounts, loadCategories, loadPayees, loadImportedLines, loadProcessingRules ]) })
+    .when('/misc/categories', {templateUrl: '/partials/misc/categories.html', controller: 'MiscCategoriesController', resolve: loadIdbCollections([loadCategories]) })    
+    .when('/misc/payees', {templateUrl: '/partials/misc/payees.html', controller: 'MiscPayeesController', resolve: loadIdbCollections([loadPayees]) })
     .when('/misc/processingRules', {templateUrl: '/partials/misc/processingRules.html', controller: 'MiscProcessingRulesController', resolve: resolveFDb((fdb) ->[fdb.tables.processingRules]) })    
     .when('/misc/importedLines/:year/:month', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: resolveFDb((fdb) ->[fdb.tables.importedLines]) })    
     .when('/misc/importedLines/', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: resolveFDb((fdb) ->[fdb.tables.importedLines]) })    
