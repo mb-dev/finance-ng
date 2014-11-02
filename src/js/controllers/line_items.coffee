@@ -28,10 +28,10 @@ angular.module('app.controllers')
       applyDateChanges()
 
     $scope.nextMonth = ->
-      $scope.currentDate.add('months', 1)
+      $scope.currentDate.add(1, 'months')
       $location.path('/line_items/' + $scope.currentDate.year().toString() + '/' + ($scope.currentDate.month()+1).toString())
     $scope.prevMonth = ->
-      $scope.currentDate.add('months', -1)
+      $scope.currentDate.add(-1, 'months')
       $location.path('/line_items/' + $scope.currentDate.year().toString() + '/' + ($scope.currentDate.month()+1).toString())
     $scope.deleteItem = (item) ->
       db.lineItems().deleteItemAndRebalance(item)
@@ -110,5 +110,5 @@ angular.module('app.controllers')
       .then -> $scope.$apply -> $location.path($routeParams.returnto || "/line_items/#{itemDate.year()}/#{itemDate.month()}")
 
   .controller 'LineItemShowController', ($scope, $routeParams, db) ->
-    $scope.item = db.lineItems().findById($routeParams.itemId)
-    $scope.account = db.accounts().findById($scope.item.accountId)
+    $scope.item = db.preloaded.item
+    $scope.account = db.preloaded.account

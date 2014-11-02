@@ -20,13 +20,13 @@ angular.module('app.controllers')
       updateFunc = db.budgetItems().insert
     else
       $scope.title = 'Edit account'
-      $scope.item = db.budgetItems().findById($routeParams.itemId)
-      updateFunc = db.budgetItems().editById
+      $scope.item = db.preloaded.budgetItem
+      updateFunc = db.budgetItems().updateById
 
-    $scope.categories = db.categories().getAll().toArray().sort()
+    $scope.categories = db.preloaded.categories
 
     $scope.onSubmit = ->
-      onSuccess = -> $location.path('/budgets/' + $scope.item.budgetYear.toString())
+      onSuccess = -> $scope.$apply -> $location.path('/budgets/' + $scope.item.budgetYear.toString())
       saveTables = -> db.saveTables([db.tables.budgetItems])
       updateFunc($scope.item).then(saveTables).then(onSuccess, errorReporter.errorCallbackToScope($scope))
 

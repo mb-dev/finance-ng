@@ -22,41 +22,47 @@ App.config ($routeProvider, $locationProvider) ->
   authAndCheckData = (tableList, db, storageService, $rootScope) ->
     setTimeout ->
       if storageService.isAuthenticateTimeAndSet()
-        db.authAndCheckData(tableList).then (ok) ->
+        db.getTables(tableList).then (ok) ->
           coffeescript_needs_this_line = true
         , (failure) ->
           $rootScope.$broadcast('auth_fail', failure)
     , 5000
     db
 
-  resolveFDb = (tableList, allowLoggedOut) ->
-    {
-      db: ($q, fdb, storageService, $rootScope) -> 
-        defer = $q.defer()
-        if allowLoggedOut && !storageService.isUserExists()
-          defer.resolve(null)
-        else
-          fdb.getTables(tableList(fdb)).then -> 
-            authAndCheckData(Object.keys(fdb.tables), fdb, storageService, $rootScope)
-            defer.resolve(fdb)
-          , (err) ->
-            defer.reject(err)
-        defer.promise
-    }
-
   loadIdbCollections = (otherFunctions = []) ->
     {
-      db: ($q, $route, financeidb) ->
+      db: ($q, $route, financeidb, storageService, $rootScope) ->
         defer = $q.defer()
         financeidb.loadTables().then ->
           async.each otherFunctions, (func, callback) ->
-            func(financeidb, $route).then -> callback()
+            func(financeidb, $route).then -> 
+              callback()
+            , (err) ->
+              console.log "Failed #{err}"
           , (err) ->
             defer.resolve(financeidb)
+          if storageService.isUserExists() and storageService.getEncryptionKey()
+            authAndCheckData(Object.keys(financeidb.tables), financeidb, storageService, $rootScope)
         , (err) ->
+          console.log "error loading"
           defer.reject(err)
         defer.promise
     }
+
+  loadBudgetItemsForYear = (db, $route) ->
+    year = parseInt($route.current.params.year, 10) or moment().year()
+    db.budgetItems().getAllForYear(year).then (budgetItems) ->
+      db.preloaded.budgetItems = budgetItems
+
+  loadBudgetItemId = (db, $route) ->
+    itemId = parseInt($route.current.params.itemId, 10)
+    db.budgetItems().findById(itemId).then (budgetItem) ->
+      db.preloaded.budgetItem = budgetItem
+
+  loadPlannedItemsForYear = (db, $route) ->
+    year = parseInt($route.current.params.year, 10) or moment().year()
+    db.plannedItems().getAllForYear(year).then (plannedItems) ->
+      db.preloaded.plannedItems = plannedItems
 
   loadCategories = (db) ->
     db.categories().getAllKeys().then (categories) ->
@@ -71,9 +77,9 @@ App.config ($routeProvider, $locationProvider) ->
       db.preloaded.accounts = accounts
 
   loadImportedLines = (db) ->
-    db.importedLines().getAllContentsAsObject().then (importedLines) ->
+    db.importedLines().getAll().then (importedLines) ->
       db.preloaded.importedLines = {}
-      db.preloaded.importedLines[item.key] = item.value for item in importedLines
+      db.preloaded.importedLines[item.content] = true for item in importedLines
 
   loadProcessingRules = (db) ->
     db.processingRules().getAll().then (processingRules) -> 
@@ -83,6 +89,11 @@ App.config ($routeProvider, $locationProvider) ->
     itemId = parseInt($route.current.params.itemId, 10)
     db.accounts().findById(itemId).then (account) ->
       db.preloaded.item = account
+
+  loadLineItemsByYear = (db, $route) ->
+    year = parseInt($route.current.params.year, 10) or moment().year()
+    db.lineItems().getByDynamicFilter({date: {year: year}}).then (lineItems) =>
+      db.preloaded.lineItems = lineItems
 
   loadLineItem = (db, $route) ->
     itemId = parseInt($route.current.params.itemId, 10)
@@ -109,30 +120,30 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/processing_rules/:itemId/edit', {templateUrl: '/partials/processing_rules/form.html'})
     .when('/processing_rules/:itemId', {templateUrl: '/partials/processing_rules/show.html'})
     
-    .when('/budgets/:year?', {templateUrl: '/partials/budgets/index.html', controller: 'BudgetsIndexController', resolve: resolveFDb((fdb) ->[fdb.tables.budgetItems, fdb.tables.lineItems]) })
-    .when('/budgets/:year/new', {templateUrl: '/partials/budgets/form.html', controller: 'BudgetItemsFormController', resolve: resolveFDb((fdb) ->[fdb.tables.budgetItems, fdb.tables.categories]) })
+    .when('/budgets/:year?', {templateUrl: '/partials/budgets/index.html', controller: 'BudgetsIndexController', resolve: loadIdbCollections([loadCategories, loadLineItemsByYear, loadBudgetItemsForYear, loadPlannedItemsForYear]) })
+    .when('/budgets/:year/new', {templateUrl: '/partials/budgets/form.html', controller: 'BudgetItemsFormController', resolve: loadIdbCollections([loadCategories, loadBudgetItemsForYear]) })
     .when('/budgets/:year/:itemId', {templateUrl: '/partials/budgets/show.html'})
-    .when('/budgets/:year/:itemId/edit', {templateUrl: '/partials/budgets/form.html', controller: 'BudgetItemsFormController', resolve: resolveFDb((fdb) ->[fdb.tables.budgetItems, fdb.tables.categories]) })
+    .when('/budgets/:year/:itemId/edit', {templateUrl: '/partials/budgets/form.html', controller: 'BudgetItemsFormController', resolve: loadIdbCollections([loadCategories, loadBudgetItemsForYear, loadBudgetItemId]) })
 
 
     .when('/planned_items/:year?', {templateUrl: '/partials/planned_items/index.html'})
     .when('/planned_items/:year/:name/edit', {templateUrl: '/partials/planned_items/edit.html'})
 
-    .when('/reports/:year?/:month?', {templateUrl: '/partials/reports/index.html', controller: 'ReportsIndexController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories]) })
-    .when('/reports/:year/categories/:item', {templateUrl: '/partials/reports/show.html', controller: 'ReportsShowController', resolve: resolveFDb((fdb) ->[fdb.tables.lineItems, fdb.tables.categories])})
+    .when('/reports/:year?/:month?', {templateUrl: '/partials/reports/index.html', controller: 'ReportsIndexController', resolve: loadIdbCollections([loadCategories]) })
+    .when('/reports/:year/categories/:item', {templateUrl: '/partials/reports/show.html', controller: 'ReportsShowController', resolve: loadIdbCollections([loadCategories]) })
 
     .when('/misc', {templateUrl: '/partials/misc/index.html'})    
     .when('/misc/import', {templateUrl: '/partials/misc/import.html', controller: 'ImportItemsController', resolve: loadIdbCollections([loadAccounts, loadCategories, loadPayees, loadImportedLines, loadProcessingRules ]) })
     .when('/misc/categories', {templateUrl: '/partials/misc/categories.html', controller: 'MiscCategoriesController', resolve: loadIdbCollections([loadCategories]) })    
     .when('/misc/payees', {templateUrl: '/partials/misc/payees.html', controller: 'MiscPayeesController', resolve: loadIdbCollections([loadPayees]) })
-    .when('/misc/processingRules', {templateUrl: '/partials/misc/processingRules.html', controller: 'MiscProcessingRulesController', resolve: resolveFDb((fdb) ->[fdb.tables.processingRules]) })    
-    .when('/misc/importedLines/:year/:month', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: resolveFDb((fdb) ->[fdb.tables.importedLines]) })    
-    .when('/misc/importedLines/', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: resolveFDb((fdb) ->[fdb.tables.importedLines]) })    
+    .when('/misc/processingRules', {templateUrl: '/partials/misc/processingRules.html', controller: 'MiscProcessingRulesController', resolve: loadIdbCollections([loadProcessingRules]) })    
+    .when('/misc/importedLines/:year/:month', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: loadIdbCollections([loadImportedLines]) })    
+    .when('/misc/importedLines/', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: loadIdbCollections([loadImportedLines]) })    
 
 
     .when('/login_success', template: 'Loading...', controller: 'LoginOAuthSuccessController')
-    .when('/key', {templateUrl: '/partials/user/key.html', controller: 'UserKeyController', resolve:  {db: (fdb) -> fdb}})
-    .when('/profile', {templateUrl: '/partials/user/profile.html', controller: 'UserProfileController', resolve:  {db: (fdb) -> fdb} })
+    .when('/key', {templateUrl: '/partials/user/key.html', controller: 'UserKeyController', resolve:  loadIdbCollections()} )
+    .when('/profile', {templateUrl: '/partials/user/profile.html', controller: 'UserProfileController', resolve:  loadIdbCollections() })
     .when('/edit_profile', {templateUrl: '/partials/user/edit_profile.html', controller: 'UserEditProfileController'})
     .when('/logout', {template: 'Logging out...', controller: 'UserLogoutController'})
 

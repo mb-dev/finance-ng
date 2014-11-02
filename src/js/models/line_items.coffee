@@ -58,7 +58,7 @@ class window.LineItemCollection extends IndexedDbCollection
           minDate = moment({year: filter.date.year}).startOf('year').valueOf()
           maxDate = moment({year: filter.date.year}).endOf('year').valueOf()
         
-        @dba.lineItems.query('date').bound(minDate, maxDate).execute().done (lineItems) =>
+        @dba.lineItems.query('date').bound(minDate, maxDate).execute().then (lineItems) =>
           lineItems = _.filter(lineItems, (item) -> 
             if filter.categories?
               return false if filter.categories.indexOf(item.categoryName) < 0
@@ -101,20 +101,38 @@ class window.LineItemCollection extends IndexedDbCollection
   getItemsByAccountIdSorted: (accountId) =>
     @getItemsByAccountId(accountId, ['originalDate', 'id']).toArray()
 
-  reBalance: (modifiedItem) =>
+  reBalance: (modifiedItem, accountId) =>
     currentBalance = 0
 
-    updateBalance = (item) ->
+    updateBalance = (item) =>
       unless item.tags and item.tags.indexOf(LineItemCollection.TAG_CASH) >= 0
         currentBalance += helpers.$signedAmount.apply(item)
+      
+      if item.balance != currentBalance
+        item.balance = currentBalance
+        @onEdit(item)
+
       currentBalance
 
-    new RSVP.Promise (resolve, reject) =>
-      @dba.lineItems.query('date_id')
-      .all()
-      .modify(balance: updateBalance)
+    findPreviousItem = =>
+      @dba.lineItems.query('account_date_id').upperBound([modifiedItem.accountId, modifiedItem.date, modifiedItem.id]).desc().limit(0, 2).execute()
+
+    findRestItemsUpdateBalance = =>
+      query = @dba.lineItems.query('account_date_id')
+      if modifiedItem
+        query = query.lowerBound([modifiedItem.accountId, modifiedItem.date, modifiedItem.id])
+      else
+        query = query.bound([accountId, 0, 0], [accountId, Number.MAX_VALUE, Number.MAX_VALUE])
+      query.modify(balance: updateBalance)
       .execute()
-      .then -> resolve()
+
+    if modifiedItem
+      findPreviousItem().then (previousItems) ->
+        if previousItems.length == 2
+          currentBalance = previousItems[1].balance
+      .then -> findRestItemsUpdateBalance()
+    else
+      findRestItemsUpdateBalance()
 
   cloneLineItem: (originalItem) =>
     newItem = {}

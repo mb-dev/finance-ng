@@ -3,7 +3,7 @@ APP_NAME = 'financeng'
 angular.module('app.services')
   .factory 'financeidb', ($q, $rootScope, storageService, userService) ->
     
-    db = new IndexedDbDatabase('financeng', $q, storageService, userService)
+    db = new IndexedDbDatabase(APP_NAME, $q, storageService, userService)
     
     tables = {}
     tables.categories = db.createCollection('categories', new IndexedDbSimpleCollection(APP_NAME, 'categories'))
@@ -12,7 +12,7 @@ angular.module('app.services')
     tables.lineItems = db.createCollection('lineItems', new LineItemCollection(APP_NAME, 'lineItems', ['date', 'id']))
 
     tables.budgetItems = db.createCollection('budgetItems', new BudgetItemCollection(APP_NAME, 'budgetItems'))
-    tables.plannedItems = db.createCollection('plannedItems', new BudgetItemCollection(APP_NAME, 'plannedItems'))
+    tables.plannedItems = db.createCollection('plannedItems', new PlannedItemCollection(APP_NAME, 'plannedItems'))
     tables.importedLines = db.createCollection('importedLines', new ImportedLinesCollection(APP_NAME, 'importedLines'))
     tables.processingRules = db.createCollection('processingRules', new IndexedDbSimpleCollection(APP_NAME, 'processingRules'))
 
@@ -24,13 +24,13 @@ angular.module('app.services')
           key: { keyPath: 'id' }
           indexes:
             id: {unique: true}
-            budget_year: {}
+            budgetYear: {}
         plannedItems:
           key: { keyPath: 'id' }
           indexes:
             id: {unique: true}
-            event_date_start: {}
-            event_date_end: {}
+            eventDateStart: {}
+            eventDateEnd: {}
         categories:
           key: { keyPath: 'id' }
           indexes:
@@ -49,6 +49,7 @@ angular.module('app.services')
             id: {unique: true}
             date: {}
             'date_id': {unique: true, key: ['date', 'id']}
+            'account_date_id': {unique: true, key: ['accountId', 'date', 'id']}
         importedLines:
           key: { keyPath: 'id' }
           indexes:
@@ -68,9 +69,13 @@ angular.module('app.services')
         , (err) ->
           if err then reject(err) else resolve()
 
+    financeDbConfig = {incomeCategories: ['Income:Salary', 'Income:Dividend', 'Income:Misc']}
+
     accessFunc = {
       tables: tableNames
       preloaded: {}
+      config: ->
+        financeDbConfig
       budgetItems: ->
         tables.budgetItems
       plannedItems: ->
@@ -89,8 +94,6 @@ angular.module('app.services')
         tables.processingRules
       loadTables: ->
         loadTables()
-      config: ->
-        {}
       getTables: (tableList, forceRefreshAll) =>
         db.getTables(tableList, forceRefreshAll)
       saveTables: (tableList, forceServerCleanAndSaveAll) ->

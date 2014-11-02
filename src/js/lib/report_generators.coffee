@@ -3,14 +3,19 @@ class window.LineItemsReportView
     @db = db
     @year = year
     
-    @lineItems = db.lineItems().getByDynamicFilter({date: {year: @year}}).toArray()    
+  generateReport: =>
+    @db.lineItems().getByDynamicFilter({date: {year: @year}}).then (lineItems) =>
+      @db.lineItems().addHelpers(lineItems)
+      @lineItems = lineItems
+      @_generateAfterLineItems()
 
+  _generateAfterLineItems: =>
     rootCategoriesMap = {}
     @rootCategoryToCategories = {}
 
     @lineItemsBox = new Box()
     @childCategoriesBox = new Box()
-    db.categories().getAll().toArray().forEach (categoryName) =>
+    @db.preloaded.categories.forEach (categoryName) =>
       return if categoryName.indexOf('Transfer') >= 0
       rootCategoryName = categoryName.split(':')[0]
       @childCategoriesBox.addRow(categoryName)
@@ -40,7 +45,7 @@ class window.LineItemsReportView
     @db.config().incomeCategories.forEach (incomeCategory) =>
       @lineItemsBox.addToValue(incomeCategory, 4, 'amount', 0.0)
 
-  generateReport: =>
+
     incomeSection = {name: 'Income', rootCategories: [], monthlyTotals: [], totalAvg: '0', totalSum: '0'}
     expenseSection = {name: 'Expense', rootCategories: [], monthlyTotals: [], totalAvg: '0', totalSum: '0'}
     reportSections = [incomeSection, expenseSection]
@@ -67,12 +72,12 @@ class window.LineItemsReportView
 
     totalExpenses = new BigNumber(0)
     Object.keys(@lineItemsBox.rowByHash).sort().forEach (categoryName) =>
-      return if Lazy(categoryName).startsWith('Income')
+      return if categoryName.indexOf('Income') == 0
       totalExpenses = totalExpenses.plus(@lineItemsBox.rowTotals(categoryName).amount.times(-1))
     expenseSection.totalSum = totalExpenses.times(-1)
     expenseSection.totalAvg = totalExpenses.times(-1).div(12)
     Object.keys(@lineItemsBox.rowByHash).sort().forEach (rootCategoryName) =>
-      return if Lazy(rootCategoryName).startsWith('Income')
+      return if rootCategoryName.indexOf('Income') == 0
       if totalExpenses.equals(0)
         percent = "0"
       else
@@ -124,29 +129,31 @@ class window.BudgetReportView
     @db = db
     @year = parseInt(year, 10)
 
-    @budgetItems = db.budgetItems().getItemsByYear('budgetYear', @year).toArray()
-    @plannedItems = db.plannedItems().getItemsByYear('eventDateStart', @year).toArray()
-    @lineItems = db.lineItems().getItemsByYear('date', @year).toArray()
+    @budgetItems = db.preloaded.budgetItems
+    @plannedItems = db.preloaded.plannedItems
+    @lineItems = db.preloaded.lineItems
+    @db.lineItems().addHelpers(@lineItems)
 
     @totals = {}
 
     @groupedItems = {}
-    Lazy(@lineItems).each (lineItem) =>
+    @lineItems.forEach (lineItem) =>
       if lineItem.grouped_label
         item = @groupedItems[lineItem.grouped_label] ?= {amount: 0, month: 12, label: lineItem.grouped_label}
         item['amount'] += lineItem.$signedAmount()
-        item['month'] = Lazy([item['month'], lineItem.$date().month]).min
+        item['month'] = Math.min([item['month'], lineItem.$date().month])
     
-    @groupedItems = Lazy(@groupedItems).values().sortBy((item) -> item['month']).toArray()
+    @groupedItems = _.values(@groupedItems)
+    @groupedItems = _.sortBy(@groupedItems, (item) -> item['month'])
 
     categoryToBudget = {}
-    Lazy(@budgetItems).each (budgetItem) ->
-      Lazy(budgetItem.categories).each (categoryName) ->
+    @budgetItems.forEach (budgetItem) ->
+      budgetItem.categories.forEach (categoryName) ->
         categoryToBudget[categoryName] = budgetItem
 
     # prepare expense box
     @expenseBox = new Box()
-    Lazy(@budgetItems).each (budgetItem) =>
+    @budgetItems.forEach (budgetItem) =>
       @expenseBox.addRow(budgetItem.name)
     
     @expenseBox.setColumns([0..11], ['expense', 'future_expense', 'planned_expense'])
@@ -157,7 +164,7 @@ class window.BudgetReportView
     @groups = {}
     @unbudgetedCategories = []
     # add expenses/income
-    Lazy(@lineItems).each (lineItem) =>
+    @lineItems.forEach (lineItem) =>
       return if lineItem.tags && lineItem.tags.indexOf(LineItemCollection.EXCLUDE_FROM_REPORT) >= 0
       return if lineItem.categoryName == LineItemCollection.TRANSFER_TO_CASH
       if db.config().incomeCategories.indexOf(lineItem.categoryName) >= 0
@@ -181,8 +188,8 @@ class window.BudgetReportView
     # add future expenses
     if @year == moment().year()
       currentMonth = moment().month()
-      Lazy(@budgetItems).each (budgetItem) =>
-        Lazy.range(currentMonth, 11, 1).each (futureMonth) =>
+      @budgetItems.forEach (budgetItem) =>
+        [currentMonth..11].forEach (futureMonth) =>
           @expenseBox.addToValue(budgetItem.name, futureMonth, 'future_expense', budgetItem.estimatedMinMonthly)
         
       # add planned items
@@ -213,7 +220,7 @@ class window.BudgetReportView
   
   generateReport: =>
     incomeRow = []
-    Lazy(@incomeBox.rowColumnValues('income')).each (column) =>
+    @incomeBox.rowColumnValues('income').forEach (column) =>
       month = column.column
       if @isInFuture(month)
         incomeRow.push {type: 'future', amount: column.values.future_income.toFixed(2)}
@@ -221,7 +228,7 @@ class window.BudgetReportView
         incomeRow.push {type: 'current', amount: column.values.amount.toFixed(2) }
 
     expenseRowsForBudgetItem = []
-    Lazy(@budgetItems).sortBy((item) -> item.name).each (budgetItem) =>
+    _.sortBy(@budgetItems, (item) -> item.name).forEach (budgetItem) =>
       expenseRow = {columns: []}
       expenseRow.meta = {
         budgetItemId: budgetItem.id
@@ -235,7 +242,7 @@ class window.BudgetReportView
       }
       amountAvailable = 0
       amountUsed = BigNumber(0)
-      Lazy(@expenseBox.rowColumnValues(budgetItem.name)).each (expenseColumn) =>
+      @expenseBox.rowColumnValues(budgetItem.name).forEach (expenseColumn) =>
         month = expenseColumn.column
         if expenseColumn.values.expense != 0
           amount = expenseColumn.values.expense.abs()
@@ -253,15 +260,15 @@ class window.BudgetReportView
 
       expenseRowsForBudgetItem.push expenseRow
 
-    totalLimit = Lazy(@budgetItems).pluck('limit').sum()
+    totalLimit = totalLimit + item for item in _.pluck(@budgetItem, 'limit')
     {
       incomeMeta: {totalIncome: @totalIncome().toFixed(2)}, 
       incomeCategories: @db.config().incomeCategories.join(','),
       incomeRow: incomeRow, 
       expenseRows: expenseRowsForBudgetItem, 
       totalBudgeted: totalLimit,
-      groups: Lazy(@groups).values().toArray()
-      unbudgetedCategories: Lazy(@unbudgetedCategories).uniq().toArray()
+      groups: _.values(@groups)
+      unbudgetedCategories: _.uniq(@unbudgetedCategories)
     }
 
 #   def budget_year_range

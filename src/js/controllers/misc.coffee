@@ -34,7 +34,7 @@ angular.module('app.controllers')
       account = $scope.account
       importedLines = db.preloaded.importedLines
       importer = $injector.get('Import' + account.importFormat)
-      $scope.items = importer.import(fileContent)
+      $scope.items = db.lineItems().sortLazy(importer.import(fileContent))
       db.lineItems().addHelpers($scope.items)
 
       # mark items that were imported before with ignore flag
@@ -69,6 +69,7 @@ angular.module('app.controllers')
     $scope.onConfirmImport = ->
       imported = 0
       promises = []
+      $scope.items = db.lineItems().sortLazy($scope.items)
       $scope.items.forEach (item) ->
         return if item.$ignore
         importedLine = {content: item.$originalJson}
@@ -84,7 +85,7 @@ angular.module('app.controllers')
         imported += 1
 
       RSVP.all(_.compact(promises))
-      .then -> db.lineItems().reBalance()
+      .then -> db.lineItems().reBalance($scope.items[0])
       .then -> db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees, db.tables.importedLines, db.tables.processingRules])
       .then -> $scope.$apply ->
         $scope.flashSuccess(imported.toString() + ' items were imported successfully!')
@@ -97,24 +98,26 @@ angular.module('app.controllers')
     $scope.items = db.preloaded.payees
 
   .controller 'MiscProcessingRulesController', ($scope, $routeParams, $location, db, $injector) ->
-    processingRules = db.processingRules().getAll().toArray().sort()
+    processingRules = db.preloaded.processingRules
 
     $scope.processingRulesByName = []
     $scope.processingRulesByAmount = []
-    processingRules.forEach (item) ->
-      details = db.processingRules().get(item)
-      if Lazy(item).startsWith('name:')
-        $scope.processingRulesByName.push({name: item.substring(5), payeeName: details.payeeName, categoryName: details.categoryName, key: item})
+    processingRules.forEach (processingRule) ->
+      key = processingRule.key
+      details = processingRule.value
+      if key.indexOf('name:') == 0
+        $scope.processingRulesByName.push({name: key.substring(5), payeeName: details.payeeName, categoryName: details.categoryName, key: key})
       else
-        $scope.processingRulesByAmount.push({name: item.substring(6), payeeName: details.payeeName, categoryName: details.categoryName, key: item})
+        $scope.processingRulesByAmount.push({name: key.substring(6), payeeName: details.payeeName, categoryName: details.categoryName, key: key})
 
     $scope.deleteItem = (key, collection, index) ->
-      db.processingRules().delete(key)
-      db.saveTables([db.tables.processingRules]).then ->
+      db.processingRules().deleteKey(key)
+      .then -> db.saveTables([db.tables.processingRules])
+      .then -> $scope.$apply ->
         collection.splice(index, 1)
 
   .controller 'MiscImportedLinesController', ($scope, $routeParams, $location, db, $injector) ->
-    $scope.importedLines = db.importedLines().getAll().filter((item, index) ->
+    $scope.importedLines = _.filter db.preloaded.importedLines, (item, index) ->
       if $routeParams.year && $routeParams.month
         try
           parts = item.content.split(',')      
@@ -124,11 +127,10 @@ angular.module('app.controllers')
           debugger
       else
         true
-    ).toArray()
 
     $scope.deleteItem = (item, index) ->
       db.importedLines().deleteById(item.id)
-      db.saveTables([db.tables.importedLines]).then ->
+      .then -> db.saveTables([db.tables.importedLines]).then -> $scope.$apply ->
         $scope.importedLines.splice(index, 1)
 
 angular.module('app.filters')

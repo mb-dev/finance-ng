@@ -28,13 +28,11 @@ ng-include(src="'/partials/common/finance_header.html'")
       .form-group
         label.col-xs-4.col-sm-2.control-label Payee
         .col-xs-8.col-sm-10
-          select(ng-model='item.payeeName', selectize="stringsWithCreate", all-items="allPayees")
-            option(value='{{item.payeeName}}', selected="true") {{item.payeeName}}
+          input.form-control(type='text', ng-model='item.payeeName', ng-options="payee for payee in allPayees", bs-typeahead)
       .form-group
         label.col-xs-4.col-sm-2.control-label Category
         .col-xs-8.col-sm-10
-          select(ng-model='item.categoryName', selectize="stringsWithCreate", all-items="allCategories")
-            option(value='{{item.categoryName}}', selected="true") {{item.categoryName}}
+          input.form-control(type='text', ng-model='item.categoryName', ng-options="category for category in allCategories", bs-typeahead)
       hr/
       .form-group
         label.col-xs-4.col-sm-2.control-label Comment
