@@ -267,7 +267,7 @@ class window.BudgetReportView
       incomeRow: incomeRow, 
       expenseRows: expenseRowsForBudgetItem, 
       totalBudgeted: totalLimit,
-      groups: _.values(@groups)
+      groups: _.values(@groups).map (group) -> group.amount = group.amount.toFixed(2); group
       unbudgetedCategories: _.uniq(@unbudgetedCategories)
     }
 

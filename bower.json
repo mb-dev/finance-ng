@@ -10,8 +10,6 @@
     "mbdev-core": "https://github.com/mb-dev/mbdev-core.git"
   },
   "resolutions": {
-    "jquery": "2.0.3",
-    "bootstrap": "3.2.0",
     "angular": "1.3.0-beta.13"
   }
 }
