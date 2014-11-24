@@ -10,6 +10,12 @@ toImportString = (item) ->
   "#{item.type},#{item.amount},#{item.payeeName||''},#{item.comment || ''},#{moment(item.date).format('L')}"
 
 angular.module('app.controllers')
+  .controller 'MiscController', ($scope, $routeParams, $location, db, $injector) ->
+    $scope.forceLoadAll = ->
+      db.getTables(Object.keys(db.tables), true)
+
+    $scope.forceSaveAll = ->
+      db.saveTables(Object.keys(db.tables), true)
   .controller 'ImportItemsController', ($scope, $routeParams, $location, db, $injector) ->
     $scope.states = {SELECT_FILE: 'selectFile', REVIEW_ITEMS: 'reviewItems', RENAME_ITEMS: 'renameItems'}
     $scope.allCategories = db.preloaded.categories

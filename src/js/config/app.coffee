@@ -132,7 +132,7 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/reports/:year?/:month?', {templateUrl: '/partials/reports/index.html', controller: 'ReportsIndexController', resolve: loadIdbCollections([loadCategories]) })
     .when('/reports/:year/categories/:item', {templateUrl: '/partials/reports/show.html', controller: 'ReportsShowController', resolve: loadIdbCollections([loadCategories]) })
 
-    .when('/misc', {templateUrl: '/partials/misc/index.html'})    
+    .when('/misc', {templateUrl: '/partials/misc/index.html', controller: 'MiscController', resolve: loadIdbCollections() })
     .when('/misc/import', {templateUrl: '/partials/misc/import.html', controller: 'ImportItemsController', resolve: loadIdbCollections([loadAccounts, loadCategories, loadPayees, loadImportedLines, loadProcessingRules ]) })
     .when('/misc/categories', {templateUrl: '/partials/misc/categories.html', controller: 'MiscCategoriesController', resolve: loadIdbCollections([loadCategories]) })    
     .when('/misc/payees', {templateUrl: '/partials/misc/payees.html', controller: 'MiscPayeesController', resolve: loadIdbCollections([loadPayees]) })
