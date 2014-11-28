@@ -247,8 +247,9 @@ class window.BudgetReportView
         if expenseColumn.values.expense != 0
           amount = expenseColumn.values.expense.abs()
           expenseRow.columns.push {type: 'current', amount: amount.toFixed(2)}
-          amountAvailable += budgetItem.limit
-          amountUsed = amountUsed.plus(expenseColumn.values.expense.times(-1))
+          unless @isInFuture(month)
+            amountAvailable += budgetItem.limit
+            amountUsed = amountUsed.plus(expenseColumn.values.expense.times(-1))
         else if expenseColumn.values.planned_expense > 0
           expenseRow.columns.push {type: 'planned', amount: expenseColumn.values.planned_expense.toFixed(2)}
         else if expenseColumn.values.future_expense > 0
