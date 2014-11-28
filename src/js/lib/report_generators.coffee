@@ -228,6 +228,7 @@ class window.BudgetReportView
         incomeRow.push {type: 'current', amount: column.values.amount.toFixed(2) }
 
     expenseRowsForBudgetItem = []
+    totalBalance = BigNumber(0)
     _.sortBy(@budgetItems, (item) -> item.name).forEach (budgetItem) =>
       expenseRow = {columns: []}
       expenseRow.meta = {
@@ -257,17 +258,20 @@ class window.BudgetReportView
         else
           expenseRow.columns.push {type: 'other', amount: '0.0'}
       
+      totalBalance = totalBalance.plus(BigNumber(amountAvailable)).minus(amountUsed)
       expenseRow.meta.now = BigNumber(amountAvailable).minus(amountUsed).toFixed(2)
 
       expenseRowsForBudgetItem.push expenseRow
 
-    totalLimit = totalLimit + item for item in _.pluck(@budgetItem, 'limit')
+    totalLimit = 0
+    totalLimit = totalLimit + item.limit for item in @budgetItems
     {
       incomeMeta: {totalIncome: @totalIncome().toFixed(2)}, 
       incomeCategories: @db.config().incomeCategories.join(','),
       incomeRow: incomeRow, 
       expenseRows: expenseRowsForBudgetItem, 
       totalBudgeted: totalLimit,
+      totalBalance: totalBalance.toFixed(2),
       groups: _.values(@groups).map (group) -> group.amount = group.amount.toFixed(2); group
       unbudgetedCategories: _.uniq(@unbudgetedCategories)
     }

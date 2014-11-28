@@ -47,6 +47,9 @@ ng-include(src="'/partials/common/finance_header.html'")
 
   .well.well-sm.row
       |Total Budgeted: {{report.totalBudgeted | currency}}
+      br/
+      |Current Budget Balance: 
+      currency-with-sign(amount='report.totalBalance')
 
   h3 Groups:
   ul
