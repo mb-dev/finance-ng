@@ -124,7 +124,7 @@ angular.module('app.controllers')
         imported += 1
 
       RSVP.all(_.compact(promises))
-      .then -> db.lineItems().reBalance($scope.items[0])
+      .then -> db.lineItems().reBalance($scope.items[0], $scope.items[0].accountId)
       .then -> db.saveTables([db.tables.lineItems, db.tables.categories, db.tables.payees, db.tables.importedLines, db.tables.processingRules])
       .then -> $scope.$apply ->
         $scope.flashSuccess(imported.toString() + ' items were imported successfully!')
