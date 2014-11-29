@@ -41,7 +41,8 @@ ng-include(src="'/partials/common/finance_header.html'")
           currency-with-sign(amount='section.totalAvg | bnToFixed')
         td
           currency-with-sign(amount='section.totalSum | bnToFixed')
-        td &nbsp;
+        td 
+          {{section.totalPercent | percent}}
       tr.total
         td Total
         td.total(ng-repeat='column in report.reportTotals.monthly')

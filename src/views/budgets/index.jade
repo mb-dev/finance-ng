@@ -29,7 +29,10 @@ ng-include(src="'/partials/common/finance_header.html'")
           td
         tr.item-row(ng-repeat='expenseRow in report.expenseRows')
           td 
-            span {{expenseRow.meta.name}} - 
+            span {{expenseRow.meta.name}}
+            br/
+            currency-with-sign-comparison(amount='expenseRow.meta.avg', compareTo='expenseRow.meta.limit') 
+            | &nbsp;/  
             span.limit ${{expenseRow.meta.limit}}
             br/
             span.now 
@@ -39,9 +42,9 @@ ng-include(src="'/partials/common/finance_header.html'")
             a(href='/line_items/{{currentYear}}/{{$index+1}}?categories={{expenseRow.meta.categories}}', target='_blank')
               {{expenseColumn.amount | currency}}
           td
-            span Total: {{expenseRow.meta.total | currency}}
+            span {{expenseRow.meta.expenses | currency}} / {{expenseRow.meta.total | currency}}
             br/ 
-            span Expenses: {{expenseRow.meta.expenses | currency}} ({{expenseRow.meta.percent}})
+            span ({{expenseRow.meta.percent}})
           td
             a.btn.btn-primary.btn-small.edit_btn(href="/budgets/{{currentYear | amDateFormat: 'YYYY'}}/{{expenseRow.meta.budgetItemId}}/edit") Edit
 

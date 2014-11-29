@@ -9,6 +9,7 @@ path = require('path');
 debug = require('gulp-debug')
 sourcemaps = require('gulp-sourcemaps')
 plumber = require('gulp-plumber')
+notify = require("gulp-notify")
 
 paths = {}
 paths.scripts = [
@@ -36,8 +37,9 @@ gulp.task 'build-views', ->
 
 gulp.task 'build-js', ->
   gulp.src(paths.scripts)
+    .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
     .pipe(sourcemaps.init())
-    .pipe(gulpif(/[.]coffee$/, coffee({bare: true}).on('error', gutil.log)))
+    .pipe(gulpif(/[.]coffee$/, coffee({bare: true})))
     .pipe(concat('app.js'))
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('public/js'))

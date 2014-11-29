@@ -55,6 +55,7 @@ class window.LineItemsReportView
       totalIncome = totalIncome.plus(@lineItemsBox.rowTotals(categoryName).amount)
     incomeSection.totalSum = totalIncome
     incomeSection.totalAvg = totalIncome.div(12)
+    incomeSection.totalPercent = 0
     @db.config().incomeCategories.forEach (categoryName) =>
       categoryInfo = {
         name: categoryName
@@ -76,6 +77,7 @@ class window.LineItemsReportView
       totalExpenses = totalExpenses.plus(@lineItemsBox.rowTotals(categoryName).amount.times(-1))
     expenseSection.totalSum = totalExpenses.times(-1)
     expenseSection.totalAvg = totalExpenses.times(-1).div(12)
+    expenseSection.totalPercent = totalExpenses.div(incomeSection.totalSum).times(100).toFixed(0)
     Object.keys(@lineItemsBox.rowByHash).sort().forEach (rootCategoryName) =>
       return if rootCategoryName.indexOf('Income') == 0
       if totalExpenses.equals(0)
@@ -86,7 +88,7 @@ class window.LineItemsReportView
         name: rootCategoryName
         monthlyTotals: []
         avg: @lineItemsBox.rowTotals(rootCategoryName).amount.times(-1).div(12).toFixed(2)
-        total: @lineItemsBox.rowTotals(rootCategoryName).amount.times(-1),
+        total: @lineItemsBox.rowTotals(rootCategoryName).amount.times(-1).toFixed(2),
         percent: percent,
         categories: Object.keys(@rootCategoryToCategories[rootCategoryName]).join(',')
         subCategoriesInfo: []
@@ -118,7 +120,6 @@ class window.LineItemsReportView
       else
         reportTotals.monthly[month] = new BigNumber(0)
       totalAmount = totalAmount.plus(reportTotals.monthly[month])
-    reportTotals.avg = totalAmount.div(12)
     reportTotals.sum = totalAmount
     reportTotals.percent = totalAmount.div(totalIncome).times(100).toFixed(0)
     {reportSections: reportSections, reportTotals: reportTotals}
@@ -237,12 +238,14 @@ class window.BudgetReportView
         limit: budgetItem.limit
         categories: budgetItem.categories.join(',')
         now: 0
+        avg: 0
         total: budgetItem.limit*12
         expenses: @totalExpensesForBudgetItemInYear(budgetItem).toFixed(2) 
         percent: @percentExpense(budgetItem)
       }
       amountAvailable = 0
       amountUsed = BigNumber(0)
+      totalMonths = 0
       @expenseBox.rowColumnValues(budgetItem.name).forEach (expenseColumn) =>
         month = expenseColumn.column
         if expenseColumn.values.expense != 0
@@ -251,6 +254,7 @@ class window.BudgetReportView
           unless @isInFuture(month)
             amountAvailable += budgetItem.limit
             amountUsed = amountUsed.plus(expenseColumn.values.expense.times(-1))
+            totalMonths += 1
         else if expenseColumn.values.planned_expense > 0
           expenseRow.columns.push {type: 'planned', amount: expenseColumn.values.planned_expense.toFixed(2)}
         else if expenseColumn.values.future_expense > 0
@@ -258,8 +262,10 @@ class window.BudgetReportView
         else
           expenseRow.columns.push {type: 'other', amount: '0.0'}
       
-      totalBalance = totalBalance.plus(BigNumber(amountAvailable)).minus(amountUsed)
-      expenseRow.meta.now = BigNumber(amountAvailable).minus(amountUsed).toFixed(2)
+      balance = BigNumber(amountAvailable).minus(amountUsed)
+      totalBalance = totalBalance.plus(balance)
+      expenseRow.meta.now = balance.toFixed(2)
+      expenseRow.meta.avg = amountUsed.div(totalMonths).toFixed(2)
 
       expenseRowsForBudgetItem.push expenseRow
 
