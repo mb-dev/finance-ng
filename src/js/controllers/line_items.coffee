@@ -130,13 +130,14 @@ angular.module('app.controllers')
     $scope.item = db.preloaded.item
     $scope.newItem = db.lineItems().cloneLineItem($scope.item)
     $scope.newItem.categoryName = ''
-    $scope.amount = new BigNumber($scope.item.amount)
-    $scope.newAmount = 0
-    $scope.amountLeft = $scope.item.amount
+    $scope.meta = {}
+    $scope.meta.amount = new BigNumber($scope.item.amount)
+    $scope.meta.newAmount = 0
+    $scope.meta.amountLeft = $scope.item.amount
 
     $scope.onChangeSplitAmount = ->
-      if $scope.newAmount
-        $scope.amountLeft = parseFloat($scope.amount.minus($scope.newAmount).toFixed(2))
+      if $scope.meta.newAmount
+        $scope.meta.amountLeft = parseFloat($scope.meta.amount.minus($scope.meta.newAmount).toFixed(2))
 
     onSuccess = -> $scope.$apply ->
       if $scope.$hide?
@@ -148,8 +149,8 @@ angular.module('app.controllers')
       
 
     $scope.onSubmit = ->
-      $scope.item.amount = parseFloat($scope.amountLeft.toFixed(2)).toString()
-      $scope.newItem.amount = parseFloat($scope.newAmount.toFixed(2)).toString()
+      $scope.item.amount = parseFloat($scope.meta.amountLeft.toFixed(2)).toString()
+      $scope.newItem.amount = parseFloat($scope.meta.newAmount.toFixed(2)).toString()
       db.categories().findOrCreate($scope.newItem.categoryName)
       .then ->  db.lineItems().updateById($scope.item)
       .then ->  db.lineItems().insert($scope.newItem)
