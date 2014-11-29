@@ -54,6 +54,9 @@ angular.module('app.controllers')
     $scope.accounts = db.preloaded.accounts
     $scope.account = $scope.accounts[0] if $scope.accounts.length > 0
 
+    processingRules = {}
+    processingRules[rule.key] = rule.value for rule in db.preloaded.processingRules
+
     if $routeParams.accountId
       $scope.account = _($scope.accounts).find({id: parseInt($routeParams.accountId, 10)})
 
@@ -83,7 +86,7 @@ angular.module('app.controllers')
         else
           item.originalDate = item.date
           item.$originalPayeeName = item.payeeName
-          if !item.$process(db.preloaded.processingRules)
+          if !item.$process(processingRules)
             item.payeeName = correctCase(item.payeeName)
             item.$addRule = false
           else

@@ -3,7 +3,7 @@ angular.module('app.importers')
     import: (fileContent) ->
       rows = CSV.parse(fileContent)
       rows.splice(0, 1)
-      Lazy(rows).map((row) =>
+      _(rows).map((row) =>
         date = row[0]
         description = row[1]
         comments = row[2]
@@ -11,7 +11,7 @@ angular.module('app.importers')
         amount = row[4]
         balance = row[5]
 
-        if !Lazy(description).endsWith('(Pending)')
+        if description.indexOf('(Pending)') < 0
           amountAsFloat = parseFloat(amount.match(/[0-9.\-]+/g).join(''))
 
           lineItem = {}
@@ -22,7 +22,7 @@ angular.module('app.importers')
           lineItem.payeeName = description.trim() if !checkNumber
           lineItem.date = moment(date).valueOf()
           lineItem
-      ).compact().toArray()
+      ).compact().valueOf()
 
   .factory 'ImportProvidentVisa', () ->
     import: (fileContent) ->
