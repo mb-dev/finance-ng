@@ -11,11 +11,41 @@ toImportString = (item) ->
 
 angular.module('app.controllers')
   .controller 'MiscController', ($scope, $routeParams, $location, db, $injector) ->
+    $scope.msg = ''
     $scope.forceLoadAll = ->
-      db.getTables(Object.keys(db.tables), true)
+      $scope.msg = ''
+      db.getTables(Object.keys(db.tables), true).then ->
+        $scope.msg = 'Done loading all tables'
 
-    $scope.forceSaveAll = ->
-      db.saveTables(Object.keys(db.tables), true)
+    $scope.forceSave = (tableName) ->
+      $scope.msg = ''
+      db.saveTables([tableName], true).then -> $scope.$apply ->
+        $scope.msg = "Done saving #{tableName}"
+
+    $scope.reBalanceAll = ->
+      $scope.msg = ''
+      db.accounts().getAll().then (accounts) ->
+        async.each accounts, (account, callback) ->
+          db.lineItems().reBalance(null, account.id).then ->
+            callback()
+        , (err) -> $scope.$apply ->
+          if err 
+            $scope.msg = 'Error rebalancing'
+            console.log('error', err)
+          else
+            $scope.msg = 'Done rebalancing'
+
+    $scope.recreatePayees = ->
+      db.loaders.loadPayees().then (payees) ->
+        allPayees = _.indexBy(payees)
+        db.lineItems().getAll().then (lineItems) ->
+          promises = []
+          for lineItem in lineItems
+            if !allPayees[lineItem.payeeName]
+              promises.push(db.payees().findOrCreate(lineItem.payeeName))
+          RSVP.all(promises).then ->
+            db.saveTables([db.tables.payees]).then -> console.log 'done'
+
   .controller 'ImportItemsController', ($scope, $routeParams, $location, db, $injector) ->
     $scope.states = {SELECT_FILE: 'selectFile', REVIEW_ITEMS: 'reviewItems', RENAME_ITEMS: 'renameItems'}
     $scope.allCategories = db.preloaded.categories

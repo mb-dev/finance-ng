@@ -2,10 +2,22 @@ ng-include(src="'/partials/common/finance_header.html'")
 .container
   h2 More Actions:
   hr/
+  div.alert.alert-success(ng-if='msg') 
+    {{msg}}
   a.btn.btn-primary(ng-click='forceLoadAll()') Force load all tables from the server
   br/
   br/
-  a.btn.btn-primary(ng-click='forceSaveAll()') Force save all tables from the server
+  | Force save: 
+  a.btn.btn-primary(ng-click="forceSave('payees')") Payees
+  &nbsp;
+  a.btn.btn-primary(ng-click="forceSave('categories')") Categories
+  br/
+  br/
+  | Recreate: 
+  a.btn.btn-primary(ng-click='recreatePayees()') Payees
+  br/
+  br/
+  a.btn.btn-primary(ng-click='reBalanceAll()') Rebalance all
   br/
   br/
   a.btn.btn-primary(href='/misc/import') Import Line Items

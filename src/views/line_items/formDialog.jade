@@ -1,0 +1,16 @@
+.modal.fade.in(tabindex="-1", ng-controller="LineItemsFormController")
+  .modal-dialog
+    .modal-content
+      .modal-header
+        button.close(type='button', ng-click="$hide()")
+          span(aria-hidden='true') &times;
+          span.sr-only Close
+        h4.modal-title {{title}}
+      .modal-body
+
+        ng-include(src="'/partials/line_items/_form.html'")
+
+
+      .modal-footer
+        button.btn.btn-default(type='button', ng-click="$hide()") Close
+        button.btn.btn-primary(type='button', ng-click="onSubmit()") Save changes

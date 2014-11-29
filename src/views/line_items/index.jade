@@ -1,7 +1,7 @@
 ng-include(src="'/partials/common/finance_header.html'")
 .line_items_index.index_page.container
   .new.row.btn-toolbar.top
-    a.btn.btn-primary.add_transaction(ng-href='/line_items/new') 
+    a.btn.btn-primary.add_transaction(ng-click='createLineItem()') 
       i.fa.fa-plus 
       | Add Transaction
     a.btn.btn-primary.import(ng-href='/misc/import') 
@@ -25,22 +25,22 @@ ng-include(src="'/partials/common/finance_header.html'")
       .hidden-xs.col-md-2.text-center Actions
       
     .list-group-item.row.animate-repeat(ng-repeat='item in lineItems', ng-click='onClickItem(item)')
-      a.col-xs-12.col-md-10(ng-href='/line_items/{{item.id}}')
-        .date.col-xs-2.col-md-1
-          i.fa.fa-tags.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.tags[0]}}', ng-show='{{item.tags && item.tags.length > 0}}')/
-          i.fa.fa-comment.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.comment}}', ng-show='{{item.comment.length > 0}}')/
-          i.fa.fa-plane.fa-fw.display-tooltip(rel= 'tooltip', title='{{item.groupedLabel}}', ng-show='{{item.groupedLabel.length > 0}}')
+      a.col-xs-12.col-md-10(ng-href='/line_items/{{::item.id}}')
+        .date.col-xs-2.col-md-1(class="account-{{::item.$accountIndex}}")
+          i.fa.fa-tags.fa-fw.display-tooltip(rel= 'tooltip', title='{{::item.tags[0]}}', ng-show='{{item.tags && item.tags.length > 0}}')/
+          i.fa.fa-comment.fa-fw.display-tooltip(rel= 'tooltip', title='{{::item.comment}}', ng-show='{{item.comment.length > 0}}')/
+          i.fa.fa-plane.fa-fw.display-tooltip(rel= 'tooltip', title='{{::item.groupedLabel}}', ng-show='{{item.groupedLabel.length > 0}}')
           | &nbsp;
         .date.col-xs-2.col-md-1
           {{item.date | amDateFormat:'DD' }}
-        .payee.col-xs-5.col-md-4 {{item.payeeName}}
-        .payee.hidden-xs.col-md-3 {{item.categoryName}}
+        .payee.col-xs-5.col-md-4 {{::item.payeeName}}
+        .payee.hidden-xs.col-md-3 {{::item.categoryName}}
         .amount.col-xs-3.col-md-1
            currency-with-sign(amount='item.$signedAmount()')
-        .payee.hidden-xs.col-md-2 {{item.balance | currency}}
+        .payee.hidden-xs.col-md-2 {{::item.balance | currency}}
       .actions.hidden-xs.col-md-2
-        a.btn.btn-default.btn-sm.edit(ng-href='/line_items/{{item.id}}/edit?returnto={{currentLocation}}') Edit 
+        a.btn.btn-default.btn-sm.edit(ng-click='editLineItem(item)') Edit 
         &nbsp; 
-        a.btn.btn-default.btn-sm.split(ng-href='/line_items/{{item.id}}/split?returnto={{currentLocation}}') Split 
+        a.btn.btn-default.btn-sm.split(ng-click='splitLineItem(item)') Split 
         &nbsp; 
         a.btn.btn-default.btn-sm.delete(ng-confirm-click='Are you sure you want to delete {{item.payeeName}}?', confirmed-click='deleteItem(item)') Delete

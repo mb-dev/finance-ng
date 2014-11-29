@@ -32,7 +32,8 @@ paths.views = ['./src/views/**/*.jade', 'bower_components/mbdev-core/src/views/*
 
 gulp.task 'build-views', ->
   gulp.src(paths.views)
-    .pipe(jade().on('error', gutil.log))
+    .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+    .pipe(jade())
     .pipe(gulp.dest('./public/partials'))
 
 gulp.task 'build-js', ->

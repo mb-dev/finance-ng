@@ -129,7 +129,7 @@ class window.LineItemCollection extends IndexedDbCollection
     if modifiedItem
       findPreviousItem().then (previousItems) ->
         if previousItems.length == 2
-          currentBalance = previousItems[1].balance
+          currentBalance = parseFloat(previousItems[1].balance)
       .then -> findRestItemsUpdateBalance()
     else
       findRestItemsUpdateBalance()

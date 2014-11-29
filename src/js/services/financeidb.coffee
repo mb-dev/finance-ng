@@ -69,11 +69,25 @@ angular.module('app.services')
         , (err) ->
           if err then reject(err) else resolve()
 
+    preloaded = {}
+    loaders = 
+      loadCategories: ->
+        tables.categories.getAllKeys().then (categories) ->
+          preloaded.categories = categories
+
+      loadPayees:  ->
+        tables.payees.getAllKeys().then (payees) ->
+          preloaded.payees = payees
+
+      loadAccounts: (db) ->
+        tables.accounts.getAll().then (accounts) ->
+          preloaded.accounts = accounts
+
     financeDbConfig = {incomeCategories: ['Income:Salary', 'Income:Dividend', 'Income:Misc']}
 
     accessFunc = {
       tables: tableNames
-      preloaded: {}
+      preloaded: preloaded
       config: ->
         financeDbConfig
       budgetItems: ->
@@ -98,4 +112,5 @@ angular.module('app.services')
         db.getTables(tableList, forceRefreshAll)
       saveTables: (tableList, forceServerCleanAndSaveAll) ->
         db.saveTables(tableList, forceServerCleanAndSaveAll)
+      loaders: loaders
     }

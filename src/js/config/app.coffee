@@ -109,9 +109,9 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/accounts/:itemId/edit', {templateUrl: '/partials/accounts/form.html', controller: 'AccountsFormController', resolve: loadIdbCollections([loadAccountId]) })
     .when('/accounts/:itemId', {templateUrl: '/partials/accounts/show.html', controller: 'AccountsShowController', resolve: loadIdbCollections([loadAccountId]) })
 
-    .when('/line_items/new', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: loadIdbCollections([loadCategories, loadPayees, loadAccounts]) })
-    .when('/line_items/:itemId/edit', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: loadIdbCollections([loadCategories, loadPayees, loadAccounts, loadLineItem]) })
-    .when('/line_items/:itemId/split', {templateUrl: '/partials/line_items/split.html', controller: 'LineItemsSplitController', resolve: loadIdbCollections([loadCategories, loadPayees, loadAccounts, loadLineItem]) })
+    .when('/line_items/new', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: loadIdbCollections([]) })
+    .when('/line_items/:itemId/edit', {templateUrl: '/partials/line_items/form.html', controller: 'LineItemsFormController', resolve: loadIdbCollections([loadLineItem]) })
+    .when('/line_items/:itemId/split', {templateUrl: '/partials/line_items/split.html', controller: 'LineItemsSplitController', resolve: loadIdbCollections([loadAccounts, loadLineItem]) })
     .when('/line_items/:itemId', {templateUrl: '/partials/line_items/show.html', controller: 'LineItemShowController', resolve: loadIdbCollections([loadLineItem]) })
     .when('/line_items/:year/:month', {templateUrl: '/partials/line_items/index.html', controller: 'LineItemsIndexController', reloadOnSearch: false, resolve: loadIdbCollections() })
     .when('/line_items/', {templateUrl: '/partials/line_items/index.html', controller: 'LineItemsIndexController', resolve: loadIdbCollections() })
