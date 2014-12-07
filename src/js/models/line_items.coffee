@@ -106,38 +106,39 @@ class window.LineItemCollection extends IndexedDbCollection
     @getItemsByAccountId(accountId, ['originalDate', 'id']).toArray()
 
   reBalance: (modifiedItem, accountId) =>
-    currentBalance = new BigNumber(0)
+    new RSVP.Promise (resolve, reject) =>
+      currentBalance = new BigNumber(0)
 
-    updateBalance = (item) =>
-      unless item.tags and item.tags.indexOf(LineItemCollection.TAG_CASH) >= 0
-        currentBalance = currentBalance.plus(helpers.$signedAmount.apply(item))
-      
-      newBalanceString = currentBalance.toFixed(2)
-      if item.balance != newBalanceString
-        item.balance = newBalanceString
-        @onEdit(item)
+      updateBalance = (item) =>
+        unless item.tags and item.tags.indexOf(LineItemCollection.TAG_CASH) >= 0
+          currentBalance = currentBalance.plus(helpers.$signedAmount.apply(item))
+        
+        newBalanceString = currentBalance.toFixed(2)
+        if item.balance != newBalanceString
+          item.balance = newBalanceString
+          @onEdit(item)
 
-      newBalanceString
+        newBalanceString
 
-    findPreviousItem = =>
-      @dba.lineItems.query('account_originalDate_id').upperBound([modifiedItem.accountId, modifiedItem.originalDate, modifiedItem.id]).desc().limit(0, 2).execute()
+      findPreviousItem = =>
+        @dba.lineItems.query('account_originalDate_id').upperBound([modifiedItem.accountId, modifiedItem.originalDate, modifiedItem.id]).desc().limit(0, 2).execute()
 
-    findRestItemsUpdateBalance = =>
-      query = @dba.lineItems.query('account_originalDate_id')
+      findRestItemsUpdateBalance = =>
+        query = @dba.lineItems.query('account_originalDate_id')
+        if modifiedItem
+          query = query.lowerBound([modifiedItem.accountId, modifiedItem.originalDate, modifiedItem.id])
+        else
+          query = query.bound([accountId, 0, 0], [accountId, Number.MAX_VALUE, Number.MAX_VALUE])
+        query.modify(balance: updateBalance)
+        .execute()
+
       if modifiedItem
-        query = query.lowerBound([modifiedItem.accountId, modifiedItem.originalDate, modifiedItem.id])
+        findPreviousItem().then (previousItems) ->
+          if previousItems.length == 2
+            currentBalance = new BigNumber(parseFloat(previousItems[1].balance))
+        .then -> findRestItemsUpdateBalance().then -> resolve()
       else
-        query = query.bound([accountId, 0, 0], [accountId, Number.MAX_VALUE, Number.MAX_VALUE])
-      query.modify(balance: updateBalance)
-      .execute()
-
-    if modifiedItem
-      findPreviousItem().then (previousItems) ->
-        if previousItems.length == 2
-          currentBalance = new BigNumber(parseFloat(previousItems[1].balance))
-      .then -> findRestItemsUpdateBalance()
-    else
-      findRestItemsUpdateBalance()
+        findRestItemsUpdateBalance().then -> resolve()
 
   cloneLineItem: (originalItem) =>
     newItem = {}
