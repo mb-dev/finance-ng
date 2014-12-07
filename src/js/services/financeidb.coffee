@@ -50,6 +50,8 @@ angular.module('app.services')
             date: {}
             'date_id': {unique: true, key: ['date', 'id']}
             'account_date_id': {unique: true, key: ['accountId', 'date', 'id']}
+            'originalDate_id': {unique: true, key: ['originalDate', 'id']}
+            'account_originalDate_id': {unique: true, key: ['accountId', 'originalDate', 'id']}
         importedLines:
           key: { keyPath: 'id' }
           indexes:

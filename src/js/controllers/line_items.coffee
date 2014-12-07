@@ -12,6 +12,7 @@ angular.module('app.controllers')
       filter.date = {month: $scope.currentDate.month(), year: $scope.currentDate.year()}
       filter.categories = $routeParams.categories.split(',') if $routeParams.categories
       filter.accountId = parseInt($routeParams.accountId, 10) if $routeParams.accountId
+      filter.sortBy = 'originalDate' if $routeParams.sortBy == 'originalDate'
       db.lineItems().getByDynamicFilter(filter).then (lineItems) -> $scope.$apply ->
         $scope.lineItems = lineItems.reverse()
         db.lineItems().addHelpers($scope.lineItems)

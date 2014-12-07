@@ -27,7 +27,8 @@ angular.module('app.controllers')
       db.accounts().getAll().then (accounts) ->
         async.each accounts, (account, callback) ->
           db.lineItems().reBalance(null, account.id).then ->
-            callback()
+            db.saveTables(['lineItems']).then ->
+              callback()
         , (err) -> $scope.$apply ->
           if err 
             $scope.msg = 'Error rebalancing'

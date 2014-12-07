@@ -58,7 +58,12 @@ class window.LineItemCollection extends IndexedDbCollection
           minDate = moment({year: filter.date.year}).startOf('year').valueOf()
           maxDate = moment({year: filter.date.year}).endOf('year').valueOf()
         
-        @dba.lineItems.query('date').bound(minDate, maxDate).execute().then (lineItems) =>
+        if filter.sortBy == 'originalDate'
+          index = 'originalDate_id'
+        else
+          index = 'date_id'
+
+        @dba.lineItems.query(index).bound([minDate, 0], [maxDate, Number.MAX_VALUE]).execute().then (lineItems) =>
           lineItems = _.filter(lineItems, (item) -> 
             if filter.categories?
               return false if filter.categories.indexOf(item.categoryName) < 0
@@ -73,7 +78,6 @@ class window.LineItemCollection extends IndexedDbCollection
               return false if item.groupedLabel != filter.groupedLabel
             true
           )
-          lineItems = @sortLazy(lineItems, sortColumns)
           resolve(lineItems)
       else
         resolve([])
@@ -102,25 +106,26 @@ class window.LineItemCollection extends IndexedDbCollection
     @getItemsByAccountId(accountId, ['originalDate', 'id']).toArray()
 
   reBalance: (modifiedItem, accountId) =>
-    currentBalance = 0
+    currentBalance = new BigNumber(0)
 
     updateBalance = (item) =>
       unless item.tags and item.tags.indexOf(LineItemCollection.TAG_CASH) >= 0
-        currentBalance += helpers.$signedAmount.apply(item)
+        currentBalance = currentBalance.plus(helpers.$signedAmount.apply(item))
       
-      if item.balance != currentBalance
-        item.balance = currentBalance
+      newBalanceString = currentBalance.toFixed(2)
+      if item.balance != newBalanceString
+        item.balance = newBalanceString
         @onEdit(item)
 
-      currentBalance
+      newBalanceString
 
     findPreviousItem = =>
-      @dba.lineItems.query('account_date_id').upperBound([modifiedItem.accountId, modifiedItem.date, modifiedItem.id]).desc().limit(0, 2).execute()
+      @dba.lineItems.query('account_originalDate_id').upperBound([modifiedItem.accountId, modifiedItem.originalDate, modifiedItem.id]).desc().limit(0, 2).execute()
 
     findRestItemsUpdateBalance = =>
-      query = @dba.lineItems.query('account_date_id')
+      query = @dba.lineItems.query('account_originalDate_id')
       if modifiedItem
-        query = query.lowerBound([modifiedItem.accountId, modifiedItem.date, modifiedItem.id])
+        query = query.lowerBound([modifiedItem.accountId, modifiedItem.originalDate, modifiedItem.id])
       else
         query = query.bound([accountId, 0, 0], [accountId, Number.MAX_VALUE, Number.MAX_VALUE])
       query.modify(balance: updateBalance)
@@ -129,7 +134,7 @@ class window.LineItemCollection extends IndexedDbCollection
     if modifiedItem
       findPreviousItem().then (previousItems) ->
         if previousItems.length == 2
-          currentBalance = parseFloat(previousItems[1].balance)
+          currentBalance = new BigNumber(parseFloat(previousItems[1].balance))
       .then -> findRestItemsUpdateBalance()
     else
       findRestItemsUpdateBalance()
