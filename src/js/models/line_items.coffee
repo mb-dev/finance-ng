@@ -82,30 +82,7 @@ class window.LineItemCollection extends IndexedDbCollection
       else
         resolve([])
 
-  getItemsByMonthYear: (month, year, sortColumns) ->
-    results = Lazy(@collection).filter((item) -> 
-      date = moment(item.date)
-      date.month() == month && date.year() == year
-    )
-    @sortLazy(results, sortColumns)
-
-  getItemsByMonthYearAndCategories: (month, year, categories, sortColumns) ->
-    results = Lazy(@collection).filter((item) -> 
-      date = moment(item.date)
-      date.month() == month && date.year() == year && categories.indexOf(item.categoryName) >= 0
-    )
-    @sortLazy(results, sortColumns)
-
-  getItemsByAccountId: (accountId, sortColumns) ->
-    results = Lazy(@collection).filter((item) -> 
-      item.accountId == accountId
-    ).map((item) -> angular.copy(item))
-    @sortLazy(results, sortColumns)
-
-  getItemsByAccountIdSorted: (accountId) =>
-    @getItemsByAccountId(accountId, ['originalDate', 'id']).toArray()
-
-  reBalance: (modifiedItem, accountId) =>
+  reBalance: (modifiedItem, accountId, deletedItem = false) =>
     new RSVP.Promise (resolve, reject) =>
       currentBalance = new BigNumber(0)
 
@@ -126,7 +103,7 @@ class window.LineItemCollection extends IndexedDbCollection
       findRestItemsUpdateBalance = =>
         query = @dba.lineItems.query('account_originalDate_id')
         if modifiedItem
-          query = query.lowerBound([modifiedItem.accountId, modifiedItem.originalDate, modifiedItem.id])
+          query = query.bound([modifiedItem.accountId, modifiedItem.originalDate, modifiedItem.id], [modifiedItem.accountId, Number.MAX_VALUE, Number.MAX_VALUE])
         else
           query = query.bound([accountId, 0, 0], [accountId, Number.MAX_VALUE, Number.MAX_VALUE])
         query.modify(balance: updateBalance)
@@ -135,7 +112,8 @@ class window.LineItemCollection extends IndexedDbCollection
       if modifiedItem
         findPreviousItem().then (previousItems) ->
           if previousItems.length == 2
-            currentBalance = new BigNumber(parseFloat(previousItems[1].balance))
+            startingIndex = if deletedItem then 0 else 1
+            currentBalance = new BigNumber(parseFloat(previousItems[startingIndex].balance))
         .then -> findRestItemsUpdateBalance().then -> resolve()
       else
         findRestItemsUpdateBalance().then -> resolve()
@@ -157,11 +135,5 @@ class window.LineItemCollection extends IndexedDbCollection
         resolve(results)
 
   deleteItemAndRebalance: (item) =>
-    items = @getItemsByAccountIdSorted(item.accountId)
-    modifiedItemIndex = Lazy(items).pluck('id').indexOf(item.id)
-    if modifiedItemIndex == 0
-      previousItem = items[1]
-    else
-      previousItem = items[modifiedItemIndex - 1]
     @deleteById(item.id)
-    @reBalance(previousItem)
+    .then => @reBalance(item, item.accountId, true)

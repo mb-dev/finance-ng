@@ -65,8 +65,9 @@ angular.module('app.controllers')
       $location.path('/line_items/' + $scope.currentDate.year().toString() + '/' + ($scope.currentDate.month()+1).toString())
     $scope.deleteItem = (item) ->
       db.lineItems().deleteItemAndRebalance(item)
-      db.saveTables([db.tables.lineItems]).then ->
-        $scope.lineItems.splice($scope.lineItems.indexOf(item), 1)
+      .then -> db.saveTables([db.tables.lineItems])
+      .then -> $scope.$apply ->
+        refresh()
 
       
     return
