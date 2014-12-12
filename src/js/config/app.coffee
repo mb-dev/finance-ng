@@ -49,11 +49,6 @@ App.config ($routeProvider, $locationProvider) ->
         defer.promise
     }
 
-  loadBudgetItemsForYear = (db, $route) ->
-    year = parseInt($route.current.params.year, 10) or moment().year()
-    db.budgetItems().getAllForYear(year).then (budgetItems) ->
-      db.preloaded.budgetItems = budgetItems
-
   loadBudgetItemId = (db, $route) ->
     itemId = parseInt($route.current.params.itemId, 10)
     db.budgetItems().findById(itemId).then (budgetItem) ->
@@ -120,10 +115,10 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/processing_rules/:itemId/edit', {templateUrl: '/partials/processing_rules/form.html'})
     .when('/processing_rules/:itemId', {templateUrl: '/partials/processing_rules/show.html'})
     
-    .when('/budgets/:year?', {templateUrl: '/partials/budgets/index.html', controller: 'BudgetsIndexController', resolve: loadIdbCollections([loadCategories, loadLineItemsByYear, loadBudgetItemsForYear, loadPlannedItemsForYear]) })
-    .when('/budgets/:year/new', {templateUrl: '/partials/budgets/form.html', controller: 'BudgetItemsFormController', resolve: loadIdbCollections([loadCategories, loadBudgetItemsForYear]) })
+    .when('/budgets/:year?', {templateUrl: '/partials/budgets/index.html', controller: 'BudgetsIndexController', resolve: loadIdbCollections([loadCategories, loadLineItemsByYear, loadPlannedItemsForYear]) })
+    .when('/budgets/:year/new', {templateUrl: '/partials/budgets/form.html', controller: 'BudgetItemsFormController', resolve: loadIdbCollections([loadCategories]) })
     .when('/budgets/:year/:itemId', {templateUrl: '/partials/budgets/show.html'})
-    .when('/budgets/:year/:itemId/edit', {templateUrl: '/partials/budgets/form.html', controller: 'BudgetItemsFormController', resolve: loadIdbCollections([loadCategories, loadBudgetItemsForYear, loadBudgetItemId]) })
+    .when('/budgets/:year/:itemId/edit', {templateUrl: '/partials/budgets/form.html', controller: 'BudgetItemsFormController', resolve: loadIdbCollections([loadCategories, loadBudgetItemId]) })
 
 
     .when('/planned_items/:year?', {templateUrl: '/partials/planned_items/index.html'})

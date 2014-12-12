@@ -81,9 +81,13 @@ angular.module('app.services')
         tables.payees.getAllKeys().then (payees) ->
           preloaded.payees = payees
 
-      loadAccounts: (db) ->
+      loadAccounts: ->
         tables.accounts.getAll().then (accounts) ->
           preloaded.accounts = accounts
+
+      loadBudgetItemsForYear: (year) ->
+        tables.budgetItems.getAllForYear(year).then (budgetItems) ->
+          preloaded.budgetItems = budgetItems
 
     financeDbConfig = {incomeCategories: ['Income:Salary', 'Income:Dividend', 'Income:Misc']}
 

@@ -1,0 +1,23 @@
+.error {{error}}
+.panel.panel-default
+  form.panel-body.form-horizontal(role='form')
+    .form-group
+      label.col-xs-4.col-sm-2.control-label Name
+      .col-xs-8.col-sm-10
+        input.form-control(type='text', placeholder='Name', ng-model='item.name')
+    .form-group
+      label.col-xs-4.col-sm-2.control-label Categories
+      .col-xs-8.col-sm-10
+        select.form-control(ng-model='item.categories', multiple='', ng-multiple="true", ng-options="value for value in categories", size=15)
+    .form-group
+      label.col-xs-4.col-sm-2.control-label Budget Year
+      .col-xs-8.col-sm-10
+        input.form-control(type='text', placeholder='Budget Year', ng-model='item.budgetYear', numbers-only)
+    .form-group
+      label.col-xs-4.col-sm-2.control-label Limit
+      .col-xs-8.col-sm-10
+        input.form-control(type='text', placeholder='Limit', ng-model='item.limit', numbers-only)
+    .form-group
+      label.col-xs-4.col-sm-2.control-label Estimated Min Monthly
+      .col-xs-8.col-sm-10
+        input.form-control(type='text', placeholder='Estimated Minimum Amount', ng-model='item.estimatedMinMonthly', numbers-only)

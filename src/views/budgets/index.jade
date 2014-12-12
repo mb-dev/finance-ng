@@ -45,8 +45,9 @@ ng-include(src="'/partials/common/finance_header.html'")
             span {{expenseRow.meta.expenses | currency}} / {{expenseRow.meta.total | currency}}
             br/ 
             span ({{expenseRow.meta.percent}})
-          td
-            a.btn.btn-primary.btn-small.edit_btn(href="/budgets/{{currentYear | amDateFormat: 'YYYY'}}/{{expenseRow.meta.budgetItemId}}/edit") Edit
+          td.actions
+            a.btn.btn-primary.btn-small.edit_btn(ng-click="editBudgetItem(expenseRow.meta.budgetItemId)") Edit
+            a.btn.b.btn-small.clone_btn(ng-click="cloneBudgetItem(expenseRow.meta.budgetItemId)") Clone
 
   .well.well-sm.row
       |Total Budgeted: {{report.totalBudgeted | currency}}
