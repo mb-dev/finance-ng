@@ -40,6 +40,7 @@ angular.module('app.controllers')
 
     $scope.createLineItem = ->
       db.preloaded.item = null
+      db.preloaded.activeDate = $scope.currentDate.valueOf()
       dialog = $modal({template: '/partials/line_items/formDialog.html', show: true})
       dialog.$scope.$on 'itemEdited', (event) ->
         refresh()
@@ -97,7 +98,7 @@ angular.module('app.controllers')
       $scope.type = 'new'
       $scope.title = 'New line item'
       # TODO: Allow defining any account as default
-      $scope.item = {type: 1, date: moment().valueOf(), tags: ['Cash'], accountId: null}
+      $scope.item = {type: 1, date: (db.preloaded.activeDate or moment().valueOf()), tags: ['Cash'], accountId: null}
       updateFunc = db.lineItems().insert
 
     $scope.onChangePayee = ->
