@@ -10,8 +10,10 @@ angular.module('app.controllers')
     applyDateChanges = ->
       filter = {}
       filter.date = {month: $scope.currentDate.month(), year: $scope.currentDate.year()}
+      filter.date.month = null if $scope.yearView
       filter.categories = $routeParams.categories.split(',') if $routeParams.categories
       filter.accountId = parseInt($routeParams.accountId, 10) if $routeParams.accountId
+      filter.groupedLabel = $routeParams.groupedLabel if $routeParams.groupedLabel
       filter.sortBy = 'originalDate' if $routeParams.sortBy == 'originalDate'
       db.lineItems().getByDynamicFilter(filter).then (lineItems) -> $scope.$apply ->
         $scope.lineItems = lineItems.reverse()
@@ -28,14 +30,12 @@ angular.module('app.controllers')
       if $routeParams.month? && $routeParams.year?
         $scope.currentDate.year(+$routeParams.year).month(+$routeParams.month - 1)
         applyDateChanges()
-      else if($routeParams.year? && $routeParams.groupedLabel?)
+      else if($routeParams.year?)
         $scope.currentDate.year(+$routeParams.year).month(0)
-        db.lineItems().getByDynamicFilter({date: {year: $scope.currentDate.year()}, groupedLabel: $routeParams.groupedLabel}).toArray().reverse()
-      else if($routeParams.year? && $routeParams.categoryName?)
-        $scope.currentDate.year(+$routeParams.year).month(0)
-        db.lineItems().getByDynamicFilter({date: {year: $scope.currentDate.year()}, categoryName: $routeParams.categoryName}).toArray().reverse()
-      else
+        $scope.yearView = true
         applyDateChanges()
+      else
+        throw new Error("missing month or year")
     refresh()
 
     $scope.createLineItem = ->

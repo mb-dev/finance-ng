@@ -51,6 +51,7 @@ class window.LineItemCollection extends IndexedDbCollection
   getByDynamicFilter: (filter, sortColumns) ->
     new RSVP.Promise (resolve, reject) =>
       if filter.date
+        console.log filter.date
         if filter.date.month? && filter.date.year?
           minDate = moment({month: filter.date.month, year: filter.date.year}).startOf('month').valueOf()
           maxDate = moment({month: filter.date.month, year: filter.date.year}).endOf('month').valueOf()
