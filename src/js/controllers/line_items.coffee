@@ -29,13 +29,10 @@ angular.module('app.controllers')
     refresh = ->
       if $routeParams.month? && $routeParams.year?
         $scope.currentDate.year(+$routeParams.year).month(+$routeParams.month - 1)
-        applyDateChanges()
       else if($routeParams.year?)
         $scope.currentDate.year(+$routeParams.year).month(0)
         $scope.yearView = true
-        applyDateChanges()
-      else
-        throw new Error("missing month or year")
+      applyDateChanges()
     refresh()
 
     $scope.createLineItem = ->

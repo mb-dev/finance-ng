@@ -130,6 +130,7 @@ angular.module('app.controllers')
       .then -> $scope.$apply ->
         $scope.flashSuccess(imported.toString() + ' items were imported successfully!')
         $location.path('/line_items')
+      .done()
 
   .controller 'MiscCategoriesController', ($scope, $routeParams, $location, db, $injector) ->
     $scope.items = db.preloaded.categories
