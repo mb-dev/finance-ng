@@ -189,7 +189,7 @@ angular.module('app.controllers')
       else
         '    Liabilities:CreditCard:Chase'
       if item.groupedLabel
-        item.allTags = '    ; :' + item.groupedLabel.replace(/[ ]/g, '-') + ':' + "\n"
+        item.allTags = '    ; :' + item.groupedLabel.replace(/[ ]/g, '-') + ':' + "\n\n"
       else
         item.allTags = "\n"
       item
