@@ -16,6 +16,7 @@ App = angular.module('app', [
   'angularMoment'
   'mgcrea.ngStrap'
   'checklist-model'
+  'nvd3'
 ])
 
 App.config ($routeProvider, $locationProvider) ->
@@ -35,7 +36,7 @@ App.config ($routeProvider, $locationProvider) ->
         defer = $q.defer()
         financeidb.loadTables().then ->
           async.each otherFunctions, (func, callback) ->
-            func(financeidb, $route).then -> 
+            func(financeidb, $route).then ->
               callback()
             , (err) ->
               console.log "Failed #{err}"
@@ -77,7 +78,7 @@ App.config ($routeProvider, $locationProvider) ->
       db.preloaded.importedLines[item.content] = true for item in importedLines
 
   loadProcessingRules = (db) ->
-    db.processingRules().getAll().then (processingRules) -> 
+    db.processingRules().getAll().then (processingRules) ->
       db.preloaded.processingRules = processingRules
 
   loadAccountId = (db, $route) ->
@@ -114,7 +115,7 @@ App.config ($routeProvider, $locationProvider) ->
     .when('/processing_rules/', {templateUrl: '/partials/processing_rules/index.html'})
     .when('/processing_rules/:itemId/edit', {templateUrl: '/partials/processing_rules/form.html'})
     .when('/processing_rules/:itemId', {templateUrl: '/partials/processing_rules/show.html'})
-    
+
     .when('/budgets/:year?', {templateUrl: '/partials/budgets/index.html', controller: 'BudgetsIndexController', resolve: loadIdbCollections([loadCategories, loadLineItemsByYear, loadPlannedItemsForYear]) })
     .when('/budgets/:year/new', {templateUrl: '/partials/budgets/form.html', controller: 'BudgetItemsFormController', resolve: loadIdbCollections([loadCategories]) })
     .when('/budgets/:year/:itemId', {templateUrl: '/partials/budgets/show.html'})
@@ -129,12 +130,12 @@ App.config ($routeProvider, $locationProvider) ->
 
     .when('/misc', {templateUrl: '/partials/misc/index.html', controller: 'MiscController', resolve: loadIdbCollections() })
     .when('/misc/import', {templateUrl: '/partials/misc/import.html', controller: 'ImportItemsController', resolve: loadIdbCollections([loadAccounts, loadCategories, loadPayees, loadImportedLines, loadProcessingRules ]) })
-    .when('/misc/categories', {templateUrl: '/partials/misc/categories.html', controller: 'MiscCategoriesController', resolve: loadIdbCollections([loadCategories]) })    
+    .when('/misc/categories', {templateUrl: '/partials/misc/categories.html', controller: 'MiscCategoriesController', resolve: loadIdbCollections([loadCategories]) })
     .when('/misc/payees', {templateUrl: '/partials/misc/payees.html', controller: 'MiscPayeesController', resolve: loadIdbCollections([loadPayees]) })
-    .when('/misc/processingRules', {templateUrl: '/partials/misc/processingRules.html', controller: 'MiscProcessingRulesController', resolve: loadIdbCollections([loadProcessingRules]) })    
-    .when('/misc/importedLines/:year/:month', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: loadIdbCollections([loadImportedLines]) })    
-    .when('/misc/importedLines/', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: loadIdbCollections([loadImportedLines]) })    
-
+    .when('/misc/processingRules', {templateUrl: '/partials/misc/processingRules.html', controller: 'MiscProcessingRulesController', resolve: loadIdbCollections([loadProcessingRules]) })
+    .when('/misc/importedLines/:year/:month', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: loadIdbCollections([loadImportedLines]) })
+    .when('/misc/importedLines/', {templateUrl: '/partials/misc/importedLines.html', controller: 'MiscImportedLinesController', resolve: loadIdbCollections([loadImportedLines]) })
+    .when('/misc/export_ledger', {templateUrl: '/partials/misc/export_ledger.html', controller: 'ExportLedger', resolve: loadIdbCollections() })
 
     .when('/login_success', template: 'Loading...', controller: 'LoginOAuthSuccessController')
     .when('/key', {templateUrl: '/partials/user/key.html', controller: 'UserKeyController', resolve:  loadIdbCollections()} )
@@ -162,14 +163,14 @@ App.run ($rootScope, $location, $injector, $timeout, $window, storageService, us
   $rootScope.loginUrl = userService.oauthUrl($rootScope.domain)
 
   storageService.setAppName($rootScope.appName, $rootScope.domain)
-  
+
   $rootScope.$on "$routeChangeError", (event, current, previous, rejection) ->
     if rejection.data.reason
       redirectOnFailure(rejection.data)
-  
+
   $rootScope.$on '$routeChangeStart', ->
     $rootScope.currentLocation = $location.path()
-    
+
     if storageService.getSuccessMsg()
       $rootScope.successMsg = storageService.getSuccessMsg()
     if storageService.getNoticeMsg()

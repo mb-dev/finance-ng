@@ -9,6 +9,13 @@ correctCase = (name) ->
 toImportString = (item) ->
   "#{item.type},#{item.amount},#{item.payeeName||''},#{item.comment || ''},#{moment(item.date).format('L')}"
 
+padTo = (str, length) ->
+  return '' unless str
+  result = str
+  result += ' ' for i in [1..(length-str.length)]
+  result
+
+
 angular.module('app.controllers')
   .controller 'MiscController', ($scope, $routeParams, $location, db, $injector) ->
     $scope.msg = ''
@@ -30,7 +37,7 @@ angular.module('app.controllers')
             db.saveTables(['lineItems']).then ->
               callback()
         , (err) -> $scope.$apply ->
-          if err 
+          if err
             $scope.msg = 'Error rebalancing'
             console.log('error', err)
           else
@@ -161,7 +168,7 @@ angular.module('app.controllers')
     $scope.importedLines = _.filter db.preloaded.importedLines, (item, index) ->
       if $routeParams.year && $routeParams.month
         try
-          parts = item.content.split(',')      
+          parts = item.content.split(',')
           dateParts = parts.pop().split('/')
           dateParts[0] == $routeParams.month && dateParts[2] == $routeParams.year
         catch
@@ -173,6 +180,30 @@ angular.module('app.controllers')
       db.importedLines().deleteById(item.id)
       .then -> db.saveTables([db.tables.importedLines]).then -> $scope.$apply ->
         $scope.importedLines.splice(index, 1)
+
+  .controller 'ExportLedger', ($scope, $routeParams, $location, db, $injector) ->
+    transformItem = (item) ->
+      item.longCategoryName = '    ' + padTo(item.categoryName, 64)
+      item.ledgerAccountName = if item.account == 1
+        '    Assets:ProvidentChecking'
+      else
+        '    Liabilities:CreditCard:Chase'
+      if item.groupedLabel
+        item.allTags = '    ; :' + item.groupedLabel.replace(/[ ]/g, '-') + ':' + "\n"
+      else
+        item.allTags = "\n"
+      item
+
+    $scope.items = []
+    $scope.cashItems = []
+    db.lineItems().getByDynamicFilter(date: {year: +$routeParams.year, month: +$routeParams.month-1}, sortBy: 'originalDate').then (lineItems) -> $scope.$apply ->
+      db.lineItems().addHelpers(lineItems)
+
+      for item in lineItems
+        if item.tags and item.tags.indexOf('Cash') >= 0
+          $scope.cashItems.push(transformItem(item))
+        else
+          $scope.items.push(transformItem(item))
 
 angular.module('app.filters')
   .filter 'notIgnored', ->

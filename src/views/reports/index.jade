@@ -5,6 +5,8 @@ ng-include(src="'/partials/common/finance_header.html'")
     span.col-xs-6.current_month {{currentYear}}
     a.col-xs-3.next_month(ng-click='nextYear()', href='#') Next &gt;&gt;
 
+  nvd3(options="options", data="data")
+
   table.table.table-striped.table-bordered.table-condensed.report_table.row
     thead
       tr

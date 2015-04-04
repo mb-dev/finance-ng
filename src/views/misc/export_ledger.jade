@@ -1,0 +1,18 @@
+ng-include(src="'/partials/common/finance_header.html'")
+
+pre(ng-repeat="item in items")
+  {{item.originalDate | amDateFormat:'YYYY/MM/DD' }} * {{item.payeeName}}
+  {{item.longCategoryName}}&#36;{{item.$signedAmount()*-1}}
+  {{item.ledgerAccountName}}
+  {{item.allTags}}
+
+pre
+  ;-----------------------------
+  ; MONTH - CASH
+  | &nbsp;
+
+pre(ng-repeat="item in cashItems")
+  {{item.originalDate | amDateFormat:'YYYY/MM/DD' }} * {{item.payeeName}}
+  {{item.longCategoryName}}&#36;{{item.$signedAmount()*-1}}
+  {{item.ledgerAccountName}}
+  {{item.allTags}}

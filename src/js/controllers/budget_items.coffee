@@ -1,13 +1,77 @@
 angular.module('app.controllers')
   .controller 'BudgetsIndexController', ($scope, $routeParams, $location, $modal, db, budgetReportService) ->
+    MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
+    getHorizontalBarCategoryAmountChart = ->
+      type: 'multiBarChart'
+      stacked: true
+      height: 600
+      xAxis:
+        axisLabel: 'Month'
+        showMaxMin: false
+        tickFormat: (d) ->
+          MONTHS[d-1]
+      yAxis:
+        axisLabel: 'Dollars'
+        axisLabelDistance: 40
+        tickFormat: (d) ->
+          d3.format('$f')(d)
+
+    getMultibarMonthAmountChart = ->
+      type: 'multiBarHorizontalChart'
+      height: 600
+      xAxis:
+        axisLabel: 'Amount'
+        showMaxMin: false
+        tickFormat: (d) ->
+          d3.format('$f')(d)
+      yAxis:
+        axisLabel: 'Category'
+        axisLabelDistance: 40
+        
+
+    generateChartDataFromReport = (report) ->
+      budgetMonthlyData = []
+      budgetSummmaryData = []
+      incomeMonthly = []
+      for column, index in report.incomeRow
+        incomeMonthly[index] ?= 0.0
+        incomeMonthly[index] += parseFloat(column.amount)
+      for expenseRow in report.expenseRows
+        sectionData = {
+          key: expenseRow.meta.name
+          values: []
+        }
+        for column, index in expenseRow.columns
+          amount = parseFloat(column.amount)
+          sectionData.values.push({x: index+1, y: amount})
+          incomeMonthly[index] -= amount
+        budgetMonthlyData.push(sectionData)
+      incomeData = {
+        key: 'Income'
+        values: []
+      }
+      for monthIncome, index in incomeMonthly
+        if monthIncome > 0
+          incomeData.values.push({x: index+1, y: monthIncome})
+        else
+          incomeData.values.push({x: index+1, y: 0})
+      budgetMonthlyData.push(incomeData)
+      {budgetMonthlyData, budgetSummmaryData}
+
     $scope.currentYear = moment().year()
     if $routeParams.year
       $scope.currentYear = parseInt($routeParams.year, 10)
     $scope.months = moment.monthsShort()
+    $scope.budgetSummaryOptions = 
+      chart: getHorizontalBarCategoryAmountChart()
+    $scope.budgetMonthlyOptions = 
+      chart: getMultibarMonthAmountChart()
     refresh = ->
       db.loaders.loadBudgetItemsForYear($scope.currentYear).then -> $scope.$apply ->
         reportGenerator = budgetReportService.getReportForYear(db, $scope.currentYear)
         $scope.report = reportGenerator.generateReport()
+        angular.extend($scope, generateChartDataFromReport($scope.report))
     refresh()
 
     $scope.nextYear = ->

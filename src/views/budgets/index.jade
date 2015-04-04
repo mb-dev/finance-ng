@@ -5,6 +5,11 @@ ng-include(src="'/partials/common/finance_header.html'")
     span.col-xs-6.current_month {{currentYear}}
     a.col-xs-3.next_month(ng-click='nextYear()', href='#') Next &gt;&gt;
   
+  a(ng-click="switchToChart('budgetSummary')") Budget Summary
+  a(ng-click="switchToChart('budgetMonthly')") Budget Monthly
+  nvd3(options="budgetSummaryOptions", data="budgetSummmaryData")
+  nvd3(options="budgetMonthlyOptions", data="budgetMonthlyData")
+
   .row.btn-toolbar
     a.btn.btn-primary(ng-href="/budgets/{{currentYear}}/new") 
       i.fa.fa-plus.fa-fw
