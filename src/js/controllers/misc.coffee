@@ -184,7 +184,7 @@ angular.module('app.controllers')
   .controller 'ExportLedger', ($scope, $routeParams, $location, db, $injector) ->
     transformItem = (item) ->
       item.longCategoryName = '    ' + padTo(item.categoryName, 64)
-      item.ledgerAccountName = if item.account == 1
+      item.ledgerAccountName = if item.accountId is 1
         '    Assets:ProvidentChecking'
       else
         '    Liabilities:CreditCard:Chase'
