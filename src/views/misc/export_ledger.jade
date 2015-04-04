@@ -13,6 +13,6 @@ pre
 
 pre(ng-repeat="item in cashItems")
   {{item.originalDate | amDateFormat:'YYYY/MM/DD' }} * {{item.payeeName}}
-  {{item.longCategoryName}}&#36;{{item.$signedAmount()*-1}}
+  {{item.longCategoryName}}&#36;{{item.$signedAmount()*-1 | currency}}
   |     Assets:Cash
   {{item.allTags}}
